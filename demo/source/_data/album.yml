@@ -1,0 +1,11 @@
+- class_name: Morii 视觉
+  path_name: /album/morii/
+  description: 主题图标与品牌示例
+  cover: /icons/brand/morii-icon.png
+  album_list:
+    - image:
+        - /icons/brand/morii-icon.png
+        - /icons/brand/morii-logo.png
+      content: Morii 品牌图标
+      from: Morii
+      date: 2026-10-15

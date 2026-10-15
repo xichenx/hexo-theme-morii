@@ -1,0 +1,24 @@
+title: Morii Theme
+author: Morii
+description: 用卡片，收藏技术与生活。
+language: zh-CN
+timezone: Asia/Shanghai
+url: https://example.test
+root: /
+permalink: posts/:title/
+pretty_urls:
+  trailing_index: false
+  trailing_html: false
+theme: morii
+per_page: 4
+index_generator:
+  per_page: 5
+archive_generator:
+  per_page: 4
+category_generator:
+  per_page: 4
+tag_generator:
+  per_page: 4
+highlight:
+  enable: true
+  line_number: true

@@ -1,0 +1,10 @@
+- class_name: 一起探索
+  class_desc: 演示数据，欢迎访问项目和 Hexo 官方网站。
+  link_list:
+    - name: Morii
+      link: https://github.com/xichenx/hexo-theme-morii
+      avatar: /icons/brand/morii-logo.png
+      descr: 主题源码、反馈与更新
+    - name: Hexo
+      link: https://hexo.io/
+      descr: 快速、简洁且高效的博客框架

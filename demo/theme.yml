@@ -1,0 +1,45 @@
+brand: Morii
+tagline: 用卡片，收藏技术与生活。
+intro: 这里是 Morii 主题的独立演示站，展示文章、卡片与音乐体验。
+avatar: /icons/brand/morii-logo.png
+footer:
+  runtime:
+    enable: false
+  filing:
+    enable: false
+social:
+  - name: GitHub
+    icon: github
+    url: https://github.com/xichenx/hexo-theme-morii
+    description: 查看 Morii 源码
+home:
+  selected_posts: []
+clock:
+  enable: false
+comments:
+  enable: false
+friends_feed:
+  endpoint: ''
+featured:
+  - title: 主题使用
+    description: 安装、配置与开始写作
+    path: /categories/主题使用/
+    icon: '◈'
+    tone: blue
+  - title: 开发笔记
+    description: 组件与交互体验
+    path: /categories/开发笔记/
+    icon: '✦'
+    tone: violet
+  - title: 即刻短文
+    description: 记录日常的小灵感
+    path: /essay/
+    icon: '☼'
+    tone: orange
+explore:
+  - name: 音乐馆
+    path: /music/
+  - name: 朋友圈
+    path: /fcircle/
+  - name: 留言板
+    path: /comments/

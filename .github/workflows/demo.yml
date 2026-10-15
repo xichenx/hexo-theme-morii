@@ -1,0 +1,61 @@
+name: Demo Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: demo-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    # Enable repository variable MORII_DEMO_PAGES=true after configuring Pages.
+    if: vars.MORII_DEMO_PAGES == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - name: Set demo URL
+        env:
+          DEMO_URL: ${{ vars.MORII_DEMO_URL }}
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const repository = process.env.GITHUB_REPOSITORY.split('/');
+          const owner = process.env.GITHUB_REPOSITORY_OWNER;
+          const defaultRoot = repository[1].toLowerCase() === `${owner.toLowerCase()}.github.io` ? '/' : `/${repository[1]}/`;
+          const url = new URL(process.env.DEMO_URL || `https://${owner}.github.io${defaultRoot}`);
+          if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash || !url.pathname.endsWith('/')) throw new Error('MORII_DEMO_URL must be an HTTPS directory URL ending in /.');
+          fs.appendFileSync(process.env.GITHUB_ENV, `MORII_DEMO_URL=${url.origin}\nMORII_DEMO_ROOT=${url.pathname}\n`);
+          NODE
+      - run: npm run build:demo
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .cache/demo/public
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy demo
+        id: deployment
+        uses: actions/deploy-pages@v4

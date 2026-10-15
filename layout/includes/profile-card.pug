@@ -1,6 +1,6 @@
 section.side-card.profile-card
   .profile-card__cover
-  img.profile-card__avatar(src=theme.avatar alt=config.author loading='lazy')
+  img.profile-card__avatar(src=url_for(theme.avatar) alt=config.author loading='lazy')
   h2= config.author
   p= config.description
   include social-links.pug
