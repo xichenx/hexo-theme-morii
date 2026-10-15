@@ -214,15 +214,27 @@
     api.subscribe(updateFloating);
     const float = hub.querySelector('.music-float');
     const ball = hub.querySelector('.music-ball');
-    const panel = hub.querySelector('#music-float-panel');
-    const expand = value => { panel.hidden = !value; ball.setAttribute('aria-expanded', String(value)); };
-    ball.addEventListener('click', () => expand(panel.hidden));
-    hub.querySelector('.music-float-close').addEventListener('click', () => { expand(false); ball.focus(); });
-    document.addEventListener('keydown', event => { if (event.key === 'Escape') expand(false); });
+    const trackButton = hub.querySelector('.music-float-track');
+    const lyric = hub.querySelector('#music-capsule-lyrics');
+    const expand = value => {
+      float.classList.toggle('is-expanded', value);
+      trackButton.setAttribute('aria-expanded', String(value));
+      lyric.setAttribute('aria-hidden', String(!value));
+    };
+    trackButton.addEventListener('click', () => expand(!float.classList.contains('is-expanded')));
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && float.contains(document.activeElement)) { expand(false); trackButton.focus(); }
+    });
+    let wasPlaying = false;
     let floatCover = '';
     api.subscribe(s => {
       const track = s.tracks[s.current];
       float.classList.toggle('is-playing', s.playing);
+      if (s.playing !== wasPlaying) { expand(s.playing); wasPlaying = s.playing; }
+      ball.setAttribute('aria-label', s.playing ? '暂停音乐' : '播放音乐');
+      hub.querySelector('.music-ball-state').textContent = s.playing ? 'Ⅱ' : '▶';
+      hub.querySelector('.music-capsule-progress').style.transform = `scaleX(${s.duration ? Math.min(1, s.time / s.duration) : 0})`;
+      trackButton.title = `${track?.title || '音乐馆'} · 点击展开或收起歌词`;
       hub.querySelectorAll('[data-music-title]').forEach(node => { node.textContent = track?.title || '未选择音乐'; });
       hub.querySelectorAll('[data-music-artist]').forEach(node => { node.textContent = track?.artist || ''; });
       hub.querySelector('[data-music-mini-lyric]').textContent = s.lyrics[s.lyricIndex]?.text || s.lyricStatus || '让音乐陪你继续探索。';

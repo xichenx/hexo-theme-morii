@@ -67,23 +67,35 @@
 .music-mobile-tabs { display: none; }
 .music-room button:focus-visible, .music-room a:focus-visible, .music-room input:focus-visible { outline: 2px solid #d4c4ff; outline-offset: 4px; }
 #morii-audio-hub > audio { display: none; }
-.music-float { position: fixed; z-index: 1100; bottom: 24px; left: 24px; color: var(--ink); }
-.music-ball { position: relative; display: grid; place-items: center; width: 56px; height: 56px; padding: 0; border: 3px solid var(--surface); border-radius: 50%; background: var(--accent); color: white; box-shadow: 0 4px 25px #26233b30; cursor: pointer; }
-.music-ball-cover { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: inherit; object-fit: cover; animation: music-record-turn 16s linear infinite; animation-play-state: paused; }
+.music-float { position: fixed; z-index: 1100; bottom: 20px; left: 20px; max-width: calc(100vw - 40px); color: var(--ink); }
+.music-capsule { position: relative; isolation: isolate; display: flex; align-items: center; height: 42px; max-width: 100%; padding: 0 6px; overflow: hidden; border: 1px solid var(--line); border-radius: 40px; background: var(--surface); box-shadow: 0 4px 16px #26233b18; transition: background .3s, color .3s, border-color .3s; }
+.music-float.is-playing .music-capsule { color: white; border-color: var(--accent); background: var(--accent); animation: music-capsule-glow 5s ease-in-out infinite; }
+.music-capsule-progress { position: absolute; z-index: -1; inset: 0; background: #ffffff2e; transform: scaleX(0); transform-origin: left; pointer-events: none; transition: transform .25s linear; }
+.music-ball { position: relative; display: grid; place-items: center; flex: 0 0 28px; width: 28px; height: 28px; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: var(--accent-soft); color: var(--accent); cursor: pointer; }
+.music-ball-cover { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: inherit; object-fit: cover; animation: music-record-turn 24s linear infinite; animation-play-state: paused; }
+.music-float.is-playing .music-ball { border-color: #ffffffa6; box-shadow: 0 0 10px #ffffff4d; }
 .music-float.is-playing .music-ball-cover { animation-play-state: running; }
-.music-ball-note { font-size: 24px; }
-.music-ball-state { position: absolute; right: -3px; bottom: -1px; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--surface); background: var(--accent); color: white; font-size: 9px; }
-.music-float.is-playing .music-ball-state { font-size: 0; }
-.music-float.is-playing .music-ball-state::after { content: 'Ⅱ'; font-size: 10px; }
-#music-float-panel { position: absolute; left: 0; bottom: 70px; width: min(300px, calc(100vw - 40px)); padding: 20px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); box-shadow: 0 15px 50px #27233825; }
-#music-float-panel > strong { display: block; padding-right: 4px; font-size: 15px; line-height: 1.6; overflow-wrap: anywhere; }
-#music-float-panel > span { display: block; margin-top: 5px; font-size: 11px; color: var(--muted); }
-#music-float-panel > p { color: var(--muted); font-size: 12px; line-height: 1.7; }
-.music-float-actions { display: flex; align-items: center; gap: 14px; }
-.music-float-actions button { border: 0; background: var(--surface-2); color: var(--ink); border-radius: 50%; width: 32px; height: 32px; cursor: pointer; }
-.music-float-actions a { margin-left: auto; color: var(--accent); font-size: 11px; }
-.music-float-close { border: 0; padding: 0; background: transparent; color: var(--muted); font-size: 11px; cursor: pointer; }
-.music-float-status { font-size: 10px !important; }
+.music-ball-note { font-size: 14px; }
+.music-ball-state { position: absolute; inset: 0; display: grid; place-items: center; border-radius: inherit; background: #15132665; color: white; font-size: 10px; opacity: 0; transition: opacity .2s; }
+.music-ball:hover .music-ball-state, .music-ball:focus-visible .music-ball-state { opacity: 1; }
+.music-float-track { flex: 0 1 auto; min-width: 0; max-width: 140px; height: 40px; padding: 0 12px 0 8px; border: 0; background: none; color: inherit; cursor: pointer; font: inherit; text-align: left; }
+.music-float-track span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+#music-capsule-lyrics { flex-shrink: 1; width: 0; min-width: 0; margin: 0; overflow: hidden; color: inherit; font-size: 12px; line-height: 40px; white-space: nowrap; text-overflow: ellipsis; transition: width .3s, margin .3s, opacity .3s; opacity: 0; }
+.music-float.is-expanded #music-capsule-lyrics { width: 200px; margin: 0 8px; opacity: .92; }
+.music-float-actions { display: flex; flex-shrink: 0; align-items: center; gap: 3px; width: 0; overflow: hidden; opacity: 0; transition: width .3s, opacity .3s; }
+.music-float.is-expanded .music-float-actions, .music-float:hover .music-float-actions, .music-float:focus-within .music-float-actions { width: 80px; opacity: 1; }
+.music-float-actions button, .music-float-actions a { display: grid; place-items: center; flex-shrink: 0; width: 24px; height: 28px; padding: 0; border: 0; border-radius: 7px; background: none; color: inherit; font-size: 13px; cursor: pointer; }
+.music-float-actions button:disabled { opacity: .35; cursor: default; }
+.music-float-actions button:hover:not(:disabled), .music-float-actions a:hover { background: #ffffff26; }
+.music-float-resume { position: absolute; z-index: 2; inset: 0; display: none; align-items: center; justify-content: center; border: 0; border-radius: inherit; background: var(--accent); color: white; font: inherit; font-size: 12px; cursor: pointer; }
+.music-float button:focus-visible, .music-float a:focus-visible { outline: 2px solid currentColor; outline-offset: -3px; }
+@media (hover: hover) {
+  .music-float:not(.is-playing):hover:not(:focus-within) .music-float-resume { display: flex; }
+}
+@keyframes music-capsule-glow {
+  0%, 100% { box-shadow: 0 0 12px -4px color-mix(in srgb, var(--accent) 15%, transparent); }
+  50% { box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 55%, transparent); }
+}
 .music-shell-active { overflow: hidden; }
 .music-shell-active > :not(#morii-audio-hub):not(#morii-site-frame):not(script):not(style):not(link) { display: none !important; }
 #morii-site-frame { position: fixed; z-index: 1000; inset: 0; width: 100%; height: 100dvh; border: 0; background: var(--bg); }
@@ -121,10 +133,14 @@
   .music-control-bar { margin-top: 12px; padding-top: 12px; }
   .music-transport { gap: 20px; }
   .music-volume { width: 44px; }
-  .music-float { bottom: 20px; left: 16px; }
+  .music-float { bottom: 20px; left: 16px; max-width: calc(100vw - 32px); }
+  .music-float-track { max-width: 112px; }
+  .music-float.is-expanded #music-capsule-lyrics { width: min(150px, calc(100vw - 245px)); margin: 0 4px; }
+  .music-float.is-expanded .music-float-track { max-width: 96px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .music-album img, .music-ball-cover { animation: none; }
+  .music-album img, .music-ball-cover, .music-float.is-playing .music-capsule { animation: none; }
+  .music-capsule, #music-capsule-lyrics, .music-float-actions, .music-capsule-progress { transition: none; }
   .music-lyrics { scroll-behavior: auto; }
   .music-lyric-line { transition: none; }
 }

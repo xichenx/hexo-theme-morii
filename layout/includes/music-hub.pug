@@ -1,19 +1,19 @@
 - var globalMusic = morii_music()
 #morii-audio-hub(data-music-config=JSON.stringify(globalMusic) data-music-page=url_for('/music/'))
   audio#music-player(preload='none' aria-label='音乐播放器')
-  .music-float(hidden)
-    button.music-ball(type='button' aria-label='展开音乐播放器' aria-expanded='false' aria-controls='music-float-panel')
-      img.music-ball-cover(alt='' hidden)
-      span.music-ball-note(aria-hidden='true') ♫
-      span.music-ball-state(aria-hidden='true') ▶
-    section#music-float-panel(hidden aria-label='悬浮音乐播放器')
-      strong(data-music-title) 未选择音乐
-      span(data-music-artist)
-      p(data-music-mini-lyric) 让音乐陪你继续探索。
+  .music-float(hidden aria-label='悬浮音乐播放器')
+    .music-capsule
+      span.music-capsule-progress(aria-hidden='true')
+      button.music-ball(type='button' data-music-action='toggle' aria-label='播放音乐')
+        img.music-ball-cover(alt='' hidden)
+        span.music-ball-note(aria-hidden='true') ♫
+        span.music-ball-state(aria-hidden='true') ▶
+      button.music-float-track(type='button' aria-expanded='false' aria-controls='music-capsule-lyrics' title='点击歌名展开或收起歌词')
+        span(data-music-title) 未选择音乐
+      p#music-capsule-lyrics(data-music-mini-lyric aria-hidden='true') 让音乐陪你继续探索。
       .music-float-actions
         button(type='button' data-music-action='previous' aria-label='上一首') ⏮
-        button(type='button' data-music-action='toggle' aria-label='播放' data-music-toggle) ▶
         button(type='button' data-music-action='next' aria-label='下一首') ⏭
-        a(href=url_for('/music/')) 打开音乐馆 ↗
-      p.music-float-status(data-music-status role='status')
-      button.music-float-close(type='button' aria-label='收起音乐播放器') 收起
+        a(href=url_for('/music/') aria-label='打开音乐馆' title='打开完整音乐馆') ♫
+      button.music-float-resume(type='button' data-music-action='toggle') 播放音乐
+    p.sr-only(data-music-status role='status')
