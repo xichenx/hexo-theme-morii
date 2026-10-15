@@ -1,0 +1,7 @@
+- var outdatedNotice = morii_outdated_notice(page)
+if outdatedNotice
+  aside.outdated-notice(data-updated=outdatedNotice.updated data-days-limit=outdatedNotice.limit hidden=outdatedNotice.days <= outdatedNotice.limit aria-label='文章时效提醒')
+    span.outdated-notice__icon(aria-hidden='true') ◷
+    div
+      strong 阅读提示
+      p 距离上次更新已过去 #[span(data-outdated-days)=outdatedNotice.days] 天，文中的版本、链接与操作方式可能已变化，请结合当前环境核对。

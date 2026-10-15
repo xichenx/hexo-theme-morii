@@ -1,0 +1,9 @@
+section.side-card.profile-card
+  .profile-card__cover
+  img.profile-card__avatar(src=theme.avatar alt=config.author loading='lazy')
+  h2= config.author
+  p= config.description
+  include social-links.pug
+  .profile-card__links
+    a(href=url_for('/about/')) 认识我
+    a(href=url_for('/link/')) 友情链接

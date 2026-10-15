@@ -1,0 +1,40 @@
+- var moments = theme.home && theme.home.moments && theme.home.moments.enable === false ? [] : morii_home_moments(site.data.essay)
+- var discoveryPosts = theme.home && theme.home.random && theme.home.random.enable === false ? [] : morii_discovery_posts(site.posts)
+if moments.length || discoveryPosts.length
+  section.wrap.home-discovery(aria-label='发现更多内容')
+    if moments.length
+      section.discovery-card.moments-card(data-moments)
+        .discovery-heading
+          div
+            span.section-kicker LITTLE MOMENTS
+            h2 即刻速览
+          a.text-link(href=url_for('/essay/')) 全部即刻 →
+        .moments-list
+          each moment, index in moments
+            a.moment-item(href=url_for(moment.path) hidden=index !== 0)
+              p= moment.content
+              if moment.date
+                time(datetime=date_xml(moment.date))= date(moment.date, 'YYYY.MM.DD')
+        if moments.length > 1
+          .discovery-controls(hidden data-moment-controls)
+            button.icon-button(type='button' data-moment-prev aria-label='上一条即刻') ←
+            span(data-moment-count role='status' aria-live='polite') 1 / #{moments.length}
+            button.icon-button(type='button' data-moment-next aria-label='下一条即刻') →
+    if discoveryPosts.length
+      - var initialPost = discoveryPosts[0]
+      section.discovery-card.random-card(data-random)
+        .discovery-heading
+          div
+            span.section-kicker TAKE A CHANCE
+            h2 随便逛逛
+          span.random-card__icon(aria-hidden='true') ✦
+        a.random-result(href=url_for(initialPost.path) data-random-link)
+          strong(data-random-title)= initialPost.title
+          p(data-random-summary)= morii_excerpt(initialPost, 85)
+          span 阅读这篇文章 ↗
+        if discoveryPosts.length > 1
+          button.random-refresh(type='button' data-random-refresh hidden) 换一篇 ↻
+        span.sr-only(data-random-status role='status' aria-live='polite')
+        template(data-random-pool)
+          each post in discoveryPosts
+            a(href=url_for(post.path) data-title=post.title data-summary=morii_excerpt(post, 85))

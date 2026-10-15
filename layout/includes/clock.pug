@@ -1,0 +1,24 @@
+- var clock = morii_clock()
+if clock.enable
+  section.side-card.weather-clock(data-weather-clock data-timezone=clock.timezone data-weather-url=clock.endpoint aria-label='时钟与天气 · ' + clock.city)
+    .weather-clock__top
+      span(data-clock-date) ----.--.--
+      span.weather-clock__weather #[span(data-weather-icon aria-hidden='true') ☁] #[span(data-weather-condition) 天气] #[span(data-weather-temperature) —] °C
+      span.weather-clock__humidity 💧#[span(data-weather-humidity) —]%
+    time.weather-clock__time(data-clock-time aria-label='当前时间' aria-live='off')
+      each position in [0, 1, 2, 3, 4, 5]
+        if position === 2 || position === 4
+          span.clock-colon(aria-hidden='true')
+        span.clock-digit(data-clock-digit='0' aria-hidden='true')
+          each segment in ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+            i(class='clock-segment clock-segment--' + segment)
+    .weather-clock__bottom
+      span(data-weather-wind) 风向 —
+      strong= clock.city
+      span(data-clock-period) AM
+    .weather-clock__footer
+      span(data-weather-status role='status') 正在获取天气…
+      button(type='button' data-weather-refresh aria-label='刷新天气' title='刷新天气') ↻
+    a.weather-clock__credit(href='https://open-meteo.com/' target='_blank' rel='noopener noreferrer') 天气数据：Open-Meteo
+    noscript
+      p 开启 JavaScript 后显示时钟与天气。

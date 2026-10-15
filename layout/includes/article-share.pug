@@ -1,0 +1,12 @@
+dialog.article-share-dialog#article-share-dialog(aria-labelledby='article-share-heading')
+  .article-share-top
+    h2#article-share-heading 分享这篇文章
+    button.icon-button#article-share-close(type='button' aria-label='关闭文章分享') ×
+  p.article-share-title#article-share-title
+  label(for='article-share-content') 复制内容
+  textarea#article-share-content(rows='3' readonly spellcheck='false')
+  .article-share-actions
+    button.button.service-button#article-share-copy(type='button') 复制链接
+    button.button.service-button#article-share-markdown(type='button') 复制 Markdown
+    button.button.service-button#article-share-native(type='button' hidden) 系统分享 ↗
+  p.article-share-status#article-share-status(role='status' aria-live='polite')

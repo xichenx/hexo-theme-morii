@@ -1,0 +1,7 @@
+if theme.comments && theme.comments.enable && theme.comments.provider === 'twikoo' && page.comments !== false
+  section.comments-card(class=is_post() ? '' : 'page-comments' aria-labelledby='comments-heading')
+    h2#comments-heading 留下你的想法
+    #comment-service(data-env=theme.comments.env_id data-script='https://cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js' aria-busy='false')
+      p.comment-status(role='status') 与路过的朋友聊聊这篇内容。
+      button.button.service-button#comments-load(type='button') 加载评论
+      #twikoo

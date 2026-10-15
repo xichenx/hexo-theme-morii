@@ -1,0 +1,17 @@
+- var albums = morii_albums(site.data.album)
+if albums.length
+  .album-grid
+    each album in albums
+      a.album-card(href=url_for(album.path) data-image-fallback)
+        if album.cover
+          img(src=url_for(album.cover) alt=album.title loading='lazy')
+        .album-card__caption
+          span #{album.photos.length} 张照片
+          strong= album.title
+          small= album.description
+else
+  .empty-panel.panel
+    span.empty-panel__icon(aria-hidden='true') ◇
+    h2 相册正在慢慢收集
+    p 把值得记住的瞬间，留到这里。
+    a.text-link(href=url_for('/essay/')) 先看看即刻短文 →

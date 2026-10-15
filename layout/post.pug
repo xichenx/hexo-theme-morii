@@ -1,0 +1,67 @@
+extends includes/layout.pug
+
+block content
+  - var articleCover = page.top_img === false ? null : page.top_img || page.cover
+  header.article-header.post-hero(class=articleCover ? 'has-cover' : '')
+    if articleCover
+      img.article-cover(src=url_for(articleCover) alt='' aria-hidden='true' fetchpriority='high')
+    .post-hero-inner
+      .article-kicker
+        a.article-type(href=url_for('/archives/')) 文章
+        if page.categories && page.categories.length
+          each category in page.categories.toArray()
+            a(href=url_for(category.path))= category.name
+        if page.tags && page.tags.length
+          each tag in page.tags.toArray().slice(0, 3)
+            a.article-hero-tag(href=url_for(tag.path)) # #{tag.name}
+      h1= page.title
+      if page.description && !page.password
+        p.article-description= page.description
+      .article-meta
+        span 发布于 #[time(datetime=date_xml(page.date))=date(page.date, 'YYYY-MM-DD')]
+        span 更新于 #[time(datetime=date_xml(page.updated || page.date))=date(page.updated || page.date, 'YYYY-MM-DD')]
+        if morii_reading_time(page)
+          span= morii_reading_time(page)
+  .wrap.reading-layout
+    article.article-card
+      .article-toolbar
+        if !theme.reading_list || theme.reading_list.enable !== false
+          .article-save-tools
+            button.reading-preference-button(type='button' data-save-post=url_for(page.path) aria-pressed='false' hidden) 加入稍后阅读 ☆
+            a.text-link(href=url_for('/reading-list/')) 查看清单 →
+          p#reading-list-message(role='status' aria-live='polite')
+        include includes/reading-settings.pug
+      include includes/outdated-notice.pug
+      details.mobile-toc
+        summary 本文目录
+        include includes/toc.pug
+      .article-body(data-code-collapse=(!theme.article || !theme.article.code || theme.article.code.collapse !== false) ? 'true' : 'false' data-code-lines=(theme.article && theme.article.code && theme.article.code.lines) || 18)!= page.content
+      if page.tags && page.tags.length
+        .article-tags
+          each tag in page.tags.toArray()
+            a(href=url_for(tag.path)) # #{tag.name}
+      .article-end
+        span ✦
+        p 感谢读到这里
+      .article-tools
+        if !theme.article || !theme.article.share || theme.article.share.enable !== false
+          button.button.service-button(type='button' data-share-article aria-haspopup='dialog' aria-controls='article-share-dialog' hidden) 分享文章 ↗
+        button.button.service-button#copy-article-link(type='button') 复制文章链接 ↗
+        if !theme.article || !theme.article.print || theme.article.print.enable !== false
+          button.button.service-button(type='button' data-preview-print hidden) 打印 / 导出 PDF
+      if !theme.article || !theme.article.print || theme.article.print.enable !== false
+        .print-source
+          p #{config.title} · #{config.author}
+          p 原文：#[a(href=full_url_for((page.path || '').replace(/index\.html$/, '')))=full_url_for((page.path || '').replace(/index\.html$/, ''))]
+      include includes/article-discovery.pug
+      include includes/comments.pug
+    aside.reading-aside
+      include includes/profile-card.pug
+      .reading-aside-sticky
+        .side-card.toc-card
+          .reading-toc-heading
+            h2 本文目录
+            span(data-reading-percent aria-hidden='true') 0%
+          nav(aria-label='文章章节')
+            include includes/toc.pug
+        include includes/clock.pug

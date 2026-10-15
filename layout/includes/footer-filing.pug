@@ -1,0 +1,13 @@
+- var filings = morii_filings()
+if filings.length
+  .footer-filing(aria-label='网站备案信息')
+    each filing in filings
+      if filing.url
+        a.footer-filing__item(href=filing.url target='_blank' rel='noopener noreferrer' aria-label=filing.label + '：' + filing.number)
+          span.footer-filing__badge(aria-hidden='true')= filing.type === 'icp' ? '备' : '安'
+          span= filing.number
+          span.footer-filing__arrow(aria-hidden='true') ↗
+      else
+        span.footer-filing__item(aria-label=filing.label + '：' + filing.number)
+          span.footer-filing__badge(aria-hidden='true')= filing.type === 'icp' ? '备' : '安'
+          span= filing.number

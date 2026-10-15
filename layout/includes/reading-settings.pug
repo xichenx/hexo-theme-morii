@@ -1,0 +1,16 @@
+if !theme.article || theme.article.reading_settings !== false
+  details.reading-settings(hidden)
+    summary 阅读设置
+    .reading-settings__panel
+      .reading-settings__row
+        span 正文字号
+        .reading-font-controls(role='group' aria-label='正文字号')
+          button.reading-preference-button#reading-font-smaller(type='button' aria-label='缩小正文字号') A−
+          output#reading-font-value(aria-live='polite') 17 px
+          button.reading-preference-button#reading-font-larger(type='button' aria-label='放大正文字号') A＋
+      .reading-settings__row
+        button.reading-preference-button#reading-focus-toggle(type='button' aria-pressed='false') 专注阅读
+        button.reading-preference-button#reading-settings-reset(type='button') 恢复默认
+      p#reading-settings-status(role='status' aria-live='polite') 设置仅保存在当前浏览器。
+      if !theme.article || !theme.article.print || theme.article.print.enable !== false
+        button.reading-preference-button(type='button' data-preview-print hidden) 打印 / 导出 PDF

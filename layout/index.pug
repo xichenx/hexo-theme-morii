@@ -1,0 +1,65 @@
+extends includes/layout.pug
+include includes/mixins.pug
+
+block content
+  - var firstPage = !page.current || page.current === 1
+  if firstPage
+    section.hero.wrap
+      .hero__main
+        .eyebrow #[span.eyebrow__dot] 个人博客 · 技术与生活
+        h1
+          = theme.hero && theme.hero.title ? theme.hero.title[0] : '生活明朗'
+          br
+          em= theme.hero && theme.hero.title ? theme.hero.title[1] : '万物可爱。'
+        p= theme.intro
+        .hero__actions
+          a.button.button--primary(href='#latest') 浏览文章 #[span →]
+          a.button.button--ghost(href=url_for('/about/')) 关于我
+        .hero__signature= theme.brand || config.title
+      .hero__side
+        .hero-mini.hero-mini--quote
+          span.mini-label ✦ 随手记
+          strong= theme.hero && theme.hero.note || '把热爱写进日常，把好奇带向远方。'
+          a(href=url_for('/essay/')) 看看即刻 #[span →]
+        .hero-mini.hero-mini--stats
+          span.mini-label ◉ 博客手账
+          .stats-grid
+            div #[strong=site.posts.length] #[span 篇文章]
+            div #[strong=site.categories.length] #[span 个分类]
+    section.wrap.section-block
+      .section-heading
+        div
+          span.section-kicker EXPLORE
+          h2 从这里开始
+        p 选择感兴趣的方向，慢慢逛。
+      .feature-grid
+        each item in theme.featured
+          a.feature-card(href=url_for(item.path) class='feature-card--' + item.tone)
+            span.feature-card__icon= item.icon
+            span.feature-card__arrow ↗
+            strong= item.title
+            small= item.description
+    include includes/selected-posts.pug
+    include includes/home-discovery.pug
+  else
+    .wrap.listing-page
+      .page-intro
+        span.section-kicker KEEP EXPLORING
+        h1 文章 · 第 #{page.current} 页
+        p 翻开下一页，继续发现技术与日常。
+  .wrap.content-grid#latest
+    section.posts-column
+      .section-heading.section-heading--posts
+        div
+          span.section-kicker LATEST STORIES
+          h2= firstPage ? '最新文章' : '继续阅读'
+        a.text-link(href=url_for('/archives/')) 全部文章 →
+      include includes/category-nav.pug
+      if page.posts && page.posts.length
+        .post-grid
+          each post, index in page.posts.toArray()
+            +postCard(post, index === 0 || (page.posts.length % 2 === 0 && index === page.posts.length - 1))
+      else
+        p.empty-state 还没有文章，稍后再来看看。
+      include includes/pagination.pug
+    include includes/sidebar.pug

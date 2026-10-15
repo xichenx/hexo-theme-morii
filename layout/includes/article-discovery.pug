@@ -1,0 +1,25 @@
+if !theme.article || theme.article.navigation !== false
+  if page.prev || page.next
+    nav.article-navigation(aria-label='相邻文章')
+      if page.prev
+        a.article-navigation__item(href=url_for(page.prev.path) rel='prev')
+          span ← 上一篇
+          strong= page.prev.title
+      if page.next
+        a.article-navigation__item(href=url_for(page.next.path) rel='next')
+          span 下一篇 →
+          strong= page.next.title
+- var relatedPosts = morii_related_posts(page, site.posts)
+if relatedPosts.length
+  section.related-section(aria-labelledby='related-heading')
+    .section-heading
+      div
+        span.section-kicker KEEP EXPLORING
+        h2#related-heading 你可能还想读
+    .related-grid
+      each item in relatedPosts
+        a.related-card(href=url_for(item.post.path))
+          span.related-card__reason= item.reason
+          h3= item.post.title
+          p= morii_excerpt(item.post, 76)
+          span.related-card__date #{date(item.post.date, 'YYYY.MM.DD')} · 阅读文章 ↗

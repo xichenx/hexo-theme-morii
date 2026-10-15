@@ -1,0 +1,76 @@
+extends includes/layout.pug
+
+block content
+  .wrap.listing-page
+    .page-intro(class=page.type === 'link' ? 'friends-intro' : page.type === 'music' ? 'music-page-heading' : '')
+      - var pageKickers = { about: 'ABOUT', link: 'FRIENDS', essay: 'MOMENTS', album: 'ALBUMS', album_detail: 'PHOTO JOURNAL', fcircle: 'FRIENDS FEED', music: 'MUSIC', categories: 'TOPICS', tags: 'TAGS' }
+      span.section-kicker= pageKickers[page.type] || 'EXPLORE'
+      h1= morii_page_title(page)
+      if page.description
+        p= page.description
+      else if page.type === 'link'
+        p 以文字相识，在彼此的小站里，发现更大的世界。
+      if page.type === 'link'
+        - var introGroups = morii_friend_groups(site.data.link)
+        .friends-intro-meta
+          span #{introGroups.reduce(function(total, group) { return total + group.friends.length }, 0)} 条友链
+          span #{introGroups.length} 个分组
+          a(href='#friend-connect') 交换友链 ↗
+    case page.type
+      when 'about'
+        include includes/page/about.pug
+      when 'link'
+        include includes/page/links.pug
+      when 'essay'
+        if site.data.essay
+          each group, groupIndex in site.data.essay
+            .essay-grid
+              each note, noteIndex in (group.essay_list || []).slice(0, group.limit || 100)
+                article.essay-card.panel(id='moment-' + (groupIndex + 1) + '-' + (noteIndex + 1))
+                  .essay-card__top #[span ✦ 即刻] #[time=note.date]
+                  p= note.content
+                  if note.image && note.image.length
+                    .essay-images
+                      each img in note.image.slice(0, 3)
+                        a(href=img target='_blank' rel='noopener noreferrer')
+                          img(src=img alt='短文配图' loading='lazy')
+                  if note.link
+                    a.text-link(href=note.link) 查看链接 →
+                  if note.video && note.video.length
+                    .essay-videos
+                      each video in note.video
+                        if morii_safe_url(video) && video.startsWith('https://player.bilibili.com/')
+                          iframe(src=video title=note.content loading='lazy' allowfullscreen referrerpolicy='no-referrer')
+                        else if morii_safe_url(video)
+                          video(controls preload='none' src=video aria-label=note.content)
+      when 'album'
+        include includes/page/albums.pug
+      when 'album_detail'
+        include includes/page/album-detail.pug
+      when 'categories'
+        .taxonomy-grid
+          each category in site.categories.toArray()
+            a.taxonomy-card(href=url_for(category.path))
+              strong= category.name
+              span #{category.posts.length} 篇文章 →
+      when 'tags'
+        .pill-cloud.taxonomy-tags
+          each tag in site.tags.toArray()
+            a(href=url_for(tag.path)) # #{tag.name} #[small=tag.posts.length]
+      when 'fcircle'
+        include includes/page/friends.pug
+      when 'music'
+        include includes/page/music-room.pug
+      default
+        if page.path && page.path.startsWith('air-conditioner/')
+          include includes/page/air-conditioner.pug
+        else if page.path && page.path.startsWith('game/')
+          .taxonomy-grid
+            each game in [{name:'魔方', path:'/game/mf/'}, {name:'扫雷', path:'/game/sl/'}, {name:'2048', path:'/game/2048/'}, {name:'五子棋', path:'/game/wzq/'}, {name:'推箱子', path:'/game/txz/'}]
+              a.taxonomy-card(href=url_for(game.path))
+                strong= game.name
+                span 开始游戏 →
+        else if page.content
+          .page-prose.panel!= page.content
+    if page.type !== 'music' && page.type !== 'categories' && page.type !== 'tags'
+      include includes/comments.pug

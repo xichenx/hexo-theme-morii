@@ -1,0 +1,39 @@
+section.ac-page(data-powered='off' data-mode='cool' data-swing='off' aria-label='网页小空调')
+  .ac-scene.panel
+    span.section-kicker A LITTLE COMFORT
+    h2 给日常一点舒适
+    p.ac-intro 这一刻，把心情调到喜欢的温度。
+    .ac-device(aria-hidden='true')
+      .ac-device__top
+        span= theme.brand || config.title
+        span.ac-device__indicator
+      .ac-device__screen
+        span#ac-device-mode ❄
+        span#ac-device-temperature —
+        small °C
+      .ac-device__vent
+        each blade in [1, 2, 3, 4, 5, 6]
+          span
+    .ac-airflow(aria-hidden='true')
+      span
+      span
+      span
+    span.ac-simulation 网页小玩具 · 舒适由你设定
+  .ac-remote.panel
+    .side-card__heading
+      h2 遥控器
+      span ◌
+    p#ac-status(role='status' aria-live='polite') 空调已关闭
+    button.button.service-button#ac-power(type='button' aria-pressed='false') 开启空调
+    .ac-temperature-control
+      button.icon-button#ac-decrease(type='button' aria-label='降低温度' disabled) −
+      .ac-temperature-output
+        output#ac-temperature(aria-label='设定温度') 26
+        span °C
+      button.icon-button#ac-increase(type='button' aria-label='升高温度' disabled) +
+    fieldset.ac-modes
+      legend 运行模式
+      button.button.service-button(type='button' data-ac-mode='cool' aria-pressed='true' disabled) ❄ 制冷
+      button.button.service-button(type='button' data-ac-mode='heat' aria-pressed='false' disabled) ☀ 制热
+    button.button.service-button#ac-swing(type='button' aria-pressed='false' disabled) 开启摆风
+    p.ac-hint 可调温度 16–30°C

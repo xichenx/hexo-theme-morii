@@ -1,0 +1,8 @@
+if is_post() && (!theme.article || !theme.article.print || theme.article.print.enable !== false)
+  section.print-toolbar#article-print-toolbar(hidden aria-label='打印预览操作')
+    div
+      strong 打印预览
+      p#print-status(role='status') 代码与折叠内容已展开。在打印窗口中可选择“另存为 PDF”。
+    .print-toolbar__actions
+      button.reading-preference-button#print-article(type='button') 打印 / 保存 PDF
+      button.reading-preference-button#exit-print-preview(type='button') 返回阅读

@@ -1,0 +1,73 @@
+- var profile = morii_about(site.data.about)
+.about-grid.about-grid--personal
+  .about-lead.panel
+    .about-introduction
+      span.section-kicker HELLO THERE
+      h2= profile.name || config.author
+      p= profile.description || theme.intro || config.description
+      a.about-introduction__link(href=url_for('/archives/')) 来看看我的笔记 →
+      include ../social-links.pug
+    .about-avatar(data-image-fallback)
+      span(aria-hidden='true')= (profile.name || config.author || '我').slice(0, 1)
+      if profile.avatar || theme.avatar
+        img(src=url_for(profile.avatar || theme.avatar) alt=profile.name || config.author)
+  .about-motto.panel
+    span.section-kicker MY MOTTO
+    h2= profile.motto || theme.tagline
+    p= profile.subtitle || theme.intro
+  .about-stats.panel
+    span.section-kicker A LITTLE JOURNAL
+    h2 每一篇，都是记录
+    .about-stat-grid
+      a(href=url_for('/archives/'))
+        strong= site.posts.length
+        span 篇文章
+      a(href=url_for('/categories/'))
+        strong= site.categories.length
+        span 个主题
+      a(href=url_for('/album/'))
+        strong= morii_albums(site.data.album).length
+        span 本相册
+  .about-topics.panel
+    span.section-kicker TOPICS I WRITE ABOUT
+    h2 正在记录的主题
+    if site.categories.length
+      .pill-cloud
+        each category in morii_categories(site.categories, 8)
+          a(href=url_for(category.path))= category.name
+    else
+      p 思考与日常，都会慢慢收进这里。
+  if profile.skills.length
+    .about-skills.panel
+      span.section-kicker SOMETHING ABOUT ME
+      h2 一些关于我的事
+      .pill-cloud
+        each skill in profile.skills
+          span= skill
+  if profile.careers.length
+    .about-career.panel
+      span.section-kicker MY JOURNEY
+      h2 一路走来
+      ol.about-journey
+        each career in profile.careers
+          li= career
+  if theme.about && theme.about.show_interests && (profile.music || profile.interest)
+    .about-interests.panel
+      span.section-kicker BEYOND THE SCREEN
+      h2 屏幕之外
+      if profile.music
+        a.about-interest(href=url_for('/music/'))
+          span(aria-hidden='true') ♫
+          div
+            strong 听点音乐
+            small= profile.music
+          span(aria-hidden='true') ↗
+      if profile.interest
+        .about-interest
+          span(aria-hidden='true') ◈
+          div
+            strong= profile.interest
+            if profile.interestDescription
+              small= profile.interestDescription
+if page.content
+  .page-prose.panel!= page.content

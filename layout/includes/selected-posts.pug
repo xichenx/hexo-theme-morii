@@ -1,0 +1,20 @@
+- var selectedPosts = morii_selected_posts(site.posts)
+if selectedPosts.length
+  section.wrap.section-block.selected-section(aria-labelledby='selected-heading')
+    .section-heading
+      div
+        span.section-kicker START READING
+        h2#selected-heading 值得一读
+      p 从实践中挑出的几篇笔记。
+    .selected-grid
+      each post, index in selectedPosts
+        a.selected-card(href=url_for(post.path))
+          .selected-card__media
+            if post.cover
+              img(src=url_for(post.cover) alt='' loading='lazy')
+            else
+              span(aria-hidden='true') ✦
+          .selected-card__body
+            span.selected-card__number= '0' + (index + 1)
+            strong= post.title
+            small 阅读笔记 →

@@ -1,0 +1,7 @@
+nav.category-nav(aria-label='按分类浏览')
+  a(href=url_for(is_home() ? '/' : '/archives/') aria-current=(!is_category() && !is_tag()) ? 'page' : false) 全部
+  each category in morii_categories(site.categories)
+    a(href=url_for(category.path) aria-current=(is_category() && page.category === category.name) ? 'page' : false)
+      = category.name
+      small= category.count
+  a.category-nav__more(href=url_for('/categories/')) 更多分类 ↗

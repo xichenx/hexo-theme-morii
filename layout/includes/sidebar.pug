@@ -1,0 +1,51 @@
+aside.sidebar(aria-label='站点信息')
+  include clock.pug
+  include profile-card.pug
+  if theme.sidebar && theme.sidebar.announcement && theme.sidebar.announcement.enable && theme.sidebar.announcement.content
+    section.side-card.announcement-card
+      .side-card__heading
+        h2= theme.sidebar.announcement.title || '小站公告'
+        span(aria-hidden='true') ✦
+      p= theme.sidebar.announcement.content
+  section.side-card
+    .side-card__heading
+      h2 站点导航
+      span ✦
+    .quick-links
+      a(href=url_for('/archives/')) #[span 文章归档] #[b →]
+      a(href=url_for('/categories/')) #[span 所有分类] #[b →]
+      a(href=url_for('/tags/')) #[span 标签索引] #[b →]
+      a(href=url_for('/essay/')) #[span 即刻短文] #[b →]
+      if !theme.reading_list || theme.reading_list.enable !== false
+        a(href=url_for('/reading-list/')) #[span 稍后阅读] #[b →]
+  if site.posts.length
+    section.side-card
+      .side-card__heading
+        h2 最近更新
+        span ◌
+      ul.recent-list
+        each item in site.posts.sort('updated', -1).limit(4).toArray()
+          li
+            a(href=url_for(item.path))= item.title
+            small= date(item.updated || item.date, 'YYYY.MM.DD')
+  if site.categories.length
+    section.side-card
+      .side-card__heading
+        h2 分类手册
+        span ◈
+      .sidebar-taxonomy
+        each category in morii_categories(site.categories, 6)
+          a(href=url_for(category.path))
+            span= category.name
+            small= category.count
+  include site-widgets.pug
+  if site.posts.length
+    section.side-card
+      .side-card__heading
+        h2 时间足迹
+        span ◷
+      .sidebar-years
+        each year in morii_archive_years(site.posts)
+          a(href=url_for(year.path))
+            strong= year.year
+            span #{year.count} 篇 →

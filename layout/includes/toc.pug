@@ -1,0 +1,3 @@
+.toc-content
+  each heading in morii_toc(page.content)
+    a(href='#' + heading.id class=heading.level > 2 ? 'toc-sub' : '')= heading.text

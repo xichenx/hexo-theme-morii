@@ -1,0 +1,30 @@
+if !theme.sidebar || !theme.sidebar.tags || theme.sidebar.tags.enable !== false
+  - var popularTags = morii_popular_tags(site.tags)
+  if popularTags.length
+    section.side-card.tag-widget
+      .side-card__heading
+        h2 标签漫游
+        a.text-link(href=url_for('/tags/') aria-label='查看所有标签') 全部 →
+      .widget-tag-cloud
+        each tag in popularTags
+          a(href=url_for(tag.path))
+            span= tag.name
+            small= tag.count
+if !theme.sidebar || !theme.sidebar.stats || theme.sidebar.stats.enable !== false
+  - var siteStats = morii_site_stats(site.posts)
+  section.side-card.stats-widget
+    .side-card__heading
+      h2 小站档案
+      span ◷
+    dl.widget-stat-list
+      div
+        dt 已发表文章
+        dd #{siteStats.posts} 篇
+      div
+        dt 公开内容字数
+        dd= siteStats.words.toLocaleString('zh-CN')
+      if siteStats.firstPost
+        div
+          dt 记录始于
+          dd
+            time(datetime=date_xml(siteStats.firstPost))= date(siteStats.firstPost, 'YYYY.MM.DD')

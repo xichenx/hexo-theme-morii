@@ -1,0 +1,18 @@
+mixin postCard(post, featured)
+  - var postUrl = url_for(post.path)
+  article.post-card(class=featured ? 'post-card--featured' : '')
+    a.post-card__media(href=postUrl aria-label=post.title)
+      if post.cover
+        img(src=url_for(post.cover) alt=post.title loading='lazy')
+      else
+        span.post-card__placeholder ✦
+    .post-card__body
+      .post-card__meta
+        span= date(post.date, 'YYYY.MM.DD')
+        if post.categories && post.categories.length
+          span.post-card__dot ·
+          span= post.categories.toArray()[0].name
+      h3
+        a(href=postUrl)= post.title
+      p= morii_excerpt(post, featured ? 108 : 82)
+      a.post-card__read(href=postUrl) 阅读文章 #[span →]

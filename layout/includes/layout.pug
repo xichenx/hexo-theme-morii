@@ -1,0 +1,160 @@
+doctype html
+html(lang=config.language || 'zh-CN' style=morii_accent())
+  head
+    meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1')
+    meta(name='theme-color' content=theme.accent)
+    - var documentTitle = morii_page_title(page)
+    - var documentDescription = is_post() ? morii_excerpt(page, 160) : page.description || config.description
+    - var canonicalUrl = full_url_for((page.path || '').replace(/index\.html$/, ''))
+    meta(name='description' content=documentDescription)
+    title= is_home() && (!page.current || page.current === 1) ? config.title : documentTitle + ' · ' + config.title
+    link(rel='canonical' href=canonicalUrl)
+    meta(property='og:title' content=documentTitle)
+    meta(property='og:description' content=documentDescription)
+    meta(property='og:site_name' content=config.title)
+    meta(property='og:type' content=is_post() ? 'article' : 'website')
+    meta(property='og:url' content=canonicalUrl)
+    if page.cover
+      meta(property='og:image' content=full_url_for(page.cover))
+    if is_post()
+      meta(property='article:published_time' content=date_xml(page.date))
+      meta(property='article:modified_time' content=date_xml(page.updated || page.date))
+    link(rel='icon' href=url_for(theme.favicon || config.favicon || '/favicon.ico'))
+    script(src=url_for('/js/theme-init.js'))
+    link(rel='stylesheet' href=url_for('/css/style.css'))
+    if page.type === 'link'
+      link(rel='stylesheet' href=url_for('/css/friends.css'))
+    link(rel='stylesheet' href=url_for('/css/music.css'))
+    if is_post()
+      link(rel='stylesheet' href=url_for('/css/reading.css'))
+    if is_post() && (!theme.article || !theme.article.print || theme.article.print.enable !== false)
+      link#article-print-style(rel='stylesheet' href=url_for('/css/print.css') media='print')
+  body(class=page.type === 'music' ? 'is-music' : is_post() ? 'is-reading' : page.path && page.path.startsWith('air-conditioner/') ? 'is-playground' : '')
+    a.skip-link(href='#main') 跳转到正文
+    include print-toolbar.pug
+    .site-shell
+      header.site-header
+        a.brand(href=url_for('/') aria-label='返回首页')
+          span.brand__mark(class=theme.logo ? 'brand__mark--image' : '' aria-hidden='true')
+            if theme.logo
+              img(src=url_for(theme.logo) alt='' width='35' height='35')
+            else
+              | ✦
+          span.brand__text= theme.brand || config.title
+        nav.site-nav(aria-label='主导航')
+          each item in theme.menu
+            - var activeMenu = is_current(item.path) || (item.path === '/' && is_home()) || (item.path === '/archives/' && (is_archive() || is_post())) || (item.path === '/album/' && page.type === 'album_detail')
+            a(href=url_for(item.path) class=activeMenu ? 'site-nav__item--active' : '' aria-current=activeMenu ? 'page' : false)= item.name
+        .header-actions
+          if !theme.quick_navigation || theme.quick_navigation.enable !== false
+            button.icon-button#navigation-open(type='button' aria-label='全站快捷导航' title='全站快捷导航（?）' aria-haspopup='dialog' aria-controls='navigation-dialog' aria-expanded='false') ▦
+          button.icon-button#search-open(type='button' aria-label='搜索文章' title='搜索文章') ⌕
+          button.icon-button#theme-toggle(type='button' aria-label='切换深色模式' title='切换深色模式') ◐
+          button.icon-button#menu-toggle.mobile-only(type='button' aria-label='打开菜单' aria-expanded='false') ☰
+        if is_post()
+          .reading-progress(role='progressbar' aria-label='阅读进度' aria-valuemin='0' aria-valuemax='100' aria-valuenow='0')
+            .reading-progress__bar
+      main#main
+        block content
+      footer.site-footer
+        .footer-top
+          div
+            strong= theme.brand || config.title
+            p= theme.tagline
+          a(href=url_for('/archives/')) 继续探索 #[span →]
+        .footer-bottom
+          span © #{new Date().getFullYear()} #{config.author}
+          if theme.explore && theme.explore.length
+            nav.footer-explore(aria-label='更多探索')
+              each item in theme.explore
+                a(href=url_for(item.path))= item.name
+              if !theme.reading_list || theme.reading_list.enable !== false
+                a(href=url_for('/reading-list/')) 稍后阅读
+          span 用 Hexo 与 Morii Theme 构建
+        - var footerRuntime = morii_runtime()
+        if footerRuntime || morii_filings().length
+          .footer-meta
+            if footerRuntime
+              p.footer-runtime(data-site-start=footerRuntime.start)
+                span= footerRuntime.label
+                span(data-runtime-value)= footerRuntime.value
+                span.footer-runtime__heart(aria-hidden='true') ♥
+            include footer-filing.pug
+    include navigation-panel.pug
+    include social-dialog.pug
+    if is_post()
+      button.reading-toc-trigger(type='button' data-reading-toc aria-haspopup='dialog' aria-controls='reading-toc-dialog' hidden) 目录 #[span(data-reading-percent aria-hidden='true') 0%]
+      dialog.reading-toc-dialog#reading-toc-dialog(aria-labelledby='reading-toc-title')
+        .reading-toc-heading
+          h2#reading-toc-title 本文目录
+          button.icon-button#reading-toc-close(type='button' aria-label='关闭文章目录') ×
+        nav(aria-label='文章章节')
+          include toc.pug
+    if is_post() && (!theme.article || !theme.article.share || theme.article.share.enable !== false)
+      include article-share.pug
+    dialog.search-dialog#search-dialog(aria-labelledby='search-heading' data-search-index=url_for('/morii-search.json') data-page-size=(theme.search && theme.search.page_size) || 10)
+      .search-dialog__top
+        strong#search-heading 搜索文章
+        button.icon-button#search-close(type='button' aria-label='关闭搜索') ×
+      label.sr-only(for='search-input') 搜索关键词
+      .search-input-row
+        input#search-input(type='search' placeholder='搜索标题、正文或标签…' autocomplete='off')
+        button#search-clear(type='button') 清空
+      p.search-hint#search-service-status(role='status' aria-live='polite') 输入多个关键词可缩小搜索范围。
+      button.button.service-button#search-retry(type='button' hidden) 重新加载正文搜索
+      p.search-hint#search-status(role='status' aria-live='polite') 搜索本站 #{site.posts.length} 篇文章
+      p.search-empty(hidden) 没有找到相关文章，试试其他关键词。
+      ul#search-results
+        each post in site.posts.sort('date', -1).toArray()
+          - var searchText = morii_search_text(post)
+          li(data-search=searchText)
+            a(href=url_for(post.path))
+              span= post.title
+              small= date(post.date, 'YYYY.MM.DD')
+      button.button.service-button#search-more(type='button' hidden) 展示更多结果
+    dialog.lightbox#image-dialog(aria-label='图片预览')
+      button.icon-button#image-close(type='button' aria-label='关闭图片预览') ×
+      figure
+        img#image-preview(alt='')
+        figcaption#image-caption
+      p#image-status(role='status' aria-live='polite')
+      .lightbox-controls
+        button.icon-button#image-previous(type='button' aria-label='上一张图片') ←
+        span#image-counter(aria-live='polite')
+        button.icon-button#image-next(type='button' aria-label='下一张图片') →
+        button.button.service-button#image-retry(type='button' hidden) 重新加载图片
+        a.text-link#image-original(target='_blank' rel='noopener noreferrer') 打开原图 ↗
+    button.icon-button.back-to-top#back-to-top(type='button' aria-label='返回顶部' hidden) ↑
+    .sr-only#theme-announcement(role='status' aria-live='polite')
+    include music-hub.pug
+    script(src=url_for('/js/music.js') defer)
+    script(src=url_for('/js/theme.js') defer)
+    if morii_runtime()
+      script(src=url_for('/js/runtime.js') defer)
+    script(src=url_for('/js/search.js') defer)
+    if !theme.quick_navigation || theme.quick_navigation.enable !== false
+      script(src=url_for('/js/navigation.js') defer)
+    script(src=url_for('/js/media.js') defer)
+    if morii_social_links().some(function(item) { return item.qrcode })
+      script(src=url_for('/js/social.js') defer)
+    if morii_clock().enable && (is_home() || is_archive() || is_category() || is_tag() || is_post())
+      script(src=url_for('/js/clock.js') defer)
+    if (is_post() || page.type === 'reading_list') && (!theme.reading_list || theme.reading_list.enable !== false)
+      script(src=url_for('/js/reading-list.js') defer)
+    if is_home() && (!page.current || page.current === 1)
+      script(src=url_for('/js/discovery.js') defer)
+    if page.type === 'link'
+      script(src=url_for('/js/directory.js') defer)
+    if page.path && page.path.startsWith('air-conditioner/')
+      script(src=url_for('/js/air-conditioner.js') defer)
+    if is_post()
+      script(src=url_for('/js/reading.js') defer)
+      if !theme.article || !theme.article.share || theme.article.share.enable !== false
+        script(src=url_for('/js/share.js') defer)
+      if !theme.article || !theme.article.print || theme.article.print.enable !== false
+        script(src=url_for('/js/print.js') defer)
+      if !theme.article || theme.article.reading_settings !== false
+        script(src=url_for('/js/reading-preferences.js') defer)
+    if page.type === 'fcircle' || (!is_home() && !is_archive() && !is_category() && !is_tag() && page.type !== '404' && page.type !== 'categories' && page.type !== 'tags' && theme.comments && theme.comments.enable && theme.comments.provider === 'twikoo' && page.comments !== false)
+      script(src=url_for('/js/services.js') defer)
