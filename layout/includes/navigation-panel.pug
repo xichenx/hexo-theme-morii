@@ -9,7 +9,10 @@ if !theme.quick_navigation || theme.quick_navigation.enable !== false
     nav.navigation-grid(aria-label='全站快捷导航')
       each item in morii_navigation()
         a.navigation-card(href=url_for(item.path))
-          span.navigation-card__icon(aria-hidden='true')= item.icon
+          - var iconName = morii_icon(item.icon)
+          span.navigation-card__icon(class=iconName ? 'ui-icon ui-icon--' + iconName : '' aria-hidden='true')
+            if !iconName
+              = item.icon
           div
             strong= item.name
             small= item.description

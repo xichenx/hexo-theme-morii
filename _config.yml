@@ -165,17 +165,17 @@ featured:
   - title: Android 开发
     description: 应用开发、底层原理与实践
     path: /categories/Android/
-    icon: '◈'
+    icon: code
     tone: blue
   - title: 跨端探索
     description: Flutter、HarmonyOS 与新技术
     path: /categories/Flutter/
-    icon: '✦'
+    icon: sparkles
     tone: violet
   - title: 生活随笔
     description: 旅途、日常和偶然的灵感
     path: /essay/
-    icon: '☼'
+    icon: sun
     tone: orange
 comments:
   enable: true

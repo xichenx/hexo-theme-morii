@@ -24,17 +24,17 @@ featured:
   - title: 主题使用
     description: 安装、配置与开始写作
     path: /categories/主题使用/
-    icon: '◈'
+    icon: book
     tone: blue
   - title: 开发笔记
     description: 组件与交互体验
     path: /categories/开发笔记/
-    icon: '✦'
+    icon: code
     tone: violet
   - title: 即刻短文
     description: 记录日常的小灵感
     path: /essay/
-    icon: '☼'
+    icon: sparkles
     tone: orange
 explore:
   - name: 音乐馆

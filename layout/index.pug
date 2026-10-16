@@ -35,7 +35,10 @@ block content
       .feature-grid
         each item in theme.featured
           a.feature-card(href=url_for(item.path) class='feature-card--' + item.tone)
-            span.feature-card__icon= item.icon
+            - var iconName = morii_icon(item.icon)
+            span.feature-card__icon(class=iconName ? 'ui-icon ui-icon--' + iconName : '' aria-hidden='true')
+              if !iconName
+                = item.icon
             span.feature-card__arrow ↗
             strong= item.title
             small= item.description

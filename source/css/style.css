@@ -409,6 +409,14 @@ main{
   font-size:26px;
   color:var(--accent)
 }
+.feature-card__icon.ui-icon{
+  display:grid;
+  place-items:center;
+  width:36px;
+  height:36px;
+  border-radius:11px;
+  background:color-mix(in srgb,currentColor 9%,transparent)
+}
 .feature-card__arrow{
   position:absolute;
   top:24px;
@@ -1982,6 +1990,26 @@ a.footer-filing__item:focus-visible { outline: 2px solid var(--accent); outline-
 .navigation-card { display: flex; align-items: flex-start; gap: 13px; min-width: 0; padding: 18px 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg); }
 .navigation-card:hover { color: var(--accent); border-color: var(--accent); }
 .navigation-card__icon { display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 34px; border-radius: 10px; color: var(--accent); background: var(--surface); font-size: 22px; }
+.ui-icon::before { content: ''; display: block; width: 21px; height: 21px; background: currentColor; -webkit-mask: var(--ui-icon) center / contain no-repeat; mask: var(--ui-icon) center / contain no-repeat; }
+.ui-icon--home { --ui-icon: url('../icons/ui/home.svg'); }
+.ui-icon--archive { --ui-icon: url('../icons/ui/archive.svg'); }
+.ui-icon--categories { --ui-icon: url('../icons/ui/categories.svg'); }
+.ui-icon--tags { --ui-icon: url('../icons/ui/tags.svg'); }
+.ui-icon--essay { --ui-icon: url('../icons/ui/essay.svg'); }
+.ui-icon--album { --ui-icon: url('../icons/ui/album.svg'); }
+.ui-icon--link { --ui-icon: url('../icons/ui/link.svg'); }
+.ui-icon--about { --ui-icon: url('../icons/ui/about.svg'); }
+.ui-icon--music { --ui-icon: url('../icons/ui/music.svg'); }
+.ui-icon--friends { --ui-icon: url('../icons/ui/friends.svg'); }
+.ui-icon--comments { --ui-icon: url('../icons/ui/comments.svg'); }
+.ui-icon--game { --ui-icon: url('../icons/ui/game.svg'); }
+.ui-icon--snowflake { --ui-icon: url('../icons/ui/snowflake.svg'); }
+.ui-icon--bookmark { --ui-icon: url('../icons/ui/bookmark.svg'); }
+.ui-icon--external { --ui-icon: url('../icons/ui/external.svg'); }
+.ui-icon--book { --ui-icon: url('../icons/ui/book.svg'); }
+.ui-icon--code { --ui-icon: url('../icons/ui/code.svg'); }
+.ui-icon--sparkles { --ui-icon: url('../icons/ui/sparkles.svg'); }
+.ui-icon--sun { --ui-icon: url('../icons/ui/sun.svg'); }
 .navigation-card > div { min-width: 0; }
 .navigation-card strong { display: block; font-size: 14px; margin: 3px 0 7px; overflow-wrap: anywhere; }
 .navigation-card small { display: block; color: var(--muted); font-size: 11px; line-height: 1.7; overflow-wrap: anywhere; }
