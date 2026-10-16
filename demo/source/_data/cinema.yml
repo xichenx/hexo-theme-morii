@@ -1,0 +1,13 @@
+- title: 花朵 · 播放示例
+  type: movie
+  year: '2026'
+  description: 使用 MDN 的开放示例短片，展示电影院的播放功能。
+  url: https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4
+- title: 剧集展示位
+  type: series
+  description: 在自己的站点数据中填写各集播放地址。
+  episodes: []
+- title: 动漫展示位
+  type: anime
+  description: 在自己的站点数据中填写各集播放地址。
+  episodes: []

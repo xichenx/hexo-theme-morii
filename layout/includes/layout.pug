@@ -39,6 +39,8 @@ html(lang=config.language || 'zh-CN' style=morii_accent() data-motion=(!theme.mo
     if page.type === 'link'
       link(rel='stylesheet' href=url_for('/css/friends.css'))
     link(rel='stylesheet' href=url_for('/css/music.css'))
+    if page.type === 'cinema'
+      link(rel='stylesheet' href=url_for('/css/cinema.css'))
     if is_post()
       link(rel='stylesheet' href=url_for('/css/reading.css'))
     if is_post() && (!theme.article || !theme.article.print || theme.article.print.enable !== false)
@@ -165,6 +167,8 @@ html(lang=config.language || 'zh-CN' style=morii_accent() data-motion=(!theme.mo
     .sr-only#theme-announcement(role='status' aria-live='polite')
     include music-hub.pug
     script(src=url_for('/js/music.js') defer)
+    if page.type === 'cinema'
+      script(src=url_for('/js/cinema.js') defer)
     script(src=url_for('/js/theme.js') defer)
     if visualEffects.enabled
       script(src=url_for('/js/effects.js') defer data-spotlight=visualEffects.spotlight ? 'on' : 'off' data-tilt=visualEffects.tilt ? 'on' : 'off' data-ripple=visualEffects.ripple ? 'on' : 'off')

@@ -1,13 +1,32 @@
 {
   "name": "hexo-theme-morii",
-  "version": "0.1.0-alpha.2",
-  "description": "A rich card Hexo theme with an immersive music room.",
+  "version": "0.1.0-alpha.3",
+  "description": "A rich card Hexo theme with music and cinema pages.",
   "license": "MIT",
-  "keywords": ["hexo", "hexo-theme", "theme", "blog", "morii"],
+  "keywords": [
+    "hexo",
+    "hexo-theme",
+    "theme",
+    "blog",
+    "morii"
+  ],
   "homepage": "https://github.com/xichenx/hexo-theme-morii#readme",
-  "bugs": { "url": "https://github.com/xichenx/hexo-theme-morii/issues" },
-  "files": ["_config.yml", "layout/", "scripts/", "source/", "README.md", "CHANGELOG.md", "LICENSE"],
-  "publishConfig": { "registry": "https://registry.npmjs.org/", "tag": "alpha" },
+  "bugs": {
+    "url": "https://github.com/xichenx/hexo-theme-morii/issues"
+  },
+  "files": [
+    "_config.yml",
+    "layout/",
+    "scripts/",
+    "source/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "tag": "alpha"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/xichenx/hexo-theme-morii.git"

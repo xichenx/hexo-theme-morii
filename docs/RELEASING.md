@@ -1,6 +1,6 @@
 # Morii 发布与演示站
 
-当前版本候选：`v0.1.0-alpha.2`。配置好工作流不等于已经发布版本。
+当前版本候选：`v0.1.0-alpha.3`。配置好工作流不等于已经发布版本。
 
 ## 工作流
 
@@ -10,7 +10,7 @@
 | `.github/workflows/release.yml` | 推送 `v*` 标签 | 校验版本号，测试，生成 ZIP、SHA256 校验文件和 GitHub Release 草稿 |
 | `.github/workflows/demo.yml` | main 提交、手动 | 启用后测试并部署独立演示站到 GitHub Pages |
 
-工作流使用 GitHub 自带的 `GITHUB_TOKEN`，无需额外 PAT。npm 首次发布由维护者在本机登录后执行，使用 `alpha` 标签，避免预发布版本成为默认的 `latest`。
+工作流使用 GitHub 自带的 `GITHUB_TOKEN`，无需额外 PAT。npm 发布由维护者在本机登录后执行，预发布版本使用 `alpha` 标签。是否同步更新 `latest` 以当前 npm 标签状态为准。
 
 ## 本地验证
 
@@ -24,7 +24,7 @@ npm run package:theme
 ```
 
 - 演示站输出：`.cache/demo/public/`。
-- 发布包：`dist/hexo-theme-morii-v0.1.0-alpha.2.zip`。
+- 发布包：`dist/hexo-theme-morii-v0.1.0-alpha.3.zip`。
 - 解压后只有 `morii/` 主题目录，不包含博客文章、开发测试、node_modules 或 Git 配置。
 - ZIP 打包需要 `zip`；发布包测试需要 `unzip`。GitHub Ubuntu runner 已提供这两个命令。
 - 本地 Node.js 至少为 20.19.0，CI 验证 Node 22 / 24。
@@ -72,11 +72,11 @@ npm run build:demo
 
 ### 2. 创建并推送标签
 
-首个候选版本示例：
+候选版本示例：
 
 ```bash
-git tag -a v0.1.0-alpha.2 -m "Morii v0.1.0-alpha.2"
-git push origin v0.1.0-alpha.2
+git tag -a v0.1.0-alpha.3 -m "Morii v0.1.0-alpha.3"
+git push origin v0.1.0-alpha.3
 ```
 
 标签版本必须与 `package.json` 完全一致。标签推送后 Release 工作流才会运行；推送普通提交不会创建 Release。
@@ -113,7 +113,7 @@ npm publish --tag alpha --registry https://registry.npmjs.org/
 - GitHub Releases：当前自动化的版本分发渠道。
 - GitHub Pages：独立演示站。
 - Hexo 主题目录：通过上游 PR 收录。
-- npm：首次通过本机 npm 登录发布 `alpha` 标签；后续可设置 Trusted Publishing。
+- npm：通过本机 npm 登录发布 `alpha` 标签；后续可设置 Trusted Publishing。
 
 官方参考：
 

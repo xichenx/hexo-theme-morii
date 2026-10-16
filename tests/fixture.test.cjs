@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { JSDOM } = require('jsdom');
 const { buildDemo } = require('../tools/demo.cjs');
-const pages = ['index.html', 'page/2/index.html', 'posts/welcome/index.html', 'archives/index.html', 'categories/index.html', 'categories/主题使用/index.html', 'tags/index.html', 'about/index.html', 'link/index.html', 'album/index.html', 'album/morii/index.html', 'music/index.html', 'reading-list/index.html', '404.html'];
+const pages = ['index.html', 'page/2/index.html', 'posts/welcome/index.html', 'archives/index.html', 'categories/index.html', 'categories/主题使用/index.html', 'tags/index.html', 'about/index.html', 'link/index.html', 'album/index.html', 'album/morii/index.html', 'music/index.html', 'cinema/index.html', 'reading-list/index.html', '404.html'];
 
 test('theme builds independently at both domain root and a Pages subdirectory', async t => {
   for (const prefix of ['/', '/hexo-theme-morii/']) await t.test(prefix, async () => {
@@ -48,6 +48,26 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       dom.window.close();
     }
     const index = JSON.parse(fs.readFileSync(path.join(output, 'morii-search.json'), 'utf8'));
+    const cinemaDom = new JSDOM(fs.readFileSync(path.join(output, 'cinema/index.html'), 'utf8'), { url: `https://example.test${prefix}cinema/`, runScripts: 'outside-only' });
+    const cinema = cinemaDom.window.document;
+    const cinemaVideo = cinema.querySelector('[data-cinema-video]');
+    cinemaVideo.load = () => {};
+    cinemaVideo.pause = () => {};
+    cinemaVideo.play = () => Promise.resolve();
+    cinema.querySelector('#music-player').pause = () => {};
+    cinemaDom.window.HTMLElement.prototype.scrollIntoView = () => {};
+    cinemaDom.window.eval(fs.readFileSync(path.join(__dirname, '../source/js/cinema.js'), 'utf8'));
+    assert.equal(cinema.querySelectorAll('[data-cinema-card]').length, 3);
+    cinema.querySelector('[data-cinema-card] [data-cinema-select]').click();
+    assert.equal(cinema.querySelector('[data-cinema-title]').textContent, '花朵 · 播放示例');
+    cinema.querySelector('.cinema-episodes button').click();
+    assert.equal(cinemaVideo.src, 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4');
+    cinema.querySelector('[data-cinema-filter="anime"]').click();
+    assert.equal(cinema.querySelectorAll('[data-cinema-card]:not([hidden])').length, 1);
+    cinema.querySelector('[data-cinema-search]').value = '无结果';
+    cinema.querySelector('[data-cinema-search]').dispatchEvent(new cinemaDom.window.Event('input'));
+    assert.equal(cinema.querySelector('[data-cinema-no-results]').hidden, false);
+    cinemaDom.window.close();
     for (const route of ['archives/', 'archives/2026/', 'archives/2026/10/']) {
       const read = suffix => new JSDOM(fs.readFileSync(path.join(output, route, suffix, 'index.html'), 'utf8'));
       const first = read('');

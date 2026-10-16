@@ -2000,6 +2000,7 @@ a.footer-filing__item:focus-visible { outline: 2px solid var(--accent); outline-
 .ui-icon--link { --ui-icon: url('../icons/ui/link.svg'); }
 .ui-icon--about { --ui-icon: url('../icons/ui/about.svg'); }
 .ui-icon--music { --ui-icon: url('../icons/ui/music.svg'); }
+.ui-icon--cinema { --ui-icon: url('../icons/ui/cinema.svg'); }
 .ui-icon--friends { --ui-icon: url('../icons/ui/friends.svg'); }
 .ui-icon--comments { --ui-icon: url('../icons/ui/comments.svg'); }
 .ui-icon--game { --ui-icon: url('../icons/ui/game.svg'); }
@@ -2037,3 +2038,7 @@ a.footer-filing__item:focus-visible { outline: 2px solid var(--accent); outline-
   .moment-item p { font-size: 16px; }
   .reading-focus .mobile-toc { margin-left: 22px; margin-right: 22px; }
 }
+
+/* Keep every page and nested panel scrollable without showing the scrollbar. */
+* { scrollbar-width: none !important; }
+*::-webkit-scrollbar { display: none; width: 0; height: 0; }

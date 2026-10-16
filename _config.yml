@@ -118,6 +118,8 @@ sidebar:
 explore:
   - name: 音乐馆
     path: /music/
+  - name: 电影院
+    path: /cinema/
   - name: 朋友圈
     path: /fcircle/
   - name: 留言板
@@ -146,6 +148,12 @@ music:
   embed_url: ''
   # 可选：自有音频资源，格式为 title / artist / url / cover。
   tracks: []
+cinema:
+  enable: true
+  title: 电影院
+  description: 挑一部喜欢的作品，慢慢看。
+  # 片单优先从博客根目录 source/_data/cinema.yml 读取；也可在此填写 items。
+  items: []
 menu:
   - name: 首页
     path: /

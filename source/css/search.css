@@ -21,7 +21,7 @@
 .search-suggestions > span { color: var(--muted); margin-right: 3px; }
 .search-suggestions button { border: 1px solid var(--line); border-radius: 20px; padding: 3px 9px; background: var(--surface); color: var(--muted); font-size: inherit; }
 .search-suggestions button:hover { border-color: var(--accent); color: var(--accent); }
-.search-scroll { min-height: 0; flex: 1; overflow: auto; padding: 0 20px 18px; overscroll-behavior: contain; scrollbar-gutter: stable; }
+.search-scroll { min-height: 0; flex: 1; overflow: auto; padding: 0 20px 18px; overscroll-behavior: contain; }
 .search-results-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 18px 10px 10px; }
 .search-results-heading strong { font-size: 12px; }
 .search-results-heading p { margin: 0; font-size: 11px; color: var(--muted); }

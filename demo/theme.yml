@@ -39,6 +39,8 @@ featured:
 explore:
   - name: 音乐馆
     path: /music/
+  - name: 电影院
+    path: /cinema/
   - name: 朋友圈
     path: /fcircle/
   - name: 留言板

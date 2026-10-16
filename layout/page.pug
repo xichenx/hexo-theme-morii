@@ -5,7 +5,7 @@ block content
   - var categoryEditorial = page.type === 'categories' && categoryLayout !== 'cards'
   .wrap.listing-page(class=categoryEditorial ? 'category-directory-page category-overview' : '')
     .page-intro(class=page.type === 'link' ? 'friends-intro' : page.type === 'music' ? 'music-page-heading' : categoryEditorial ? 'category-directory-intro' : '')
-      - var pageKickers = { about: 'ABOUT', link: 'FRIENDS', essay: 'MOMENTS', album: 'ALBUMS', album_detail: 'PHOTO JOURNAL', fcircle: 'FRIENDS FEED', music: 'MUSIC', categories: 'TOPICS', tags: 'TAGS' }
+      - var pageKickers = { about: 'ABOUT', link: 'FRIENDS', essay: 'MOMENTS', album: 'ALBUMS', album_detail: 'PHOTO JOURNAL', fcircle: 'FRIENDS FEED', music: 'MUSIC', cinema: 'CINEMA', categories: 'TOPICS', tags: 'TAGS' }
       span.section-kicker= pageKickers[page.type] || 'EXPLORE'
       h1= morii_page_title(page)
       if page.description
@@ -75,6 +75,8 @@ block content
         include includes/page/friends.pug
       when 'music'
         include includes/page/music-room.pug
+      when 'cinema'
+        include includes/page/cinema.pug
       default
         if page.path && page.path.startsWith('air-conditioner/')
           include includes/page/air-conditioner.pug
@@ -86,5 +88,5 @@ block content
                 span 开始游戏 →
         else if page.content
           .page-prose.panel!= page.content
-    if page.type !== 'music' && page.type !== 'categories' && page.type !== 'tags'
+    if page.type !== 'music' && page.type !== 'cinema' && page.type !== 'categories' && page.type !== 'tags'
       include includes/comments.pug

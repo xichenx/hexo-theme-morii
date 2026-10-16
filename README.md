@@ -313,6 +313,37 @@ music:
 
 曲目的 `url` 和 `cover` 也支持 `/audio/example.mp3` 这样的本站路径。未开启 JavaScript 时可通过原平台歌单入口收听。
 
+## 电影院
+
+主题自动生成 `/cinema/` 页面，包含电影、电视剧、动漫分类、片名搜索和剧集切换。把自有视频文件放在博客根目录的 `source/videos/`，并新建 `source/_data/cinema.yml`：
+
+```yaml
+- title: 周末短片
+  type: movie
+  year: '2026'
+  description: 一部适合周末观看的短片。
+  cover: /images/weekend-poster.jpg
+  url: /videos/weekend.mp4
+
+- title: 我的剧集
+  type: series
+  year: '2026'
+  cover: /images/series-poster.jpg
+  episodes:
+    - title: 第 1 集
+      url: /videos/series-01.mp4
+    - title: 第 2 集
+      url: /videos/series-02.webm
+
+- title: 动画短片
+  type: anime
+  episodes:
+    - title: 正片
+      url: https://video.example.com/anime.mp4
+```
+
+`movie`、`series`、`anime` 分别表示电影、电视剧和动漫。单片直接用 `url`；多集使用 `episodes`。也可在主题配置的 `cinema.items` 内填写同样的数据。站点数据文件优先。视频地址支持本站绝对路径或 HTTPS 地址，站点部署在子目录时会自动补上前缀。播放器使用浏览器原生视频控件，是否支持 MP4、WebM 或 HLS 由浏览器和视频编码决定；外部视频服务还需允许页面引用。未填写片单时显示配置提示。设置 `cinema.enable: false` 可关闭页面，关闭后应同时移除 `explore` 中的电影院链接。
+
 ## 页面动效
 
 默认开启卡片滚动入场、首页装饰缓动、悬停反馈、按钮按压和弹窗入场。卡片只在首次进入视口时播放，异步加载的卡片同样适用。正文段落不逐段淡入，键盘聚焦会立即结束对应卡片的入场动画。无 JavaScript 或浏览器缺少动画支持时，内容正常显示。
@@ -336,7 +367,7 @@ npm run build:demo
 npm run package:theme
 ```
 
-创建版本标签、发布 GitHub Release 与 npm 包、提交 Hexo 主题目录的具体步骤见 [发布指南](docs/RELEASING.md)。当前预览版为 `0.1.0-alpha.2`，采用 MIT 许可证。
+创建版本标签、发布 GitHub Release 与 npm 包、提交 Hexo 主题目录的具体步骤见 [发布指南](docs/RELEASING.md)。当前预览版为 `0.1.0-alpha.3`，采用 MIT 许可证。
 
 ## 交互与回归验证
 
