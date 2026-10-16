@@ -23,12 +23,14 @@ test('theme reveal uses a viewport-covering clip, guards rapid clicks and leaves
   const f = fixture(); const button = f.window.document.querySelector('button');
   button.click(); button.click(); await Promise.resolve();
   assert.equal(f.starts, 1); assert.equal(f.window.document.documentElement.dataset.theme, 'dark');
+  assert.equal(button.getAttribute('aria-label'), '切换浅色模式');
   assert.equal(f.calls[0].options.pseudoElement, '::view-transition-new(root)');
   assert.equal(f.calls[0].frames.clipPath.length, 2);
   f.finish(); await new Promise(resolve => setImmediate(resolve));
   assert.equal(button.hasAttribute('aria-busy'), false);
   assert.equal(f.window.document.documentElement.hasAttribute('data-theme-reveal'), false);
-  button.click(); assert.equal(f.window.document.documentElement.dataset.theme, 'light'); f.finish();
+  button.click(); assert.equal(f.window.document.documentElement.dataset.theme, 'light');
+  assert.equal(button.getAttribute('aria-label'), '切换深色模式'); f.finish();
   await new Promise(resolve => setImmediate(resolve)); f.dom.window.close();
 });
 test('unsupported, reduced motion, disabled animation and API failure preserve immediate theme switching', () => {

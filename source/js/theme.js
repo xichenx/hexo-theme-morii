@@ -1,7 +1,13 @@
 (() => {
   const root = document.documentElement;
   const themeButton = document.getElementById('theme-toggle');
-  const syncThemeButton = () => themeButton?.setAttribute('aria-pressed', String(root.dataset.theme === 'dark'));
+  const syncThemeButton = () => {
+    if (!themeButton) return;
+    const dark = root.dataset.theme === 'dark';
+    themeButton.setAttribute('aria-pressed', String(dark));
+    themeButton.setAttribute('aria-label', dark ? '切换浅色模式' : '切换深色模式');
+    themeButton.title = dark ? '切换浅色模式' : '切换深色模式';
+  };
   syncThemeButton();
   const brandLogo = document.querySelector('.brand__mark--image img');
   const restoreBrandMark = () => {
