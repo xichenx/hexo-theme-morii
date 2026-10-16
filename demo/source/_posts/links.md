@@ -5,7 +5,6 @@ categories:
   - 开发笔记
 tags:
   - 友链
-cover: /icons/brand/morii-icon.png
 comments: false
 ---
 

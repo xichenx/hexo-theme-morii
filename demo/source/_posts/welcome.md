@@ -5,7 +5,7 @@ categories:
   - 主题使用
 tags:
   - 开始写作
-cover: /icons/brand/morii-icon.png
+cover: /images/covers/welcome.jpg
 comments: false
 ---
 

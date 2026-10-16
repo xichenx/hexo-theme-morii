@@ -5,7 +5,6 @@ categories:
   - 随笔
 tags:
   - 生活
-cover: /icons/brand/morii-icon.png
 comments: false
 ---
 

@@ -5,7 +5,7 @@ categories:
   - 开发笔记
 tags:
   - 设计
-cover: /icons/brand/morii-icon.png
+cover: /images/covers/cards.jpg
 comments: false
 ---
 

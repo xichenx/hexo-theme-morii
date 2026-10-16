@@ -5,7 +5,7 @@ categories:
   - 开发笔记
 tags:
   - 音乐
-cover: /icons/brand/morii-icon.png
+cover: /images/covers/music.jpg
 comments: false
 ---
 

@@ -5,7 +5,6 @@ categories:
   - 主题使用
 tags:
   - 配置
-cover: /icons/brand/morii-icon.png
 comments: false
 ---
 

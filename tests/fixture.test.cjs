@@ -24,6 +24,13 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       if (file === 'index.html' || file === 'page/2/index.html') {
         const cards = [...document.querySelectorAll('#latest .post-grid > .post-card')];
         assert.equal(cards.length, file === 'index.html' ? 5 : 2);
+        const covers = [...document.querySelectorAll('#latest .post-card__media img')].map(image => image.getAttribute('src'));
+        assert.deepEqual(covers, file === 'index.html' ? [
+          `${prefix}images/covers/welcome.jpg`,
+          `${prefix}images/covers/cards.jpg`,
+          `${prefix}images/covers/music.jpg`
+        ] : [], 'Demo uses new article covers, not the app icon');
+        assert.equal(document.querySelectorAll('#latest .post-card__placeholder').length, 2, 'Articles without covers use the star fallback');
         const featured = cards.filter(card => card.classList.contains('post-card--featured'));
         assert.equal(featured.length, cards.length % 2, `${file}: only odd lists need a leading wide card`);
         if (featured.length) assert.equal(featured[0], cards[0]);
