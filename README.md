@@ -367,7 +367,7 @@ npm run build:demo
 npm run package:theme
 ```
 
-创建版本标签、发布 GitHub Release 与 npm 包、提交 Hexo 主题目录的具体步骤见 [发布指南](docs/RELEASING.md)。当前预览版为 `0.1.0-alpha.3`，采用 MIT 许可证。
+创建版本标签、发布 GitHub Release 与 npm 包、提交 Hexo 主题目录的具体步骤见 [发布指南](docs/RELEASING.md)。当前预览版为 `0.1.0-alpha.4`，采用 MIT 许可证。
 
 ## 交互与回归验证
 
