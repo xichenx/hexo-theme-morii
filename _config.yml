@@ -1,5 +1,15 @@
 # 页面布局。也可写入博客根目录的 _config.morii.yml，升级主题时无需修改主题文件。
 appearance:
+  effects:
+    enable: true        # 视觉特效总开关；独立于页面布局
+    aurora: true        # 渐变极光背景
+    particles: true     # 原生 Canvas 星尘与近邻连线
+    density: 48         # 桌面粒子数量（12–80），手机最多 18 个
+    glass: true         # 导航和展示卡片的毛玻璃
+    spotlight: true     # 鼠标跟随卡片光晕（精细指针设备）
+    tilt: true          # 卡片轻量立体倾斜（精细指针设备）
+    ripple: true        # 按钮点击波纹
+    theme_transition: true  # 深浅色切换圆形扩散，不支持时直接切换
   layouts:
     home: featured       # featured：首篇横向突出（奇数篇时）；grid：普通双列
     categories: atlas    # atlas：双列主题导航；directory：分类目录；cards：独立卡片

@@ -5,7 +5,11 @@ const list = value => Array.isArray(value) ? value : value?.toArray?.() || [];
 const plain = value => unescapeHTML(stripHTML(String(value || '')
   .replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, ' ')
   .replace(/<td\b[^>]*class=["'][^"']*\bgutter\b[^"']*["'][^>]*>[\s\S]*?<\/td>/gi, ' ')
-  .replace(/<\/(?:p|div|li|h[1-6]|pre|section)>|<br\s*\/?>/gi, ' '))).replace(/\s+/g, ' ').trim();
+  .replace(/<\/(?:p|div|li|h[1-6]|pre|section)>|<br\s*\/?>/gi, ' ')))
+  .replace(/&#(?:x([\da-f]+)|(\d+));/gi, (entity, hex, decimal) => {
+    const point = Number.parseInt(hex || decimal, hex ? 16 : 10);
+    return point > 0 && point <= 0x10ffff && !(point >= 0xd800 && point <= 0xdfff) ? String.fromCodePoint(point) : entity;
+  }).replace(/\s+/g, ' ').trim();
 
 hexo.extend.generator.register('morii-search-index', locals => {
   const root = '/' + String(hexo.config.root || '/').split('/').filter(Boolean).join('/');
@@ -16,7 +20,7 @@ hexo.extend.generator.register('morii-search-index', locals => {
     date: post.date?.format?.('YYYY.MM.DD') || '',
     protected: Boolean(post.password),
     content: post.password ? '' : plain(`${post.description || ''} ${post.excerpt || ''} ${hexo.theme.config.search?.content === false ? '' : post.content || ''}`),
-    topics: post.password ? '' : [...list(post.categories), ...list(post.tags)].map(item => plain(item?.name)).filter(Boolean).join(' ')
+    topics: post.password ? '' : [...new Set([...list(post.categories), ...list(post.tags)].map(item => plain(item?.name)).filter(Boolean))].join(' ')
   }));
   return { path: 'morii-search.json', data: JSON.stringify(entries) };
 });

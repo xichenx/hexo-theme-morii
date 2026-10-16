@@ -16,6 +16,10 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       const document = dom.window.document;
       assert.equal(document.querySelectorAll('main h1').length, 1, `${file}: one page heading`);
       assert.ok(document.querySelector('#morii-audio-hub'), `${file}: shared music player`);
+      assert.ok(document.querySelector('.morii-atmosphere[aria-hidden="true"] #morii-particles'), `${file}: decorative particles`);
+      assert.equal(document.documentElement.dataset.glass, 'on');
+      assert.equal(document.querySelector('#effects-dialog, [data-open-effects], [data-effect-option]'), null, `${file}: effects are owner-configured only`);
+      assert.equal(document.documentElement.dataset.themeTransition, 'on');
       assert.equal(document.querySelectorAll('#comment-service').length, 0, 'Demo must not use a personal comment service');
       if (file === 'index.html' || file === 'page/2/index.html') {
         const cards = [...document.querySelectorAll('#latest .post-grid > .post-card')];
@@ -85,9 +89,13 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
     { home: 'grid', categories: 'cards', category: 'cards', archives: 'grouped' },
     { home: 'featured', categories: 'directory', category: 'list', archives: 'timeline' }
   ]) await t.test(`configurable layouts: ${layouts.categories}`, async () => {
-    const output = await buildDemo({ root: '/theme/', url: 'https://example.test', themeOverrides: { appearance: { layouts } } });
+    const output = await buildDemo({ root: '/theme/', url: 'https://example.test', themeOverrides: { appearance: { layouts, effects: { enable: false } } } });
     const documentFor = file => new JSDOM(fs.readFileSync(path.join(output, file, 'index.html'), 'utf8')).window.document;
     const home = documentFor('');
+    assert.equal(home.querySelector('.morii-atmosphere'), null);
+    assert.equal(home.querySelector('script[src$="/js/effects.js"], link[href$="/css/effects.css"]'), null);
+    assert.equal(home.documentElement.hasAttribute('data-glass'), false);
+    assert.equal(home.querySelector('#effects-dialog, [data-open-effects]'), null);
     const overview = documentFor('categories');
     const category = documentFor('categories/主题使用');
     const archive = documentFor('archives');

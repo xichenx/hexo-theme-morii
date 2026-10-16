@@ -12,11 +12,43 @@
   };
   brandLogo?.addEventListener('error', restoreBrandMark, { once: true });
   if (brandLogo?.complete && brandLogo.naturalWidth === 0) restoreBrandMark();
-  themeButton?.addEventListener('click', () => {
-    root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+  const reducedThemeMotion = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
+  let themeTransition;
+  const applyTheme = next => {
+    root.dataset.theme = next;
     try { localStorage.setItem('morii-theme', root.dataset.theme); } catch { /* Keep the in-memory preference. */ }
     syncThemeButton();
+  };
+  const finishTransition = () => {
+    themeTransition = undefined;
+    delete root.dataset.themeReveal;
+    themeButton?.removeAttribute('aria-busy');
+  };
+  themeButton?.addEventListener('click', event => {
+    if (themeTransition) return;
+    const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    if (root.dataset.themeTransition !== 'on' || root.dataset.motion === 'off' || reducedThemeMotion?.matches || navigator.connection?.saveData || typeof document.startViewTransition !== 'function' || typeof root.animate !== 'function') { applyTheme(next); return; }
+    const rect = themeButton.getBoundingClientRect();
+    const x = event.detail ? event.clientX : rect.left + rect.width / 2;
+    const y = event.detail ? event.clientY : rect.top + rect.height / 2;
+    const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    let applied = false;
+    const update = () => { applied = true; applyTheme(next); };
+    root.dataset.themeReveal = 'on'; themeButton.setAttribute('aria-busy', 'true');
+    try {
+      themeTransition = document.startViewTransition(update);
+      themeTransition.ready.then(() => {
+        if (root.dataset.motion === 'off' || reducedThemeMotion?.matches) { themeTransition?.skipTransition(); return; }
+        const animation = root.animate({ clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] }, { duration: 480, easing: 'cubic-bezier(.22,1,.36,1)', pseudoElement: '::view-transition-new(root)' });
+        animation.finished.catch(() => {});
+      }).catch(() => { themeTransition?.skipTransition(); });
+      themeTransition.finished.catch(() => { if (!applied) update(); }).finally(finishTransition);
+    } catch { if (!applied) update(); finishTransition(); }
   });
+  const skipThemeTransition = () => themeTransition?.skipTransition();
+  reducedThemeMotion?.addEventListener('change', skipThemeTransition);
+  window.addEventListener('pagehide', skipThemeTransition);
+  window.addEventListener('beforeprint', skipThemeTransition);
 
   const systemTheme = typeof matchMedia === 'function' ? matchMedia('(prefers-color-scheme: dark)') : null;
   systemTheme?.addEventListener('change', event => {
@@ -30,13 +62,17 @@
 
   const menu = document.querySelector('.site-nav');
   const menuToggle = document.getElementById('menu-toggle');
-  const closeMenu = () => {
+  const closeMenu = (restoreFocus = false) => {
+    const wasOpen = menu?.classList.contains('is-open');
     menu?.classList.remove('is-open');
     menuToggle?.setAttribute('aria-expanded', 'false');
+    menuToggle?.setAttribute('aria-label', '打开菜单');
+    if (restoreFocus && wasOpen) menuToggle?.focus();
   };
   menuToggle?.addEventListener('click', () => {
     const open = menu?.classList.toggle('is-open');
     menuToggle.setAttribute('aria-expanded', String(Boolean(open)));
+    menuToggle.setAttribute('aria-label', open ? '关闭菜单' : '打开菜单');
   });
   document.addEventListener('click', event => {
     if (!menu?.contains(event.target) && !menuToggle?.contains(event.target)) closeMenu();
@@ -44,9 +80,6 @@
 
   const dialog = document.getElementById('search-dialog');
   const input = document.getElementById('search-input');
-  const results = [...document.querySelectorAll('#search-results li')];
-  const status = document.getElementById('search-status');
-  const empty = document.querySelector('.search-empty');
   const openSearch = () => {
     if (root.dataset.printPreview === 'true') return;
     if (!dialog || dialog.open) return;
@@ -60,23 +93,18 @@
   document.querySelectorAll('#search-open, [data-open-search]').forEach(button => button.addEventListener('click', openSearch));
   document.getElementById('search-close')?.addEventListener('click', () => dialog?.close());
   dialog?.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
-  input?.addEventListener('input', () => {
-    if (dialog?.dataset.searchReady === 'true') return;
-    const keywords = input.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
-    let count = 0;
-    results.forEach(item => {
-      item.hidden = !keywords.every(word => item.dataset.search.includes(word));
-      if (!item.hidden) count += 1;
-    });
-    if (status) status.textContent = keywords.length ? `找到 ${count} 篇相关文章` : `搜索本站 ${results.length} 篇文章`;
-    if (empty) empty.hidden = count > 0;
-  });
   document.addEventListener('keydown', event => {
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
       event.preventDefault();
       dialog?.open ? dialog.close() : openSearch();
     }
-    if (event.key === 'Escape') closeMenu();
+    if (event.key === 'Escape' && menu?.classList.contains('is-open')) {
+      event.preventDefault();
+      closeMenu(true);
+    }
+  });
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 800) closeMenu();
   });
 
   const fallbackImage = image => {

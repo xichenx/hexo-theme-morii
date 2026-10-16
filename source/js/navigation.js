@@ -9,6 +9,7 @@
     if (document.querySelector('dialog[open]')) return;
     opener = document.activeElement;
     document.getElementById('menu-toggle')?.setAttribute('aria-expanded', 'false');
+    document.getElementById('menu-toggle')?.setAttribute('aria-label', '打开菜单');
     document.querySelector('.site-nav')?.classList.remove('is-open');
     dialog.showModal();
     button.setAttribute('aria-expanded', 'true');

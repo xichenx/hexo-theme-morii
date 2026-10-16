@@ -1,7 +1,7 @@
 (() => {
   const root = document.documentElement;
   const main = document.getElementById('main');
-  if (!main || root.dataset.motion === 'off') return;
+  if (!main) return;
   const preference = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
   const selector = '.hero__main, .hero-mini, .section-heading, .feature-card, .post-card, .profile-card, .side-card, .discovery-card, .selected-card, .friend-card, .feed-card, .photo-card, .taxonomy-card, .related-card, .archive-tree-item, .page-intro:not(.music-page-heading), .article-header';
   const seen = new WeakSet();
@@ -20,16 +20,16 @@
     main.querySelectorAll('.hero__main').forEach(element => element.style.setProperty('--morii-ambient-state', 'paused'));
   };
   const register = node => {
-    if (!reveals || stopped || preference?.matches || node.nodeType !== 1) return;
+    if (!reveals || stopped || preference?.matches || root.dataset.motion === 'off' || node.nodeType !== 1) return;
     const elements = [...(node.matches(selector) ? [node] : []), ...node.querySelectorAll(selector)];
     elements.forEach(element => {
       if (!seen.has(element) && !observed.has(element)) { observed.add(element); reveals.observe(element); }
     });
   };
   const start = () => {
-    if (stopped || preference?.matches || reveals || typeof IntersectionObserver !== 'function' || typeof Element.prototype.animate !== 'function') return;
+    if (stopped || root.dataset.motion === 'off' || preference?.matches || reveals || typeof IntersectionObserver !== 'function' || typeof Element.prototype.animate !== 'function') return;
     reveals = new IntersectionObserver(entries => {
-      if (!reveals || stopped || preference?.matches) return;
+      if (!reveals || stopped || preference?.matches || root.dataset.motion === 'off') return;
       let order = 0;
       entries.forEach(entry => {
         const element = entry.target;

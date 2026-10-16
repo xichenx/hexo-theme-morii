@@ -1,5 +1,6 @@
 doctype html
-html(lang=config.language || 'zh-CN' style=morii_accent() data-motion=(!theme.motion || theme.motion.enable !== false) ? 'on' : 'off')
+- var visualEffects = morii_effects()
+html(lang=config.language || 'zh-CN' style=morii_accent() data-motion=(!theme.motion || theme.motion.enable !== false) ? 'on' : 'off' data-glass=visualEffects.enabled ? (visualEffects.glass ? 'on' : 'off') : null data-effects=visualEffects.enabled ? 'on' : null data-theme-transition=visualEffects.transition ? 'on' : null)
   head
     meta(charset='utf-8')
     meta(name='viewport' content='width=device-width, initial-scale=1')
@@ -24,6 +25,9 @@ html(lang=config.language || 'zh-CN' style=morii_accent() data-motion=(!theme.mo
     script(src=url_for('/js/theme-init.js'))
     link(rel='stylesheet' href=url_for('/css/style.css'))
     link(rel='stylesheet' href=url_for('/css/media.css'))
+    link(rel='stylesheet' href=url_for('/css/search.css'))
+    if visualEffects.enabled
+      link(rel='stylesheet' href=url_for('/css/effects.css'))
     if !theme.motion || theme.motion.enable !== false
       link(rel='stylesheet' href=url_for('/css/motion.css'))
     if is_archive()
@@ -40,6 +44,10 @@ html(lang=config.language || 'zh-CN' style=morii_accent() data-motion=(!theme.mo
     if is_post() && (!theme.article || !theme.article.print || theme.article.print.enable !== false)
       link#article-print-style(rel='stylesheet' href=url_for('/css/print.css') media='print')
   body(class=page.type === 'music' ? 'is-music' : is_post() ? 'is-reading' : page.path && page.path.startsWith('air-conditioner/') ? 'is-playground' : '')
+    if visualEffects.enabled
+      .morii-atmosphere(aria-hidden='true' data-aurora=visualEffects.aurora ? 'on' : null)
+        if visualEffects.particles
+          canvas#morii-particles(data-density=visualEffects.density)
     a.skip-link(href='#main') 跳转到正文
     include print-toolbar.pug
     .site-shell
@@ -51,7 +59,7 @@ html(lang=config.language || 'zh-CN' style=morii_accent() data-motion=(!theme.mo
             else
               | ✦
           span.brand__text= theme.brand || config.title
-        nav.site-nav(aria-label='主导航')
+        nav.site-nav#site-nav(aria-label='主导航')
           each item in theme.menu
             - var activeMenu = is_current(item.path) || (item.path === '/' && is_home()) || (item.path === '/archives/' && (is_archive() || is_post())) || (item.path === '/album/' && page.type === 'album_detail')
             a(href=url_for(item.path) class=activeMenu ? 'site-nav__item--active' : '' aria-current=activeMenu ? 'page' : false)= item.name
@@ -60,7 +68,7 @@ html(lang=config.language || 'zh-CN' style=morii_accent() data-motion=(!theme.mo
             button.icon-button#navigation-open(type='button' aria-label='全站快捷导航' title='全站快捷导航（?）' aria-haspopup='dialog' aria-controls='navigation-dialog' aria-expanded='false') ▦
           button.icon-button#search-open(type='button' aria-label='搜索文章' title='搜索文章') ⌕
           button.icon-button#theme-toggle(type='button' aria-label='切换深色模式' title='切换深色模式') ◐
-          button.icon-button#menu-toggle.mobile-only(type='button' aria-label='打开菜单' aria-expanded='false') ☰
+          button.icon-button#menu-toggle.mobile-only(type='button' aria-label='打开菜单' aria-controls='site-nav' aria-expanded='false') ☰
         if is_post()
           .reading-progress(role='progressbar' aria-label='阅读进度' aria-valuemin='0' aria-valuemax='100' aria-valuenow='0')
             .reading-progress__bar
@@ -102,26 +110,7 @@ html(lang=config.language || 'zh-CN' style=morii_accent() data-motion=(!theme.mo
           include toc.pug
     if is_post() && (!theme.article || !theme.article.share || theme.article.share.enable !== false)
       include article-share.pug
-    dialog.search-dialog#search-dialog(aria-labelledby='search-heading' data-search-index=url_for('/morii-search.json') data-page-size=(theme.search && theme.search.page_size) || 10)
-      .search-dialog__top
-        strong#search-heading 搜索文章
-        button.icon-button#search-close(type='button' aria-label='关闭搜索') ×
-      label.sr-only(for='search-input') 搜索关键词
-      .search-input-row
-        input#search-input(type='search' placeholder='搜索标题、正文或标签…' autocomplete='off')
-        button#search-clear(type='button') 清空
-      p.search-hint#search-service-status(role='status' aria-live='polite') 输入多个关键词可缩小搜索范围。
-      button.button.service-button#search-retry(type='button' hidden) 重新加载正文搜索
-      p.search-hint#search-status(role='status' aria-live='polite') 搜索本站 #{site.posts.length} 篇文章
-      p.search-empty(hidden) 没有找到相关文章，试试其他关键词。
-      ul#search-results
-        each post in site.posts.sort('date', -1).toArray()
-          - var searchText = morii_search_text(post)
-          li(data-search=searchText)
-            a(href=url_for(post.path))
-              span= post.title
-              small= date(post.date, 'YYYY.MM.DD')
-      button.button.service-button#search-more(type='button' hidden) 展示更多结果
+    include search-panel.pug
     dialog.lightbox#image-dialog(aria-label='图片预览')
       .lightbox-header
         strong 图片预览
@@ -155,6 +144,8 @@ html(lang=config.language || 'zh-CN' style=morii_accent() data-motion=(!theme.mo
     include music-hub.pug
     script(src=url_for('/js/music.js') defer)
     script(src=url_for('/js/theme.js') defer)
+    if visualEffects.enabled
+      script(src=url_for('/js/effects.js') defer data-spotlight=visualEffects.spotlight ? 'on' : 'off' data-tilt=visualEffects.tilt ? 'on' : 'off' data-ripple=visualEffects.ripple ? 'on' : 'off')
     if !theme.motion || theme.motion.enable !== false
       script(src=url_for('/js/motion.js') defer)
     if morii_runtime()

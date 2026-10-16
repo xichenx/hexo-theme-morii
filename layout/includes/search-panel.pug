@@ -1,0 +1,51 @@
+dialog.search-dialog#search-dialog(aria-labelledby='search-heading' data-search-index=url_for('/morii-search.json') data-page-size=(theme.search && theme.search.page_size) || 10)
+  .search-header
+    .search-dialog__top
+      div
+        span.section-kicker SEARCH MORII
+        h2#search-heading 发现字里行间
+      button.icon-button#search-close(type='button' aria-label='关闭搜索' title='关闭（Esc）') ×
+    label.sr-only(for='search-input') 搜索关键词
+    .search-input-row
+      span.search-input-icon(aria-hidden='true')
+        svg(viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8')
+          circle(cx='10.8' cy='10.8' r='6.8')
+          path(d='m16 16 4.5 4.5')
+      input#search-input(type='search' placeholder='搜索标题、正文、分类或标签…' autocomplete='off' maxlength='200' aria-controls='search-results' aria-describedby='search-keyboard-help')
+      button#search-clear(type='button' aria-label='清空搜索关键词' hidden) 清空
+    .search-scope(role='group' aria-label='搜索范围')
+      button(type='button' data-search-scope='all' aria-pressed='true') 全部内容
+      button(type='button' data-search-scope='title' aria-pressed='false') 仅标题
+      button(type='button' data-search-scope='topics' aria-pressed='false') 分类与标签
+    if site.tags.length
+      .search-suggestions(aria-label='快速查找')
+        span 快速查找
+        each tag in site.tags.sort('length', -1).limit(5).toArray()
+          button(type='button' data-search-term=tag.name)= '# ' + tag.name
+  .search-scroll
+    .search-results-heading
+      strong#search-results-heading 最近文章
+      p#search-status(role='status' aria-live='polite') 共 #{site.posts.length} 篇文章
+    .search-empty(hidden)
+      span.search-empty-icon(aria-hidden='true') ⌕
+      strong 没有找到相关文章
+      p 换个关键词，或切换到“全部内容”试试。
+    ul#search-results(aria-labelledby='search-results-heading')
+      each post in site.posts.sort('date', -1).toArray()
+        li(data-search=morii_search_text(post) data-topics=post.password ? '' : Array.from(new Set(post.categories.toArray().concat(post.tags.toArray()).map(item => item.name))).join(' ') data-protected=post.password ? 'true' : 'false')
+          a(href=url_for(post.path))
+            span.search-result-icon(aria-hidden='true') ≡
+            .search-result-content
+              strong.search-result-title= post.title
+              p.search-result-summary= morii_excerpt(post, 150)
+              small= date(post.date, 'YYYY.MM.DD')
+            span.search-result-arrow(aria-hidden='true') ↗
+    button.button.service-button#search-more(type='button' hidden) 展示更多结果
+  .search-footer
+    .search-service
+      p#search-service-status(role='status' aria-live='polite') 多个关键词用空格分隔
+      button#search-retry(type='button' hidden) 重试
+    p#search-keyboard-help
+      span #[kbd ↑] #[kbd ↓] 选择
+      span #[kbd Enter] 打开
+      span #[kbd Esc] 关闭
