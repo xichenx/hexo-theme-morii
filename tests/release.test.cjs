@@ -20,7 +20,7 @@ test('release archive contains installable theme files and an accurate checksum'
   const info = pack(`v${manifest.version}`);
   const archive = path.join(root, 'dist', info.archive);
   const entries = execFileSync('unzip', ['-Z1', archive], { encoding: 'utf8' }).trim().split('\n');
-  for (const file of ['morii/_config.yml', 'morii/layout/index.pug', 'morii/scripts/music.js', 'morii/source/js/music.js', 'morii/README.md']) assert.ok(entries.includes(file), file);
+  for (const file of ['morii/_config.yml', 'morii/layout/index.pug', 'morii/scripts/music.js', 'morii/source/js/music.js', 'morii/README.md', 'morii/LICENSE']) assert.ok(entries.includes(file), file);
   assert.ok(entries.every(entry => entry.startsWith('morii/') && !/(^|\/)(?:node_modules|\.git|\.github|\.cache|demo|tools|tests)(?:\/|$)/.test(entry)));
   const digest = crypto.createHash('sha256').update(fs.readFileSync(archive)).digest('hex');
   assert.equal(fs.readFileSync(path.join(root, 'dist/SHA256SUMS.txt'), 'utf8'), `${digest}  ${info.archive}\n`);

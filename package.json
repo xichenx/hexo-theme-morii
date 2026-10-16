@@ -1,8 +1,13 @@
 {
   "name": "hexo-theme-morii",
-  "version": "0.1.0-alpha.1",
-  "private": true,
+  "version": "0.1.0-alpha.2",
   "description": "A rich card Hexo theme with an immersive music room.",
+  "license": "MIT",
+  "keywords": ["hexo", "hexo-theme", "theme", "blog", "morii"],
+  "homepage": "https://github.com/xichenx/hexo-theme-morii#readme",
+  "bugs": { "url": "https://github.com/xichenx/hexo-theme-morii/issues" },
+  "files": ["_config.yml", "layout/", "scripts/", "source/", "README.md", "CHANGELOG.md", "LICENSE"],
+  "publishConfig": { "registry": "https://registry.npmjs.org/", "tag": "alpha" },
   "repository": {
     "type": "git",
     "url": "https://github.com/xichenx/hexo-theme-morii.git"
@@ -17,6 +22,13 @@
     "release:check": "node tools/release.cjs check",
     "package:theme": "node tools/release.cjs pack"
   },
+  "dependencies": {
+    "hexo-util": "^3.3.0"
+  },
+  "peerDependencies": {
+    "hexo": ">=8.0.0",
+    "hexo-renderer-pug": ">=3.0.0"
+  },
   "devDependencies": {
     "hexo": "8.1.2",
     "hexo-generator-archive": "2.0.0",
@@ -25,7 +37,6 @@
     "hexo-generator-tag": "2.0.0",
     "hexo-renderer-marked": "7.0.1",
     "hexo-renderer-pug": "3.0.0",
-    "hexo-util": "3.3.0",
     "js-yaml": "4.1.1",
     "jsdom": "25.0.1"
   }

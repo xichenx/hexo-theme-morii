@@ -1,6 +1,6 @@
 # Morii 发布与演示站
 
-当前版本候选：`v0.1.0-alpha.1`。配置好工作流不等于已经发布版本。
+当前版本候选：`v0.1.0-alpha.2`。配置好工作流不等于已经发布版本。
 
 ## 工作流
 
@@ -10,7 +10,7 @@
 | `.github/workflows/release.yml` | 推送 `v*` 标签 | 校验版本号，测试，生成 ZIP、SHA256 校验文件和 GitHub Release 草稿 |
 | `.github/workflows/demo.yml` | main 提交、手动 | 启用后测试并部署独立演示站到 GitHub Pages |
 
-工作流使用 GitHub 自带的 `GITHUB_TOKEN`，无需额外 PAT。npm 发布尚未配置；`package.json` 的 `private: true` 用于防止误发布到 npm。
+工作流使用 GitHub 自带的 `GITHUB_TOKEN`，无需额外 PAT。npm 首次发布由维护者在本机登录后执行，使用 `alpha` 标签，避免预发布版本成为默认的 `latest`。
 
 ## 本地验证
 
@@ -24,7 +24,7 @@ npm run package:theme
 ```
 
 - 演示站输出：`.cache/demo/public/`。
-- 发布包：`dist/hexo-theme-morii-v0.1.0-alpha.1.zip`。
+- 发布包：`dist/hexo-theme-morii-v0.1.0-alpha.2.zip`。
 - 解压后只有 `morii/` 主题目录，不包含博客文章、开发测试、node_modules 或 Git 配置。
 - ZIP 打包需要 `zip`；发布包测试需要 `unzip`。GitHub Ubuntu runner 已提供这两个命令。
 - 本地 Node.js 至少为 20.19.0，CI 验证 Node 22 / 24。
@@ -59,8 +59,7 @@ npm run build:demo
 
 ### 1. 准备提交
 
-- 整理主题默认配置中的作者个人账号、备案信息和第三方服务地址，提供适合新用户的示例值。
-- 确定主题开源许可证并补充 `LICENSE`。当前仓库尚未选定许可证；Release 草稿也会提示这一点。
+- 检查主题默认配置中的作者个人账号、备案信息和第三方服务地址；发布说明应提醒新用户替换这些示例值。
 - 在 `package.json` 更新 `version`，并同步锁文件：
 
   ```bash
@@ -76,8 +75,8 @@ npm run build:demo
 首个候选版本示例：
 
 ```bash
-git tag -a v0.1.0-alpha.1 -m "Morii v0.1.0-alpha.1"
-git push origin v0.1.0-alpha.1
+git tag -a v0.1.0-alpha.2 -m "Morii v0.1.0-alpha.2"
+git push origin v0.1.0-alpha.2
 ```
 
 标签版本必须与 `package.json` 完全一致。标签推送后 Release 工作流才会运行；推送普通提交不会创建 Release。
@@ -95,12 +94,26 @@ git push origin v0.1.0-alpha.1
 
 同一标签的失败任务可通过 Re-run jobs 重跑：已有草稿会更新附件，已公开的 Release 不会被工作流覆盖。不要移动已发布的标签，修复后发布下一个版本。
 
-## 后续发布渠道
+## npm 发布
+
+在 npm 官方注册表完成账号登录后，执行 `npm pack --dry-run` 并检查文件清单，再发布预览版：
+
+```bash
+npm publish --tag alpha --registry https://registry.npmjs.org/
+```
+
+`package.json` 的 `files` 只收录主题运行所需的模板、脚本、资源、配置、README、更新日志和许可证。`hexo-util` 是运行时依赖；Hexo 8 与 Pug 渲染器由站点安装。发布后检查 `npm view hexo-theme-morii@alpha version` 和安装生成结果。
+
+## Hexo 主题目录
+
+按照 [Hexo 官方主题发布说明](https://hexo.io/docs/themes) 向 `hexojs/site` 提交 PR：在 `source/_data/themes/morii.yml` 填写仓库、公开演示链接与标签，并在 `source/themes/screenshots/morii.png` 提供 800 × 500 PNG 截图。演示链接必须实际可访问；PR 需等待 Hexo 维护者审阅和合并。
+
+## 发布渠道
 
 - GitHub Releases：当前自动化的版本分发渠道。
 - GitHub Pages：独立演示站。
-- Hexo 主题目录：准备好公开演示地址和 800×500 PNG 截图，再向 `hexojs/site` 提交收录 PR；此流程需要人工审阅。
-- npm：后续单独补齐包内容清单、许可证和 Trusted Publishing 配置，再移除 `private: true`。当前工作流不会发布 npm 包。
+- Hexo 主题目录：通过上游 PR 收录。
+- npm：首次通过本机 npm 登录发布 `alpha` 标签；后续可设置 Trusted Publishing。
 
 官方参考：
 

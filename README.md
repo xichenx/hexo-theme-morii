@@ -12,7 +12,7 @@
 
 **[▶ 查看完整演示](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)** · [下载 MP4](https://github.com/xichenx/hexo-theme-morii/raw/refs/heads/main/docs/media/morii-demo.mp4)
 
-约 44 秒 · 1280 × 720 · 无配乐。使用独立演示站的真实界面截图剪辑，展示当前开发进度（2026-10-16）；包含尚未进入 `v0.1.0-alpha.1` 的功能。动图为节选，完整视频包含中文字幕轨与章节。
+约 44 秒 · 1280 × 720 · 无配乐。使用独立演示站的真实界面截图剪辑，展示 `v0.1.0-alpha.2` 的功能。动图为节选，完整视频包含中文字幕轨与章节。
 
 | 时间 | 内容 |
 | --- | --- |
@@ -54,7 +54,13 @@
 
 ## 安装
 
-在已有 Hexo 站点根目录执行：
+在已有 Hexo 8 站点根目录安装 alpha 版本：
+
+```bash
+npm install hexo-theme-morii@alpha hexo-renderer-pug
+```
+
+也可以从 GitHub 克隆到主题目录：
 
 ```bash
 git clone https://github.com/xichenx/hexo-theme-morii.git themes/morii
@@ -67,7 +73,7 @@ npm install hexo-renderer-pug
 theme: morii
 ```
 
-主题使用 Pug 模板与原生 CSS / JavaScript，无额外前端打包步骤。当前开发环境为 Hexo 8.1.2。首次安装请按自己的信息修改头像、社交账号、备案号、建站时间和音乐歌单；这些配置目前保留作者站点的示例值。
+主题使用 Pug 模板与原生 CSS / JavaScript，无额外前端打包步骤。当前开发环境为 Hexo 8.1.2。npm 安装会使用 `node_modules/hexo-theme-morii`；建议通过站点根目录的 `_config.morii.yml` 覆盖主题配置，避免修改安装包。首次安装请按自己的信息修改头像、社交账号、备案号、建站时间和音乐歌单；这些配置目前保留作者站点的示例值。
 
 ```bash
 npx hexo generate
@@ -76,7 +82,7 @@ npx hexo server
 
 ## 配置
 
-主题设置在 `themes/morii/_config.yml`，也可通过站点根目录的 `_config.morii.yml` 覆盖。
+主题设置在 Git 安装的 `themes/morii/_config.yml` 或 npm 安装的 `node_modules/hexo-theme-morii/_config.yml`，也可通过站点根目录的 `_config.morii.yml` 覆盖。
 
 `logo` 控制顶部导航栏图标，`favicon` 控制浏览器标签页图标，两者可以分别替换，支持本站路径或完整图片网址。例如：
 
@@ -328,7 +334,7 @@ npm run build:demo
 npm run package:theme
 ```
 
-首次启用 Pages、创建版本标签和审阅 Release 草稿的具体步骤见 [发布指南](docs/RELEASING.md)。已发布预览版 `0.1.0-alpha.1`，后续未发布改动见更新日志；npm 发布尚未启用，开源许可证也尚未选定。
+创建版本标签、发布 GitHub Release 与 npm 包、提交 Hexo 主题目录的具体步骤见 [发布指南](docs/RELEASING.md)。当前预览版为 `0.1.0-alpha.2`，采用 MIT 许可证。
 
 ## 交互与回归验证
 

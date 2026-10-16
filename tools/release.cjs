@@ -5,8 +5,8 @@ const crypto = require('node:crypto');
 const { execFileSync } = require('node:child_process');
 const root = path.resolve(__dirname, '..');
 const manifest = require('../package.json');
-const required = ['README.md', '_config.yml', 'package.json', 'layout', 'scripts', 'source'];
-const optional = ['CHANGELOG.md', 'LICENSE', 'LICENSE.md'];
+const required = ['README.md', 'LICENSE', '_config.yml', 'package.json', 'layout', 'scripts', 'source'];
+const optional = ['CHANGELOG.md'];
 function metadata(tag = `v${manifest.version}`, version = manifest.version) {
   const match = /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/.exec(tag);
   if (!match || match[4]?.split('.').some(part => /^0\d+$/.test(part))) throw new Error('Use a SemVer tag such as v0.1.0-alpha.1.');
@@ -42,8 +42,7 @@ function pack(tag) {
     const start = changelog.indexOf(heading);
     if (start < 0) throw new Error(`Add ${heading} to CHANGELOG.md before packaging.`);
     const section = changelog.slice(start).split(/\n## /)[0];
-    const licenseNote = fs.existsSync(path.join(root, 'LICENSE')) || fs.existsSync(path.join(root, 'LICENSE.md')) ? '' : '\n\n> 当前尚未指定开源许可证，请维护者在公开发布前补充 LICENSE。';
-    fs.writeFileSync(path.join(dist, 'RELEASE_NOTES.md'), `${section}\n\n安装：解压 ZIP，将 morii 目录放入 Hexo 的 themes/，安装 hexo-renderer-pug 并设置 theme: morii。${licenseNote}\n`);
+    fs.writeFileSync(path.join(dist, 'RELEASE_NOTES.md'), `${section}\n\n安装：解压 ZIP，将 morii 目录放入 Hexo 的 themes/，安装 hexo-renderer-pug 并设置 theme: morii。许可证：MIT。\n`);
   } finally { fs.rmSync(stage, { recursive: true, force: true }); }
   return info;
 }
