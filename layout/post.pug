@@ -31,6 +31,14 @@ block content
             a.text-link(href=url_for('/reading-list/')) 查看清单 →
           p#reading-list-message(role='status' aria-live='polite')
         include includes/reading-settings.pug
+      if !page.password && (!theme.article || !theme.article.resume || theme.article.resume.enable !== false)
+        .reading-resume#reading-resume(data-updated=date_xml(page.updated || page.date) hidden)
+          .reading-resume__copy
+            strong 继续上次阅读
+            p#reading-resume-description
+          .reading-resume__actions
+            button.reading-preference-button#reading-resume-continue(type='button') 继续阅读 →
+            button.reading-preference-button#reading-resume-clear(type='button') 清除本篇记录
       include includes/outdated-notice.pug
       details.mobile-toc
         summary 本文目录

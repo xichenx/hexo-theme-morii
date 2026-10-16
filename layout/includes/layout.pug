@@ -1,5 +1,5 @@
 doctype html
-html(lang=config.language || 'zh-CN' style=morii_accent())
+html(lang=config.language || 'zh-CN' style=morii_accent() data-motion=(!theme.motion || theme.motion.enable !== false) ? 'on' : 'off')
   head
     meta(charset='utf-8')
     meta(name='viewport' content='width=device-width, initial-scale=1')
@@ -23,6 +23,15 @@ html(lang=config.language || 'zh-CN' style=morii_accent())
     link(rel='icon' href=url_for(theme.favicon || config.favicon || '/favicon.ico'))
     script(src=url_for('/js/theme-init.js'))
     link(rel='stylesheet' href=url_for('/css/style.css'))
+    link(rel='stylesheet' href=url_for('/css/media.css'))
+    if !theme.motion || theme.motion.enable !== false
+      link(rel='stylesheet' href=url_for('/css/motion.css'))
+    if is_archive()
+      link(rel='stylesheet' href=url_for('/css/archive.css'))
+    if page.type === 'categories' || is_category()
+      link(rel='stylesheet' href=url_for('/css/categories.css'))
+    if is_home() && (!page.current || page.current === 1) && morii_github_calendar()
+      link(rel='stylesheet' href=url_for('/css/github-calendar.css'))
     if page.type === 'link'
       link(rel='stylesheet' href=url_for('/css/friends.css'))
     link(rel='stylesheet' href=url_for('/css/music.css'))
@@ -114,22 +123,40 @@ html(lang=config.language || 'zh-CN' style=morii_accent())
               small= date(post.date, 'YYYY.MM.DD')
       button.button.service-button#search-more(type='button' hidden) 展示更多结果
     dialog.lightbox#image-dialog(aria-label='图片预览')
-      button.icon-button#image-close(type='button' aria-label='关闭图片预览') ×
+      .lightbox-header
+        strong 图片预览
+        button.icon-button#image-close(type='button' aria-label='关闭图片预览') ×
       figure
-        img#image-preview(alt='')
+        .lightbox-stage#image-stage(tabindex='0' role='group' aria-label='图片查看区域' aria-describedby='image-help')
+          img#image-preview(alt='' draggable='false')
+          .lightbox-feedback#image-feedback(hidden)
+            span.lightbox-feedback-icon(aria-hidden='true')
+              svg(viewBox='0 0 32 32' fill='none' stroke='currentColor' stroke-width='1.5')
+                rect(x='4' y='5' width='24' height='22' rx='5')
+                circle(cx='12' cy='12' r='2')
+                path(d='m5 23 7-7 5 5 4-4 6 6')
+            strong#image-state-title 正在加载图片
+            p#image-status(role='status' aria-live='polite')
+            button.button.service-button#image-retry(type='button' hidden) 重新加载图片
         figcaption#image-caption
-      p#image-status(role='status' aria-live='polite')
+      .lightbox-zoom(role='group' aria-label='图片缩放')
+        button.icon-button#image-zoom-out(type='button' aria-label='缩小图片' title='缩小（−）') −
+        output#image-scale(aria-label='当前缩放倍数') 1.0×
+        button.icon-button#image-zoom-in(type='button' aria-label='放大图片' title='放大（+）') +
+        button.button.service-button#image-reset(type='button' title='重置缩放（0）') 适应窗口
+      p.lightbox-help#image-help 滚轮 / 双指缩放 · 放大后拖拽 · 左右滑动切图 · Esc 关闭
       .lightbox-controls
         button.icon-button#image-previous(type='button' aria-label='上一张图片') ←
         span#image-counter(aria-live='polite')
         button.icon-button#image-next(type='button' aria-label='下一张图片') →
-        button.button.service-button#image-retry(type='button' hidden) 重新加载图片
         a.text-link#image-original(target='_blank' rel='noopener noreferrer') 打开原图 ↗
     button.icon-button.back-to-top#back-to-top(type='button' aria-label='返回顶部' hidden) ↑
     .sr-only#theme-announcement(role='status' aria-live='polite')
     include music-hub.pug
     script(src=url_for('/js/music.js') defer)
     script(src=url_for('/js/theme.js') defer)
+    if !theme.motion || theme.motion.enable !== false
+      script(src=url_for('/js/motion.js') defer)
     if morii_runtime()
       script(src=url_for('/js/runtime.js') defer)
     script(src=url_for('/js/search.js') defer)
@@ -144,12 +171,16 @@ html(lang=config.language || 'zh-CN' style=morii_accent())
       script(src=url_for('/js/reading-list.js') defer)
     if is_home() && (!page.current || page.current === 1)
       script(src=url_for('/js/discovery.js') defer)
+      if morii_github_calendar()
+        script(src=url_for('/js/github-calendar.js') defer)
     if page.type === 'link'
       script(src=url_for('/js/directory.js') defer)
     if page.path && page.path.startsWith('air-conditioner/')
       script(src=url_for('/js/air-conditioner.js') defer)
     if is_post()
       script(src=url_for('/js/reading.js') defer)
+      if !page.password && (!theme.article || !theme.article.resume || theme.article.resume.enable !== false)
+        script(src=url_for('/js/reading-resume.js') defer)
       if !theme.article || !theme.article.share || theme.article.share.enable !== false
         script(src=url_for('/js/share.js') defer)
       if !theme.article || !theme.article.print || theme.article.print.enable !== false

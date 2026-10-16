@@ -6,10 +6,29 @@
 
 主题品牌为 **Morii**，组织署名为 **Morainet**，项目仓库为 [xichenx/hexo-theme-morii](https://github.com/xichenx/hexo-theme-morii)。博客名称与主题品牌分别配置，当前博客名称继续使用“心灵涂鸦”。
 
+## 演示视频
+
+[![Morii 功能演示：点击查看完整视频](docs/media/morii-demo-preview.gif)](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)
+
+**[▶ 查看完整演示](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)** · [下载 MP4](https://github.com/xichenx/hexo-theme-morii/raw/refs/heads/main/docs/media/morii-demo.mp4)
+
+约 44 秒 · 1280 × 720 · 无配乐。使用独立演示站的真实界面截图剪辑，展示当前开发进度（2026-10-16）；包含尚未进入 `v0.1.0-alpha.1` 的功能。动图为节选，完整视频包含中文字幕轨与章节。
+
+| 时间 | 内容 |
+| --- | --- |
+| 00:00 | 首页、品牌与内容卡片 |
+| 00:07 | 文章阅读与阅读偏好 |
+| 00:14 | 分类导航与时间树归档 |
+| 00:21 | 图片查看器与音乐馆 |
+| 00:28 | 站内搜索与深色模式 |
+| 00:36 | 移动端首页与分类 |
+
 ## 已实现
 
 - 响应式首页、文章、归档、分类、标签、404 页面
-- 首页可配置精选文章、全站分类导航、页码导航和按年份分组的文章归档
+- 首页可配置精选文章、全站分类导航、页码导航和按年份分组的时间树归档
+- 首页、分类总览、分类文章、归档支持配置布局；分类总览可选双列主题导航、目录和卡片。
+- 首页 GitHub 贡献日历支持主题配色、每日详情、键盘导航、移动端横向滚动、缓存与重试。
 - 首页即刻速览、随机文章发现卡片，支持手动切换和无脚本回退
 - 关于、友链、即刻短文、相册及相册详情页，读取现有 `source/_data` 文件
 - 按需加载的正文搜索、命中摘要高亮、结果分页、深色模式、移动导航、文章目录
@@ -23,6 +42,8 @@
 - 文章打印预览、打印样式、通过浏览器另存为 PDF
 - 可配置公告、热门标签卡片、本地站点统计与文章时效提醒
 - 图片弹窗预览、连续翻图、方向键导航、照片信息和加载失败重试
+- 图片查看器支持 1–8 倍缩放、拖拽、双指缩放和适应窗口下的左右滑动切图；`+` / `−` 调整缩放，`0` 重置，`Esc` 关闭。
+- 长文阅读进度保存在当前浏览器，再次访问可点击“继续上次阅读”；支持清除本篇记录，读完后自动移除。通过 `article.resume.enable: false` 关闭。最多保留 50 篇、90 天的进度；更新过的文章、带章节锚点的链接及加密文章不会显示旧进度提示。
 - 关于页个人介绍、真实站点统计与文章主题；友链分组检索和本站名片复制
 - 朋友圈卡片信息流、分页、重试及本地友链回退
 - 完整音乐播放页、Meting 歌单、同步歌词、播放模式与站内连续播放的悬浮球
@@ -191,6 +212,8 @@ social:
 
 索引加载失败时提供重试；文章被移除或暂未找到时仍保留收藏记录，可以手动移除。浏览器禁用存储时显示提示，操作不会伪装成成功。跨标签页更改会自动刷新状态。通过 `reading_list.enable: false` 可以关闭按钮、导航和页面生成；`reading-list/` 为主题保留路由。
 
+清单支持按标题、分类、标签和路径组合筛选。可以将收藏导出为 JSON，再在其他浏览器中导入；导入会保留当前收藏并合并去重，支持站点根目录变化，超出 100 篇时提示未导入数量。仅接受 256 KB 以内、格式版本受支持的 Morii 收藏备份，文件在浏览器内读取，不上传服务器。备份只包含文章路径，不包含正文、阅读位置和账号信息。
+
 ### 阅读设置
 
 阅读页采用独立的通栏大封面，集中展示分类、标签、发布日期、更新日期、阅读时长和作者。封面优先使用文章 `top_img`，其次为 `cover`；`top_img: false` 使用纯渐变背景。正文与作者侧栏分为独立卡片，手机端封面信息居中。正文默认 17 px，章节标题、列表、表格和引用有独立排版，长代码在块内横向滚动。
@@ -279,6 +302,17 @@ music:
 
 曲目的 `url` 和 `cover` 也支持 `/audio/example.mp3` 这样的本站路径。未开启 JavaScript 时可通过原平台歌单入口收听。
 
+## 页面动效
+
+默认开启卡片滚动入场、首页装饰缓动、悬停反馈、按钮按压和弹窗入场。卡片只在首次进入视口时播放，异步加载的卡片同样适用。正文段落不逐段淡入，键盘聚焦会立即结束对应卡片的入场动画。无 JavaScript 或浏览器缺少动画支持时，内容正常显示。
+
+```yaml
+motion:
+  enable: true  # false 关闭本次新增的页面动效
+```
+
+自动遵循系统“减少动态效果”，偏好变化时会取消正在运行的入场动画。首页装饰离开视口或页面进入后台时暂停，打印时关闭动效。音乐封面、空调和页脚爱心等功能原有动画仍遵循各自配置与系统设置。
+
 ## 开发与发布
 
 主题仓库已提供独立演示站、CI、GitHub Release 草稿和可选 GitHub Pages 部署工作流。
@@ -291,10 +325,47 @@ npm run build:demo
 npm run package:theme
 ```
 
-首次启用 Pages、创建版本标签和审阅 Release 草稿的具体步骤见 [发布指南](docs/RELEASING.md)。当前候选版本为 `0.1.0-alpha.1`，尚未发布；npm 发布尚未启用，开源许可证也尚未选定。
+首次启用 Pages、创建版本标签和审阅 Release 草稿的具体步骤见 [发布指南](docs/RELEASING.md)。已发布预览版 `0.1.0-alpha.1`，后续未发布改动见更新日志；npm 发布尚未启用，开源许可证也尚未选定。
 
 ## 交互与回归验证
 
 主题仓库的 `npm test` 覆盖独立 Hexo 站点在根路径和子目录的构建、页面与资源路径、音乐队列与搜索、歌词加载竞争和进度定位、悬浮胶囊、发布版本校验、ZIP 内容和 SHA256 校验。
 
 作者博客工作区保留更多依赖真实文章的回归测试，两者用途不同。在线音乐、评论、天气和朋友圈的实际可用性仍需浏览器核对；独立构建不会请求这些外部服务。
+
+### GitHub 贡献日历
+
+首页第一页在内容推荐区下方显示贡献日历，无需旧 AnZhiYu 的 `recent-posts` 容器。主题配置示例：
+
+```yaml
+github_calendar:
+  enable: true
+  user: xichenx
+  api: 'https://github-contributions-api.jogruber.de/v4/{user}?y=last'
+```
+
+未配置主题账号时可沿用站点 `githubcalendar.user`。原插件的 `layout`、`calendar_js`、`color` 由 Morii 的原生布局与样式替代；旧接口不自动沿用，因为返回格式可能不同。`api` 可替换为兼容 [GitHub Contributions API v4](https://github.com/grubersjoe/github-contributions-api) 的自建服务，需允许博客跨域读取，无需在主题中设置 GitHub Token。浏览器会将成功响应缓存一小时，展示数据的截止日期；接口失败时可重试，账号链接仍可访问。数字表示服务返回的贡献次数，不代表提交数量。关闭 `enable` 后不加载日历脚本。
+
+### 页面布局配置
+
+推荐在**博客根目录**创建或编辑 `_config.morii.yml`，通过 Hexo 的主题覆盖配置选择布局。这样升级 `themes/morii` 时可保留自己的设置；直接修改主题的 `_config.yml` 也支持。布局配置在生成站点时生效，修改后执行 `npx hexo clean && npx hexo generate`，本地预览服务需重新启动。
+
+```yaml
+appearance:
+  layouts:
+    home: featured
+    categories: atlas
+    category: list
+    archives: timeline
+```
+
+| 配置项 | 可选值 | 默认值 |
+| --- | --- | --- |
+| `home` | `featured`：最新文章列表在奇数篇时突出首篇；`grid`：普通双列文章卡片 | `featured` |
+| `categories` | `atlas`：双列主题导航；`directory`：左侧索引与近期文章目录；`cards`：独立分类卡片 | `atlas` |
+| `category` | `list`：顶部主题切换和文章行列表；`cards`：文章卡片与侧栏 | `list` |
+| `archives` | `timeline`：年份时间树；`grouped`：按年份分组的列表卡片 | `timeline` |
+
+每项可独立选择。例如喜欢经典卡片时，将 `categories` 和 `category` 都设为 `cards`；喜欢目录时，只将 `categories` 设为 `directory`。未填写的项使用默认值，非法值会在构建日志提示并回退默认布局。配置值只从上述内置方案中选择，不加载任意模板。
+
+布局选择不修改每页文章数量、文章顺序、路由或分页范围；每页数量仍由 Hexo 的 `index_generator`、`category_generator`、`archive_generator` 和全局 `per_page` 决定。此配置不会覆盖浏览器内保存的字号、专注阅读等阅读偏好。

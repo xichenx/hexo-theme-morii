@@ -1,0 +1,13 @@
+.archive-groups
+  each group in morii_archive_groups(page.posts)
+    section.archive-year.panel(aria-labelledby='archive-year-' + group.year)
+      .archive-year__heading
+        h2(id='archive-year-' + group.year)= group.year
+        span 本页 #{group.entries.length} 篇
+      each post in group.entries
+        a.archive-entry(href=url_for(post.path))
+          time(datetime=date_xml(post.date))= date(post.date, 'MM-DD')
+          strong= post.title
+          if post.password
+            small 加密文章
+          span(aria-hidden='true') ↗

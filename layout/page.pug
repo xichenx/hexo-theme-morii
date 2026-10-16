@@ -1,8 +1,10 @@
 extends includes/layout.pug
 
 block content
-  .wrap.listing-page
-    .page-intro(class=page.type === 'link' ? 'friends-intro' : page.type === 'music' ? 'music-page-heading' : '')
+  - var categoryLayout = morii_layout('categories')
+  - var categoryEditorial = page.type === 'categories' && categoryLayout !== 'cards'
+  .wrap.listing-page(class=categoryEditorial ? 'category-directory-page category-overview' : '')
+    .page-intro(class=page.type === 'link' ? 'friends-intro' : page.type === 'music' ? 'music-page-heading' : categoryEditorial ? 'category-directory-intro' : '')
       - var pageKickers = { about: 'ABOUT', link: 'FRIENDS', essay: 'MOMENTS', album: 'ALBUMS', album_detail: 'PHOTO JOURNAL', fcircle: 'FRIENDS FEED', music: 'MUSIC', categories: 'TOPICS', tags: 'TAGS' }
       span.section-kicker= pageKickers[page.type] || 'EXPLORE'
       h1= morii_page_title(page)
@@ -10,6 +12,13 @@ block content
         p= page.description
       else if page.type === 'link'
         p 以文字相识，在彼此的小站里，发现更大的世界。
+      else if page.type === 'categories'
+        p 从一个感兴趣的主题，开始下一次探索。
+      if categoryEditorial
+        span.category-intro-mark(aria-hidden='true') #
+        .category-directory-stats
+          div #[strong=morii_category_directory(site.categories).length] #[span 个主题]
+          div #[strong=site.posts.length] #[span 篇全站文章]
       if page.type === 'link'
         - var introGroups = morii_friend_groups(site.data.link)
         .friends-intro-meta
@@ -48,11 +57,16 @@ block content
       when 'album_detail'
         include includes/page/album-detail.pug
       when 'categories'
-        .taxonomy-grid
-          each category in site.categories.toArray()
-            a.taxonomy-card(href=url_for(category.path))
-              strong= category.name
-              span #{category.posts.length} 篇文章 →
+        if categoryLayout === 'directory'
+          include includes/page/categories-directory.pug
+        else if categoryLayout === 'cards'
+          .taxonomy-grid
+            each category in morii_category_directory(site.categories)
+              a.taxonomy-card(href=url_for(category.path))
+                strong= category.name
+                span #{category.count} 篇文章 →
+        else
+          include includes/page/categories.pug
       when 'tags'
         .pill-cloud.taxonomy-tags
           each tag in site.tags.toArray()

@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { JSDOM } = require('jsdom');
 const { buildDemo } = require('../tools/demo.cjs');
-const pages = ['index.html', 'page/2/index.html', 'posts/welcome/index.html', 'archives/index.html', 'categories/index.html', 'tags/index.html', 'about/index.html', 'link/index.html', 'album/index.html', 'album/morii/index.html', 'music/index.html', 'reading-list/index.html', '404.html'];
+const pages = ['index.html', 'page/2/index.html', 'posts/welcome/index.html', 'archives/index.html', 'categories/index.html', 'categories/主题使用/index.html', 'tags/index.html', 'about/index.html', 'link/index.html', 'album/index.html', 'album/morii/index.html', 'music/index.html', 'reading-list/index.html', '404.html'];
 
 test('theme builds independently at both domain root and a Pages subdirectory', async t => {
   for (const prefix of ['/', '/hexo-theme-morii/']) await t.test(prefix, async () => {
@@ -17,6 +17,14 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       assert.equal(document.querySelectorAll('main h1').length, 1, `${file}: one page heading`);
       assert.ok(document.querySelector('#morii-audio-hub'), `${file}: shared music player`);
       assert.equal(document.querySelectorAll('#comment-service').length, 0, 'Demo must not use a personal comment service');
+      if (file === 'index.html' || file === 'page/2/index.html') {
+        const cards = [...document.querySelectorAll('#latest .post-grid > .post-card')];
+        assert.equal(cards.length, file === 'index.html' ? 5 : 2);
+        const featured = cards.filter(card => card.classList.contains('post-card--featured'));
+        assert.equal(featured.length, cards.length % 2, `${file}: only odd lists need a leading wide card`);
+        if (featured.length) assert.equal(featured[0], cards[0]);
+        assert.ok(!cards.at(-1).classList.contains('post-card--featured'), `${file}: final card must remain paired`);
+      }
       for (const node of document.querySelectorAll('script[src],link[rel="stylesheet"],img[src]')) {
         const raw = node.getAttribute('src') || node.getAttribute('href');
         const url = new URL(raw, dom.window.location.href);
@@ -36,9 +44,65 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       dom.window.close();
     }
     const index = JSON.parse(fs.readFileSync(path.join(output, 'morii-search.json'), 'utf8'));
+    for (const route of ['archives/', 'archives/2026/', 'archives/2026/10/']) {
+      const read = suffix => new JSDOM(fs.readFileSync(path.join(output, route, suffix, 'index.html'), 'utf8'));
+      const first = read('');
+      const second = read('page/2');
+      const entries = first.window.document.querySelectorAll('.archive-tree-list .archive-entry');
+      assert.equal(entries.length, 4, `${route}: first page keeps archive page size`);
+      assert.equal(second.window.document.querySelectorAll('.archive-entry').length, 3);
+      const dates = [...entries].map(entry => entry.querySelector('time').dateTime);
+      assert.deepEqual(dates, [...dates].sort().reverse(), `${route}: newest first`);
+      assert.ok(dates.every(date => date.startsWith('2026-10')));
+      assert.equal(first.window.document.querySelector('.archive-year h2').textContent, '2026');
+      assert.equal(first.window.document.querySelector('.pagination a[rel="next"]').getAttribute('href'), `${prefix}${route}page/2/`);
+      assert.equal(second.window.document.querySelector('.pagination a[rel="prev"]').getAttribute('href'), `${prefix}${route}`);
+      first.window.close();
+      second.window.close();
+    }
+    const category = new JSDOM(fs.readFileSync(path.join(output, 'categories/主题使用/index.html'), 'utf8'));
+    assert.ok(category.window.document.querySelector('.category-post-list .category-post-row'), 'Category details use article rows');
+    assert.ok(category.window.document.querySelector('.category-index a[aria-current="page"]'));
+    assert.equal(category.window.document.querySelector('.post-grid, .archive-tree'), null, 'Categories use the directory layout');
+    category.window.close();
+    const directory = new JSDOM(fs.readFileSync(path.join(output, 'categories/index.html'), 'utf8'));
+    const topicLinks = directory.window.document.querySelectorAll('.category-atlas .category-topic-link');
+    assert.ok(topicLinks.length > 0);
+    for (const link of topicLinks) {
+      const href = link.getAttribute('href');
+      assert.ok(href.startsWith(`${prefix}categories/`), 'Topic links stay within deployment root');
+      assert.ok(fs.existsSync(path.join(output, decodeURIComponent(href.slice(prefix.length)), 'index.html')), 'Topic links point to generated categories');
+    }
+    assert.ok(directory.window.document.querySelector('.category-topic-updated time'));
+    assert.equal(directory.window.document.querySelector('.taxonomy-card'), null);
+    directory.window.close();
     assert.ok(JSON.stringify(index).includes('欢迎使用 Morii'));
     const article = fs.readFileSync(path.join(output, 'posts/welcome/index.html'), 'utf8');
     assert.ok(article.includes('folding-tag'), 'Compatibility tags render without the old theme');
     assert.ok(fs.existsSync(path.join(output, '.nojekyll')));
+  });
+  for (const layouts of [
+    { home: 'grid', categories: 'cards', category: 'cards', archives: 'grouped' },
+    { home: 'featured', categories: 'directory', category: 'list', archives: 'timeline' }
+  ]) await t.test(`configurable layouts: ${layouts.categories}`, async () => {
+    const output = await buildDemo({ root: '/theme/', url: 'https://example.test', themeOverrides: { appearance: { layouts } } });
+    const documentFor = file => new JSDOM(fs.readFileSync(path.join(output, file, 'index.html'), 'utf8')).window.document;
+    const home = documentFor('');
+    const overview = documentFor('categories');
+    const category = documentFor('categories/主题使用');
+    const archive = documentFor('archives');
+    assert.equal(home.querySelectorAll('#latest .post-card--featured').length, layouts.home === 'grid' ? 0 : 1);
+    assert.ok(overview.querySelector(layouts.categories === 'cards' ? '.taxonomy-grid .taxonomy-card' : '.category-directory-variant .category-directory-row'));
+    assert.ok(category.querySelector(layouts.category === 'cards' ? '.post-grid .post-card' : '.category-post-list .category-post-row'));
+    assert.ok(archive.querySelector(layouts.archives === 'grouped' ? '.archive-groups .archive-year' : '.archive-tree'));
+    assert.equal(archive.querySelectorAll('.archive-entry').length, 4, 'Changing layout must not change archive page size');
+    for (const document of [home, overview, category, archive]) {
+      assert.equal(document.querySelectorAll('main h1').length, 1);
+      for (const link of document.querySelectorAll('main a[href]')) {
+        const href = link.getAttribute('href');
+        if (href.startsWith('/') && !href.startsWith('//')) assert.ok(href.startsWith('/theme/'), `Layout link stays within deployment root: ${href}`);
+      }
+      document.defaultView.close();
+    }
   });
 });

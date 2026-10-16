@@ -1,1 +1,23 @@
-extends archive.pug
+extends includes/layout.pug
+include includes/mixins.pug
+
+block content
+  if morii_layout('category') === 'cards'
+    .wrap.listing-page
+      .page-intro
+        span.section-kicker CATEGORY
+        h1= morii_page_title(page)
+        p 这个主题下的所有文章。
+      .content-grid
+        section.posts-column
+          include includes/category-nav.pug
+          if page.posts && page.posts.length
+            .post-grid
+              each post in page.posts.toArray()
+                +postCard(post, false)
+          else
+            p.empty-state 这里还没有文章。
+          include includes/pagination.pug
+        include includes/sidebar.pug
+  else
+    include includes/page/category-list.pug

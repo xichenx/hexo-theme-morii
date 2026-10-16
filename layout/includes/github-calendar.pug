@@ -1,0 +1,24 @@
+- var githubCalendar = morii_github_calendar()
+if githubCalendar
+  section.wrap.home-github(aria-label='GitHub 贡献记录')
+    .github-calendar.panel(data-github-calendar data-api=githubCalendar.api data-user=githubCalendar.user)
+      .github-calendar-heading
+        div
+          span.section-kicker OPEN SOURCE
+          h2 GitHub 贡献记录
+        a.text-link(href=githubCalendar.profile target='_blank' rel='noopener noreferrer') @#{githubCalendar.user} ↗
+      .github-calendar-scroll(tabindex='0' role='region' aria-label='年度贡献日历，可左右滚动')
+        .github-calendar-board
+          .github-calendar-months(aria-hidden='true')
+          .github-calendar-days(role='group' aria-label='每日 GitHub 贡献')
+      .github-calendar-footer
+        p.github-calendar-status(role='status' aria-live='polite') 正在加载 GitHub 贡献记录…
+        .github-calendar-legend(aria-label='贡献颜色由浅到深表示数量由少到多')
+          span 少
+          each level in [0, 1, 2, 3, 4]
+            i(data-level=level aria-hidden='true')
+          span 多
+      p.github-calendar-detail(role='status' aria-live='polite')
+      button.button.service-button.github-calendar-retry(type='button' hidden) 重新加载贡献记录
+      noscript
+        p 开启 JavaScript 后可查看贡献日历，或点击账号访问 GitHub。

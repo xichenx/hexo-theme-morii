@@ -6,7 +6,7 @@ body.is-reading .site-header, .reading-progress, .site-footer, .reading-aside,
 .reading-settings, .mobile-toc, .article-cover, .article-tools, .article-navigation,
 .related-section, .comments-card, .article-end, .code-tools, .code-toggle,
 dialog, #live2d-widget { display: none !important; }
-.article-toolbar, .reading-toc-trigger, .article-header::after { display: none !important; }
+.article-toolbar, .reading-toc-trigger, .reading-resume, .article-header::after { display: none !important; }
 body.is-reading .site-shell { min-height: 0; }
 body.is-reading .reading-layout { display: block; width: 100%; max-width: 860px; margin: 0 auto; padding: 24px; }
 body.is-reading .article-card { overflow: visible; background: #fff; border: 0; border-radius: 0; box-shadow: none; }

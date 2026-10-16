@@ -1,0 +1,21 @@
+- var directoryTopics = morii_category_directory(site.categories)
+.category-atlas
+  .category-atlas-heading
+    h2 全部主题 #[span=directoryTopics.length]
+    span 按文章数量排列
+  nav.category-atlas-topics(aria-label='选择分类')
+    each category, index in directoryTopics
+      a.category-topic-link(href=url_for(category.path) data-tone=category.tone)
+        span.category-topic-symbol(aria-hidden='true')= category.symbol
+        .category-topic-copy
+          h2= category.name
+          p
+            strong #{category.count} 篇文章
+            if category.latest.length
+              span.category-topic-updated 最近发布 #[time(datetime=date_xml(category.latest[0].date))=date(category.latest[0].date, 'YYYY.MM.DD')]
+        span.category-topic-arrow(aria-hidden='true') ↗
+  if !directoryTopics.length
+    p.empty-state 暂时没有分类，先去文章归档看看吧。
+  .category-atlas-footer
+    span 持续记录，慢慢积累。
+    a(href=url_for('/archives/')) 按时间浏览全部文章 →

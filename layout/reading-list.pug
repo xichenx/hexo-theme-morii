@@ -6,15 +6,29 @@ block content
       span.section-kicker YOUR READING LIST
       h1 稍后阅读
       p 收好感兴趣的文章，留给下一次阅读。
-    section.reading-list-page(data-reading-list data-index=url_for('/morii-search.json'))
+    section.reading-list-page(data-reading-list data-index=url_for('/morii-search.json') data-root=url_for('/'))
       .reading-list-intro.panel
         div
           h2 浏览器里的小书签
           p 收藏保存在当前浏览器，清理网站数据会移除记录，最多可保存 100 篇。
         a.text-link(href=url_for('/archives/')) 去找些文章 →
+      .reading-list-toolbar.panel
+        label.reading-list-search(for='reading-list-search')
+          span 查找收藏
+          input#reading-list-search(type='search' placeholder='搜索标题、分类、标签或文章路径…' autocomplete='off')
+        .reading-list-transfer(role='group' aria-label='迁移收藏记录')
+          button.button.service-button#reading-list-export(type='button' disabled) 导出收藏 ↓
+          button.button.service-button#reading-list-import(type='button') 导入收藏 ↑
+          input#reading-list-import-file(type='file' accept='.json,application/json' hidden aria-label='选择 Morii 收藏备份文件')
+        p.reading-list-transfer-hint 导入会合并现有收藏，重复项自动跳过；文件仅在浏览器内读取。
+        p#reading-list-transfer-status(role='status' aria-live='polite')
       p#reading-list-status(role='status' aria-live='polite') 正在读取收藏…
       button.button.service-button#reading-list-retry(type='button' hidden) 重新加载文章信息
       .reading-list-grid#reading-list-items(aria-busy='false')
+      .empty-panel.panel#reading-list-no-match(hidden)
+        h2 没有匹配的收藏
+        p 试试其他关键词，或清空筛选查看全部。
+        button.button.service-button#reading-list-reset-filter(type='button') 清空筛选
       .empty-panel.panel#reading-list-empty(hidden)
         span.empty-panel__icon(aria-hidden='true') ☆
         h2 还没有收藏文章

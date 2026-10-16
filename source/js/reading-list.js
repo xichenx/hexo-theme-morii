@@ -6,6 +6,12 @@
   const status = document.getElementById('reading-list-status');
   const grid = document.getElementById('reading-list-items');
   const retry = document.getElementById('reading-list-retry');
+  const search = document.getElementById('reading-list-search');
+  const noMatch = document.getElementById('reading-list-no-match');
+  const exportButton = document.getElementById('reading-list-export');
+  const importButton = document.getElementById('reading-list-import');
+  const importFile = document.getElementById('reading-list-import-file');
+  const transferStatus = document.getElementById('reading-list-transfer-status');
   let metadata;
   let pending;
   let storageError = '';
@@ -54,11 +60,18 @@
       if (storageError && message) message.textContent = storageError;
     }
     if (!page || !grid) return;
+    if (exportButton) exportButton.disabled = !saved.length || Boolean(storageError);
     document.getElementById('reading-list-empty').hidden = saved.length > 0 || Boolean(storageError);
-    let missing = 0;
-    grid.replaceChildren(...saved.map(path => {
+    const terms = (search?.value || '').trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
+    const filtered = saved.filter(path => {
       const entry = metadata?.get(path);
-      if (!entry) missing += 1;
+      const text = `${entry?.title || ''} ${entry?.topics || ''} ${path}`.toLocaleLowerCase();
+      return terms.every(term => text.includes(term));
+    });
+    if (noMatch) noMatch.hidden = !saved.length || filtered.length > 0 || Boolean(storageError);
+    const missing = saved.filter(path => !metadata?.has(path)).length;
+    grid.replaceChildren(...filtered.map(path => {
+      const entry = metadata?.get(path);
       const card = document.createElement('article');
       card.className = 'saved-card panel';
       const heading = document.createElement('h2');
@@ -88,7 +101,7 @@
       card.append(heading, description, actions);
       return card;
     }));
-    if (status) status.textContent = storageError || loadError || `收藏了 ${saved.length} 篇文章${metadata && missing ? `，其中 ${missing} 篇暂未找到，记录仍保留。` : '。'}`;
+    if (status) status.textContent = storageError || loadError || `${terms.length ? `找到 ${filtered.length} / ${saved.length} 篇收藏` : `收藏了 ${saved.length} 篇文章`}${metadata && missing ? `，其中 ${missing} 篇暂未找到，记录仍保留。` : '。'}`;
   };
   const load = () => {
     if (!page || pending || !read().length) return pending;
@@ -131,6 +144,66 @@
     if (changed && message) message.textContent = added ? '已收藏，可以在稍后阅读中找到。' : '已从稍后阅读移除。';
   });
   retry?.addEventListener('click', load);
+  search?.addEventListener('input', render);
+  document.getElementById('reading-list-reset-filter')?.addEventListener('click', () => {
+    if (search) { search.value = ''; render(); search.focus(); }
+  });
+  exportButton?.addEventListener('click', () => {
+    const items = read();
+    if (storageError || !items.length) return;
+    let url;
+    try {
+      const data = { format: 'morii-reading-list', version: 1, root: page.dataset.root || '/', exportedAt: new Date().toISOString(), items };
+      url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `morii-reading-list-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      if (transferStatus) transferStatus.textContent = `已导出 ${items.length} 篇收藏。备份包含文章路径，不包含正文或阅读进度。`;
+    } catch {
+      if (transferStatus) transferStatus.textContent = '无法导出收藏，请检查浏览器是否允许下载文件。';
+    } finally {
+      if (url) setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+  });
+  importButton?.addEventListener('click', () => importFile?.click());
+  importFile?.addEventListener('change', async () => {
+    const file = importFile.files?.[0];
+    if (!file) return;
+    if (importButton) importButton.disabled = true;
+    try {
+      if (file.size > 256 * 1024) throw new Error('文件过大，请选择 256 KB 以内的 Morii 收藏备份。');
+      let data;
+      try { data = JSON.parse(await file.text()); }
+      catch { throw new Error('无法读取备份，请选择有效的 JSON 文件。'); }
+      if (data?.format !== 'morii-reading-list' || data.version !== 1 || !Array.isArray(data.items) || data.items.length > 1000) throw new Error('这不是支持的 Morii 收藏备份，现有收藏未更改。');
+      const sourceRoot = data.root;
+      if (typeof sourceRoot !== 'string' || !sourceRoot.startsWith('/') || sourceRoot.startsWith('//') || !sourceRoot.endsWith('/') || sourceRoot.length > 256 || /[?#\\\u0000-\u001f]/.test(sourceRoot) || new URL(sourceRoot, location.href).pathname !== sourceRoot) throw new Error('备份中的站点路径无效，现有收藏未更改。');
+      const current = read();
+      if (storageError) throw new Error('无法读取现有收藏，未进行导入，请检查浏览器存储设置。');
+      const merged = [...current];
+      let added = 0; let duplicates = 0; let invalid = 0; let overflow = 0;
+      for (const item of data.items) {
+        const normalized = pathFor(item);
+        if (!normalized || !normalized.startsWith(sourceRoot)) { invalid++; continue; }
+        const path = pathFor(`${page.dataset.root || '/'}${normalized.slice(sourceRoot.length)}`);
+        if (!path) { invalid++; continue; }
+        if (merged.includes(path)) { duplicates++; continue; }
+        if (merged.length >= 100) { overflow++; continue; }
+        merged.push(path); added++;
+      }
+      if (!change(() => merged)) throw new Error('无法保存导入结果，请检查浏览器存储设置。');
+      if (transferStatus) transferStatus.textContent = `已新增 ${added} 篇收藏${duplicates ? `，跳过 ${duplicates} 个重复项` : ''}${invalid ? `，忽略 ${invalid} 个无效路径` : ''}${overflow ? `，${overflow} 篇因达到 100 篇上限未导入` : ''}。`;
+      if (!metadata) load();
+    } catch (error) {
+      if (transferStatus) transferStatus.textContent = error.message || '导入失败，现有收藏未更改。';
+    } finally {
+      importFile.value = '';
+      if (importButton) importButton.disabled = false;
+    }
+  });
   window.addEventListener('storage', event => {
     if (event.key !== key && event.key !== null) return;
     render();

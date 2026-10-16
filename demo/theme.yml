@@ -43,3 +43,5 @@ explore:
     path: /fcircle/
   - name: 留言板
     path: /comments/
+github_calendar:
+  enable: false

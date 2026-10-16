@@ -1,4 +1,19 @@
+# 页面布局。也可写入博客根目录的 _config.morii.yml，升级主题时无需修改主题文件。
+appearance:
+  layouts:
+    home: featured       # featured：首篇横向突出（奇数篇时）；grid：普通双列
+    categories: atlas    # atlas：双列主题导航；directory：分类目录；cards：独立卡片
+    category: list       # list：文章行列表；cards：文章卡片与侧栏
+    archives: timeline   # timeline：时间树；grouped：按年份分组的列表卡片
+motion:
+  # 卡片滚动入场、首页氛围和交互动效；遵循系统减少动态效果设置。
+  enable: true
 brand: 心灵涂鸦
+github_calendar:
+  enable: true
+  user: xichenx
+  # 支持兼容 GitHub Contributions API v4 的自建服务，{user} 会替换为账号。
+  api: 'https://github-contributions-api.jogruber.de/v4/{user}?y=last'
 favicon: /icons/brand/morii-favicon.png
 logo: /icons/brand/morii-logo.png
 footer:
@@ -62,6 +77,8 @@ clock:
   longitude: 112.98
   timezone: Asia/Shanghai
 article:
+  resume:
+    enable: true
   share:
     enable: true
   print:

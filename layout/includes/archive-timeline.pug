@@ -1,0 +1,37 @@
+.archive-tree.panel
+  .archive-tree-intro
+    div
+      span.section-kicker THE TIMELINE
+      h2 时光里的记录
+    .archive-tree-summary
+      strong= page.posts.length
+      span 篇记录
+      small 本页 · 时间倒序
+  .archive-timeline
+    each group in morii_archive_groups(page.posts)
+      section.archive-year(aria-labelledby='archive-year-' + group.year)
+        .archive-year__heading
+          span.archive-year-node(aria-hidden='true') ✦
+          h2(id='archive-year-' + group.year)= group.year
+          span 本页 #{group.entries.length} 篇
+          i.archive-year-rule(aria-hidden='true')
+        ol.archive-tree-list
+          each post in group.entries
+            li.archive-tree-item
+              a.archive-entry(href=url_for(post.path))
+                time.archive-entry-date(datetime=date_xml(post.date) aria-label=date(post.date, 'YYYY 年 M 月 D 日'))
+                  span= date(post.date, 'DD')
+                  small= date(post.date, 'MM') + ' 月'
+                .archive-entry-copy
+                  strong= post.title
+                  .archive-entry-meta
+                    if post.categories && post.categories.length
+                      span.archive-entry-category= post.categories.first().name
+                    else
+                      span.archive-entry-category 生活与记录
+                    if post.password
+                      small.archive-entry-lock 加密文章
+                span.archive-entry-arrow(aria-hidden='true') ↗
+  .archive-tree-end
+    span(aria-hidden='true') ✦
+    p 继续记录，让时间长出新的枝叶。

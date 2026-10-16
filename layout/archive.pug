@@ -12,19 +12,10 @@ block content
         include includes/category-nav.pug
         if page.posts && page.posts.length
           if is_archive()
-            .archive-groups
-              each group in morii_archive_groups(page.posts)
-                section.archive-year.panel
-                  .archive-year__heading
-                    h2= group.year
-                    span 本页 #{group.entries.length} 篇
-                  each post in group.entries
-                    a.archive-entry(href=url_for(post.path))
-                      time(datetime=date_xml(post.date))= date(post.date, 'MM.DD')
-                      strong= post.title
-                      if post.password
-                        small 加密
-                      span(aria-hidden='true') ↗
+            if morii_layout('archives') === 'grouped'
+              include includes/archive-groups.pug
+            else
+              include includes/archive-timeline.pug
           else
             .post-grid
               each post in page.posts.toArray()
@@ -32,4 +23,7 @@ block content
         else
           p.empty-state 这里还没有文章，去其他分类看看吧。
         include includes/pagination.pug
-      include includes/sidebar.pug
+      if is_archive()
+        include includes/archive-sidebar.pug
+      else
+        include includes/sidebar.pug

@@ -41,6 +41,7 @@ block content
             small= item.description
     include includes/selected-posts.pug
     include includes/home-discovery.pug
+    include includes/github-calendar.pug
   else
     .wrap.listing-page
       .page-intro
@@ -58,7 +59,7 @@ block content
       if page.posts && page.posts.length
         .post-grid
           each post, index in page.posts.toArray()
-            +postCard(post, index === 0 || (page.posts.length % 2 === 0 && index === page.posts.length - 1))
+            +postCard(post, morii_layout('home') === 'featured' && page.posts.length % 2 === 1 && index === 0)
       else
         p.empty-state 还没有文章，稍后再来看看。
       include includes/pagination.pug

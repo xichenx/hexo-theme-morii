@@ -1,0 +1,26 @@
+- var directoryTopics = morii_category_directory(site.categories)
+.category-directory-variant
+  nav.category-directory-index(aria-label='分类目录')
+    span.section-kicker CONTENTS
+    each category, index in directoryTopics
+      a(href='#category-topic-' + (index + 1))
+        span= category.name
+        small= category.count
+    a(href=url_for('/archives/')) 全部文章 ↗
+  .category-directory-sections
+    each category, index in directoryTopics
+      section.category-directory-row(id='category-topic-' + (index + 1) aria-labelledby='category-title-' + (index + 1))
+        .category-directory-row-heading
+          span.category-topic-number(aria-hidden='true')= String(index + 1).padStart(2, '0')
+          h2(id='category-title-' + (index + 1))
+            a(href=url_for(category.path))= category.name
+          span #{category.count} 篇文章
+          a.category-topic-more(href=url_for(category.path)) 查看全部 ↗
+        ol
+          each post in category.latest
+            li
+              a(href=url_for(post.path))
+                strong= post.title
+                time(datetime=date_xml(post.date))= date(post.date, 'YYYY.MM.DD')
+    if !directoryTopics.length
+      p.empty-state 暂时没有分类，先去文章归档看看吧。
