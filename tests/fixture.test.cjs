@@ -67,6 +67,8 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
     assert.equal(cinema.querySelectorAll('[data-cinema-card]').length, 3);
     cinema.querySelector('[data-cinema-card] [data-cinema-select]').click();
     assert.equal(cinema.querySelector('[data-cinema-title]').textContent, '花朵 · 播放示例');
+    assert.equal(cinema.querySelector('[data-cinema-card] [data-cinema-select]').getAttribute('aria-pressed'), 'true');
+    assert.equal(cinema.querySelector('.cinema-episodes').nextElementSibling.className, 'cinema-now-foot');
     cinema.querySelector('.cinema-episodes button').click();
     assert.equal(cinemaVideo.src, 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4');
     cinema.querySelector('[data-cinema-filter="anime"]').click();

@@ -44,7 +44,11 @@
 
   function select(card) {
     stop();
-    cards.forEach(item => item.classList.toggle('is-selected', item === card));
+    cards.forEach(item => {
+      const selected = item === card;
+      item.classList.toggle('is-selected', selected);
+      item.querySelector('[data-cinema-select]').setAttribute('aria-pressed', String(selected));
+    });
     title.textContent = card.dataset.title;
     description.textContent = card.dataset.description || '选一集，开始播放。';
     type.textContent = { movie: '电影', series: '电视剧', anime: '动漫' }[card.dataset.type] || '电影';
@@ -54,6 +58,10 @@
     episodeList.setAttribute('role', 'group');
     episodeList.setAttribute('aria-label', `${card.dataset.title} 选集`);
     const episodes = [...card.querySelectorAll('[data-cinema-episode]')];
+    const label = document.createElement('span');
+    label.className = 'cinema-episodes-title';
+    label.textContent = episodes.length ? '选择片源 / 选集' : '片源状态';
+    episodeList.append(label);
     if (!episodes.length) {
       const note = document.createElement('p');
       note.textContent = '这部作品暂时没有可用片源。';
@@ -67,7 +75,8 @@
       button.addEventListener('click', () => play(episode, button));
       episodeList.append(button);
     });
-    root.querySelector('.cinema-now').append(episodeList);
+    root.querySelector('.cinema-now-foot').before(episodeList);
+    root.querySelector('.cinema-now-foot small').textContent = episodes.length ? '点击上方片源，即可开始播放。' : '这部作品暂时还没有可播放的片源。';
     root.querySelector('.cinema-stage')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 

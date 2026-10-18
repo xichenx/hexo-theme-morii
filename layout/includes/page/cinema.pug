@@ -1,47 +1,83 @@
 - var films = morii_cinema_catalog()
 .cinema(data-cinema)
-  .cinema-stage.panel
+  .cinema-stage
     .cinema-screen
       video.cinema-video(data-cinema-video controls preload='none' playsinline hidden)
       iframe.cinema-embed(data-cinema-embed title='电影播放器' allow='autoplay; fullscreen; picture-in-picture' allowfullscreen referrerpolicy='strict-origin-when-cross-origin' sandbox='allow-scripts allow-same-origin allow-presentation' hidden)
       .cinema-screen-placeholder(data-cinema-placeholder)
-        span.cinema-screen-icon(aria-hidden='true') ▶
-        strong 光影，正在等你入座
-        p 从下方片单选一部作品，点击剧集开始播放。
+        .cinema-screen-topline
+          span.cinema-screen-live(aria-hidden='true')
+          span MORII CINEMA
+          span SCREEN 01
+        .cinema-screen-art(aria-hidden='true')
+          span.cinema-screen-orbit
+          span.cinema-screen-spark ✦
+        .cinema-screen-message
+          span.cinema-screen-eyebrow YOUR PRIVATE SCREENING ROOM
+          strong 故事，从这里开始。
+          p 选一部喜欢的作品，挑一集，按下播放。
+        .cinema-screen-bottom
+          span 放慢一点，认真看一场。
+          span MOVIE / SERIES / ANIME
     .cinema-now
+      .cinema-now-heading
+        span.cinema-now-kicker
+          span.cinema-now-kicker-dot(aria-hidden='true')
+          |  当前放映
+        span.cinema-now-type(data-cinema-type) 影厅待映
+      .cinema-now-body
+        span.cinema-now-label NOW SHOWING · 01
+        h2(data-cinema-title aria-live='polite') 选择一部作品
+        p(data-cinema-description) 从下方片单选片。电影、电视剧和动漫，都可以在这里慢慢看。
+      .cinema-now-foot
+        span.cinema-now-foot-icon(aria-hidden='true') ↗
+        div
+          strong 你的专属放映厅
+          small 选择作品后，片源和选集将在这里出现。
+  .cinema-library
+    .cinema-library-heading
       div
-        span.section-kicker NOW SHOWING
-        h2(data-cinema-title) 选择一部作品
-        p(data-cinema-description) 电影、电视剧和动漫，都可以在这里找到自己的位置。
-      span.cinema-now-type(data-cinema-type) 影厅待映
-  .cinema-toolbar
-    .cinema-filters(role='group' aria-label='作品分类')
-      each category in [{key:'all', name:'全部'}, {key:'movie', name:'电影'}, {key:'series', name:'电视剧'}, {key:'anime', name:'动漫'}]
-        button.cinema-filter(type='button' data-cinema-filter=category.key aria-pressed=category.key === 'all')= category.name
-    label.cinema-search
-      span.sr-only 搜索片名
-      input(type='search' data-cinema-search placeholder='搜索片名…' autocomplete='off')
-  if films.length
-    .cinema-grid(data-cinema-grid)
-      each film in films
-        article.cinema-card(data-cinema-card data-type=film.type data-title=film.title data-description=film.description)
-          button.cinema-card-button(type='button' data-cinema-select aria-label='选择 ' + film.title)
-            .cinema-poster
-              if film.cover
-                img(src=url_for(film.cover) alt='' loading='lazy')
-              else
-                span.cinema-poster-mark(aria-hidden='true') ✦
-              span.cinema-poster-play(aria-hidden='true') ▶
-            .cinema-card-copy
-              small #{film.type === 'series' ? '电视剧' : film.type === 'anime' ? '动漫' : '电影'}#{film.year ? ' · ' + film.year : ''}
-              strong= film.title
-              span #{film.episodes.length ? film.episodes.length + (film.type === 'movie' ? ' 个片源' : ' 集') : '暂无片源'}
-          .cinema-card-data(hidden)
-            each episode in film.episodes
-              span(data-cinema-episode data-kind=episode.kind data-url=url_for(episode.url) data-title=episode.title)
-    p.cinema-empty(data-cinema-no-results hidden) 没有找到符合条件的作品。
-  else
-    .cinema-empty.panel
-      strong 放映表还空着
-      p 在博客的 source/_data/cinema.yml 中添加作品与播放地址，就可以开始放映。
+        span.section-kicker THE COLLECTION
+        h2 片单
+      p #{films.length} 部作品 · 找个想看的故事
+    if films.length
+      .cinema-toolbar
+        .cinema-filters(role='group' aria-label='作品分类')
+          each category in [{key:'all', name:'全部'}, {key:'movie', name:'电影'}, {key:'series', name:'电视剧'}, {key:'anime', name:'动漫'}]
+            button.cinema-filter(type='button' data-cinema-filter=category.key aria-pressed=category.key === 'all')= category.name
+        label.cinema-search
+          span.sr-only 搜索片名
+          svg(viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' aria-hidden='true')
+            circle(cx='10.8' cy='10.8' r='6.8')
+            path(d='m16 16 4.5 4.5')
+          input(type='search' data-cinema-search placeholder='搜索片名' autocomplete='off')
+      .cinema-grid(data-cinema-grid)
+        each film, index in films
+          article.cinema-card(data-cinema-card data-type=film.type data-title=film.title data-description=film.description)
+            button.cinema-card-button(type='button' data-cinema-select aria-label='选择 ' + film.title aria-pressed='false')
+              .cinema-poster
+                if film.cover
+                  img(src=url_for(film.cover) alt='' loading='lazy')
+                else
+                  span.cinema-poster-mark(aria-hidden='true')= film.type === 'series' ? '◇' : film.type === 'anime' ? '✧' : '✦'
+                .cinema-poster-top
+                  span= film.type === 'series' ? '剧集' : film.type === 'anime' ? '动漫' : '电影'
+                  span= String(index + 1).padStart(2, '0')
+                span.cinema-poster-play(aria-hidden='true') ▶
+                span.cinema-poster-bottom(aria-hidden='true') 点击选择 ↗
+              .cinema-card-copy
+                .cinema-card-meta
+                  span= film.year || 'MORII CINEMA'
+                  span= film.episodes.length ? film.episodes.length + (film.type === 'movie' ? ' 个片源' : ' 集') : '即将上架'
+                strong= film.title
+                p= film.description || '挑一段空闲时间，来这里看一场。'
+                span.cinema-card-action 查看片源 #[span(aria-hidden='true') →]
+            .cinema-card-data(hidden)
+              each episode in film.episodes
+                span(data-cinema-episode data-kind=episode.kind data-url=url_for(episode.url) data-title=episode.title)
+      p.cinema-empty(data-cinema-no-results hidden) 没有找到符合条件的作品，试试别的关键词。
+    else
+      .cinema-empty.panel
+        strong 放映表还空着
+        p 在博客的 source/_data/cinema.yml 中添加作品与播放地址，就可以开始放映。
   p.cinema-note 片源由站点维护者提供。播放效果取决于视频格式、片源服务及浏览器支持。
