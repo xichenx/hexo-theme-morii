@@ -1,6 +1,6 @@
 # Morii 发布与演示站
 
-当前版本候选：`v0.1.0-alpha.4`。配置好工作流不等于已经发布版本。
+当前正式版本：`v1.0.0`。配置好工作流不等于已经发布版本。
 
 ## 工作流
 
@@ -10,7 +10,7 @@
 | `.github/workflows/release.yml` | 推送 `v*` 标签 | 校验版本号，测试，生成 ZIP、SHA256 校验文件和 GitHub Release 草稿 |
 | `.github/workflows/demo.yml` | main 提交、手动 | 启用后测试并部署独立演示站到 GitHub Pages |
 
-工作流使用 GitHub 自带的 `GITHUB_TOKEN`，无需额外 PAT。npm 发布由维护者在本机登录后执行，预发布版本使用 `alpha` 标签。是否同步更新 `latest` 以当前 npm 标签状态为准。
+工作流使用 GitHub 自带的 `GITHUB_TOKEN`，无需额外 PAT。npm 发布由维护者在本机登录后执行，正式版本使用 `latest` 标签，预发布版本显式使用 `--tag alpha`。
 
 ## 本地验证
 
@@ -24,7 +24,7 @@ npm run package:theme
 ```
 
 - 演示站输出：`.cache/demo/public/`。
-- 发布包：`dist/hexo-theme-morii-v0.1.0-alpha.4.zip`。
+- 发布包：`dist/hexo-theme-morii-v1.0.0.zip`。
 - 解压后只有 `morii/` 主题目录，不包含博客文章、开发测试、node_modules 或 Git 配置。
 - ZIP 打包需要 `zip`；发布包测试需要 `unzip`。GitHub Ubuntu runner 已提供这两个命令。
 - 本地 Node.js 至少为 20.19.0，CI 验证 Node 22 / 24。
@@ -75,8 +75,8 @@ npm run build:demo
 候选版本示例：
 
 ```bash
-git tag -a v0.1.0-alpha.4 -m "Morii v0.1.0-alpha.4"
-git push origin v0.1.0-alpha.4
+git tag -a v1.0.0 -m "Morii v1.0.0"
+git push origin v1.0.0
 ```
 
 标签版本必须与 `package.json` 完全一致。标签推送后 Release 工作流才会运行；推送普通提交不会创建 Release。
@@ -96,13 +96,13 @@ git push origin v0.1.0-alpha.4
 
 ## npm 发布
 
-在 npm 官方注册表完成账号登录后，执行 `npm pack --dry-run` 并检查文件清单，再发布预览版：
+在 npm 官方注册表完成账号登录后，执行 `npm pack --dry-run` 并检查文件清单，再发布正式版：
 
 ```bash
-npm publish --tag alpha --registry https://registry.npmjs.org/
+npm publish --tag latest --registry https://registry.npmjs.org/
 ```
 
-`package.json` 的 `files` 只收录主题运行所需的模板、脚本、资源、配置、README、更新日志和许可证。`hexo-util` 是运行时依赖；Hexo 8 与 Pug 渲染器由站点安装。发布后检查 `npm view hexo-theme-morii@alpha version` 和安装生成结果。
+`package.json` 的 `files` 只收录主题运行所需的模板、脚本、资源、配置、README、更新日志和许可证。`hexo-util` 是运行时依赖；Hexo 8 与 Pug 渲染器由站点安装。发布后检查 `npm view hexo-theme-morii@latest version` 和安装生成结果。
 
 ## Hexo 主题目录
 
@@ -113,7 +113,7 @@ npm publish --tag alpha --registry https://registry.npmjs.org/
 - GitHub Releases：当前自动化的版本分发渠道。
 - GitHub Pages：独立演示站。
 - Hexo 主题目录：通过上游 PR 收录。
-- npm：通过本机 npm 登录发布 `alpha` 标签；后续可设置 Trusted Publishing。
+- npm：通过本机 npm 登录发布 `latest` 标签；后续可设置 Trusted Publishing。
 
 官方参考：
 
