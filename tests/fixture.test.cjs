@@ -57,6 +57,8 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
     const index = JSON.parse(fs.readFileSync(path.join(output, 'morii-search.json'), 'utf8'));
     const cinemaDom = new JSDOM(fs.readFileSync(path.join(output, 'cinema/index.html'), 'utf8'), { url: `https://example.test${prefix}cinema/`, runScripts: 'outside-only' });
     const cinema = cinemaDom.window.document;
+    assert.match(cinema.querySelector('link[href*="cinema.css"]').href, /cinema\.css\?v=wide-catalog-1$/);
+    assert.match(cinema.querySelector('script[src*="cinema.js"]').src, /cinema\.js\?v=wide-catalog-1$/);
     const cinemaVideo = cinema.querySelector('[data-cinema-video]');
     cinemaVideo.load = () => {};
     cinemaVideo.pause = () => {};
