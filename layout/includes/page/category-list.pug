@@ -1,7 +1,8 @@
 - var directoryTopics = morii_category_directory(site.categories)
 - var currentTopic = directoryTopics.find(function(topic) { return topic.name === page.category })
 .wrap.listing-page.category-directory-page
-  header.page-intro.category-directory-intro
+  header.page-intro.category-directory-intro(data-intro-word='TOPICS' data-intro-tone='taxonomy')
+    include ../intro-atmosphere.pug
     a.category-breadcrumb(href=url_for('/categories/')) ← 返回分类目录
     h1= page.category
     p 这个主题下的思考、实践与持续记录。

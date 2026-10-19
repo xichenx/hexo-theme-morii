@@ -364,8 +364,11 @@ motion:
 npm ci
 npm test
 npm run build:demo
+npm run audit:performance
 npm run package:theme
 ```
+
+`audit:performance` 会独立构建演示站，统计首页、归档、文章、相册、音乐馆和电影院的 HTML、CSS、JavaScript 与图片体积，以及首屏阻塞样式和请求数；超出 `tools/performance.cjs` 中的预算时 CI 失败。统计值是本地文件的未压缩大小，不等同于线上传输量或 LCP / INP / CLS；线上体验仍需用浏览器性能工具和真实访问数据核对。报告会标出超过 500 KiB 的示例图片。
 
 创建版本标签、发布 GitHub Release 与 npm 包、提交 Hexo 主题目录的具体步骤见 [发布指南](docs/RELEASING.md)。当前预览版为 `0.1.0-alpha.4`，采用 MIT 许可证。
 

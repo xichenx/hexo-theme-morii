@@ -5,6 +5,8 @@
   const preference = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
   const selector = '.hero__main, .hero-mini, .section-heading, .feature-card, .post-card, .profile-card, .side-card, .discovery-card, .selected-card, .friend-card, .feed-card, .photo-card, .taxonomy-card, .related-card, .archive-tree-item, .page-intro:not(.music-page-heading), .article-header';
   const seen = new WeakSet();
+  const ambientSelector = '.hero__main, .page-intro:not(.music-page-heading)';
+  let ambientObserved = new WeakSet();
   const active = new Map();
   let observed = new WeakSet();
   let reveals;
@@ -17,13 +19,15 @@
     reveals = ambient = changes = undefined;
     for (const element of active.keys()) cancel(element);
     observed = new WeakSet();
-    main.querySelectorAll('.hero__main').forEach(element => element.style.setProperty('--morii-ambient-state', 'paused'));
+    ambientObserved = new WeakSet();
+    main.querySelectorAll(ambientSelector).forEach(element => element.style.setProperty('--morii-ambient-state', 'paused'));
   };
   const register = node => {
     if (!reveals || stopped || preference?.matches || root.dataset.motion === 'off' || node.nodeType !== 1) return;
     const elements = [...(node.matches(selector) ? [node] : []), ...node.querySelectorAll(selector)];
     elements.forEach(element => {
       if (!seen.has(element) && !observed.has(element)) { observed.add(element); reveals.observe(element); }
+      if (ambient && element.matches(ambientSelector) && !ambientObserved.has(element)) { ambientObserved.add(element); ambient.observe(element); }
     });
   };
   const start = () => {
@@ -51,7 +55,6 @@
     ambient = new IntersectionObserver(entries => entries.forEach(entry => {
       entry.target.style.setProperty('--morii-ambient-state', entry.isIntersecting ? 'running' : 'paused');
     }));
-    main.querySelectorAll('.hero__main').forEach(element => ambient.observe(element));
     register(main);
     if (typeof MutationObserver === 'function') {
       changes = new MutationObserver(records => records.forEach(record => record.addedNodes.forEach(register)));

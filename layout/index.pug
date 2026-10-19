@@ -47,7 +47,8 @@ block content
     include includes/github-calendar.pug
   else
     .wrap.listing-page
-      .page-intro
+      .page-intro(data-intro-word='STORIES' data-intro-tone='archive')
+        include includes/intro-atmosphere.pug
         span.section-kicker KEEP EXPLORING
         h1 文章 · 第 #{page.current} 页
         p 翻开下一页，继续发现技术与日常。
@@ -62,7 +63,7 @@ block content
       if page.posts && page.posts.length
         .post-grid
           each post, index in page.posts.toArray()
-            +postCard(post, morii_layout('home') === 'featured' && page.posts.length % 2 === 1 && index === 0)
+            +postCard(post, morii_layout('home') === 'featured' && page.posts.length % 2 === 1 && index === 0, !firstPage && index < 2)
       else
         p.empty-state 还没有文章，稍后再来看看。
       include includes/pagination.pug

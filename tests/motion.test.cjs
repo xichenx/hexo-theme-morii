@@ -81,6 +81,25 @@ test('reduced motion, hidden pages and print cancel effects without hiding conte
   f.dom.window.close();
 });
 
+test('new intro atmospheres pause outside the viewport and after page exit', () => {
+  const f = fixture();
+  const intro = f.window.document.createElement('section');
+  intro.className = 'page-intro';
+  f.window.document.querySelector('main').append(intro);
+  f.mutations[0].callback([{ addedNodes: [intro] }]);
+  const ambient = f.observers[1];
+  assert.ok(ambient.elements.has(intro));
+  ambient.enter([intro]);
+  assert.equal(intro.style.getPropertyValue('--morii-ambient-state'), 'running');
+  ambient.callback([{ target: intro, isIntersecting: false }]);
+  assert.equal(intro.style.getPropertyValue('--morii-ambient-state'), 'paused');
+  ambient.enter([intro]);
+  f.window.dispatchEvent(new f.window.Event('pagehide'));
+  assert.equal(intro.style.getPropertyValue('--morii-ambient-state'), 'paused');
+  assert.equal(ambient.elements.size, 0);
+  f.dom.window.close();
+});
+
 test('disabled motion, unsupported browsers and initial reduced motion keep all content visible', () => {
   for (const options of [{ enabled: false }, { support: false }, { reduced: true }]) {
     const f = fixture(options);

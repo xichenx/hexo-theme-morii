@@ -3,8 +3,11 @@ extends includes/layout.pug
 block content
   - var categoryLayout = morii_layout('categories')
   - var categoryEditorial = page.type === 'categories' && categoryLayout !== 'cards'
+  - var pageWords = { about: 'ABOUT', link: 'FRIENDS', essay: 'MOMENTS', album: 'ALBUM', album_detail: 'JOURNAL', fcircle: 'FRIENDS', music: 'MUSIC', cinema: 'CINEMA', categories: 'TOPICS', tags: 'TAGS' }
   .wrap.listing-page(class=page.type === 'cinema' ? 'cinema-page' : categoryEditorial ? 'category-directory-page category-overview' : '')
-    .page-intro(class=page.type === 'link' ? 'friends-intro' : page.type === 'music' ? 'music-page-heading' : page.type === 'cinema' ? 'cinema-page-heading' : categoryEditorial ? 'category-directory-intro' : '')
+    .page-intro(class=page.type === 'link' ? 'friends-intro' : page.type === 'music' ? 'music-page-heading' : page.type === 'cinema' ? 'cinema-page-heading' : categoryEditorial ? 'category-directory-intro' : '' data-intro-word=pageWords[page.type] || 'EXPLORE' data-intro-tone=page.type || 'default')
+      if page.type !== 'music'
+        include includes/intro-atmosphere.pug
       - var pageKickers = { about: 'ABOUT', link: 'FRIENDS', essay: 'MOMENTS', album: 'ALBUMS', album_detail: 'PHOTO JOURNAL', fcircle: 'FRIENDS FEED', music: 'MUSIC', cinema: 'CINEMA', categories: 'TOPICS', tags: 'TAGS' }
       span.section-kicker= pageKickers[page.type] || 'EXPLORE'
       h1= morii_page_title(page)

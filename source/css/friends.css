@@ -1,9 +1,7 @@
-.friends-intro { position: relative; overflow: hidden; background: radial-gradient(ellipse at 85% 10%, #a695ea80, transparent 55%), linear-gradient(115deg, #344781, #6771c9); }
-.friends-intro::after { content: '✦'; position: absolute; right: 7%; top: -65px; font-size: 280px; color: #ffffff0c; pointer-events: none; }
-.friends-intro h1 { margin: 8px 0; }
-.friends-intro-meta { position: relative; z-index: 1; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 24px; font-size: 12px; color: #e5eaff; }
-.friends-intro-meta > span { border: 1px solid #ffffff30; border-radius: 8px; padding: 5px 10px; }
-.friends-intro-meta a { margin-left: 6px; font-weight: 700; }
+.friends-intro-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 22px; font-size: 12px; color: var(--intro-muted); }
+.friends-intro-meta > span { border: 1px solid var(--intro-border); border-radius: 999px; padding: 6px 11px; background: color-mix(in srgb, var(--intro-accent) 5%, transparent); }
+.friends-intro-meta a { margin-left: 5px; color: var(--intro-accent); font-weight: 750; }
+.friends-intro-meta a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .friends-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 28px; align-items: start; margin: 28px 0 50px; }
 .friend-directory { min-width: 0; }
 .friend-directory .directory-toolbar { padding: 24px; margin-bottom: 28px; }

@@ -1,9 +1,9 @@
-mixin postCard(post, featured)
+mixin postCard(post, featured, eager)
   - var postUrl = url_for(post.path)
   article.post-card(class=featured ? 'post-card--featured' : '')
     a.post-card__media(href=postUrl aria-label=post.title)
       if post.cover
-        img(src=url_for(post.cover) alt=post.title loading='lazy')
+        img(src=url_for(post.cover) alt=post.title loading=eager ? 'eager' : 'lazy' fetchpriority=eager ? 'high' : 'low' decoding='async')
       else
         span.post-card__placeholder ✦
     .post-card__body

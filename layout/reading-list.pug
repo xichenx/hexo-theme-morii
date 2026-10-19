@@ -2,7 +2,8 @@ extends includes/layout.pug
 
 block content
   .wrap.listing-page
-    .page-intro
+    .page-intro(data-intro-word='SAVED' data-intro-tone='reading')
+      include includes/intro-atmosphere.pug
       span.section-kicker YOUR READING LIST
       h1 稍后阅读
       p 收好感兴趣的文章，留给下一次阅读。

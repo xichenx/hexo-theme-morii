@@ -42,7 +42,7 @@
             button.cinema-card-button(type='button' data-cinema-select aria-label='查看 ' + film.title + ' 的片源' aria-pressed='false')
               .cinema-poster
                 if film.cover
-                  img(src=url_for(film.cover) alt='' loading='lazy')
+                  img(src=url_for(film.cover) alt='' loading=index < 2 ? 'eager' : 'lazy' fetchpriority=index < 2 ? 'high' : 'low' decoding='async')
                 else
                   span.cinema-poster-mark(aria-hidden='true')= film.type === 'series' ? '◇' : film.type === 'anime' ? '✧' : '✦'
                 span.cinema-poster-index= String(index + 1).padStart(2, '0')

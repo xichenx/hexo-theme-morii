@@ -38,6 +38,7 @@
     "check": "node tools/check.cjs",
     "test": "npm run check && node --test tests/*.test.cjs",
     "build:demo": "node tools/demo.cjs",
+    "audit:performance": "node tools/performance.cjs",
     "release:check": "node tools/release.cjs check",
     "package:theme": "node tools/release.cjs pack"
   },

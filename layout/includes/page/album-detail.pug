@@ -9,10 +9,10 @@
 if album && album.photos.length
   p.album-count 共 #{album.photos.length} 张照片 · 点击图片浏览
   .photo-grid(data-gallery)
-    each photo in album.photos
+    each photo, index in album.photos
       - var photoCaption = [photo.caption || album.title, photo.address, photo.author ? '来自 ' + photo.author : '', photo.date].filter(Boolean).join(' · ')
       a.photo-card(href=url_for(photo.src) data-caption=photoCaption data-image-fallback)
-        img(src=url_for(photo.src) alt=photo.caption || album.title loading='lazy')
+        img(src=url_for(photo.src) alt=photo.caption || album.title loading=index < 2 ? 'eager' : 'lazy' fetchpriority=index < 2 ? 'high' : 'low' decoding='async')
         span.image-placeholder(hidden aria-hidden='true') 照片暂时无法加载
         .photo-card__details
           strong= photo.caption || album.title

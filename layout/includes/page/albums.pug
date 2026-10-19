@@ -1,10 +1,10 @@
 - var albums = morii_albums(site.data.album)
 if albums.length
   .album-grid
-    each album in albums
+    each album, index in albums
       a.album-card(href=url_for(album.path) data-image-fallback)
         if album.cover
-          img(src=url_for(album.cover) alt=album.title loading='lazy')
+          img(src=url_for(album.cover) alt=album.title loading=index < 2 ? 'eager' : 'lazy' fetchpriority=index < 2 ? 'high' : 'low' decoding='async')
         .album-card__caption
           span #{album.photos.length} 张照片
           strong= album.title

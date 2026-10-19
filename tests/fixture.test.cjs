@@ -15,6 +15,25 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       const dom = new JSDOM(fs.readFileSync(path.join(output, file), 'utf8'), { url: `https://example.test${prefix}${file}` });
       const document = dom.window.document;
       assert.equal(document.querySelectorAll('main h1').length, 1, `${file}: one page heading`);
+      const introTones = {
+        'page/2/index.html': 'archive',
+        'archives/index.html': 'archive',
+        'categories/index.html': 'categories',
+        'categories/主题使用/index.html': 'taxonomy',
+        'tags/index.html': 'tags',
+        'about/index.html': 'about',
+        'link/index.html': 'link',
+        'album/index.html': 'album',
+        'album/morii/index.html': 'album_detail',
+        'music/index.html': 'music',
+        'cinema/index.html': 'cinema',
+        'reading-list/index.html': 'reading'
+      };
+      if (introTones[file]) {
+        const intro = document.querySelector('main .page-intro');
+        assert.equal(intro?.dataset.introTone, introTones[file], `${file}: page-specific intro tone`);
+        assert.ok(intro?.dataset.introWord, `${file}: decorative intro label`);
+      }
       assert.ok(document.querySelector('#morii-audio-hub'), `${file}: shared music player`);
       assert.ok(document.querySelector('.morii-atmosphere[aria-hidden="true"] #morii-particles'), `${file}: decorative particles`);
       assert.equal(document.documentElement.dataset.glass, 'on');
@@ -35,6 +54,12 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
         assert.equal(featured.length, cards.length % 2, `${file}: only odd lists need a leading wide card`);
         if (featured.length) assert.equal(featured[0], cards[0]);
         assert.ok(!cards.at(-1).classList.contains('post-card--featured'), `${file}: final card must remain paired`);
+        if (file === 'index.html') assert.ok([...document.querySelectorAll('#latest .post-card__media img')].every(image => image.getAttribute('loading') === 'lazy'), 'Images below the home hero stay lazy');
+      }
+      if (file === 'album/morii/index.html') {
+        const photos = [...document.querySelectorAll('.photo-card img')];
+        assert.deepEqual(photos.map(image => image.getAttribute('loading')), ['eager', 'eager']);
+        assert.deepEqual(photos.map(image => image.getAttribute('fetchpriority')), ['high', 'high']);
       }
       for (const node of document.querySelectorAll('script[src],link[rel="stylesheet"],img[src]')) {
         const raw = node.getAttribute('src') || node.getAttribute('href');

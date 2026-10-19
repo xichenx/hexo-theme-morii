@@ -1,0 +1,23 @@
+.intro-atmosphere(aria-hidden='true')
+  svg.intro-liquid(viewBox='0 0 960 360' preserveAspectRatio='xMidYMid slice' focusable='false')
+    defs
+      linearGradient#intro-silk-body(x1='0' y1='0' x2='.3' y2='1')
+        stop(offset='0' stop-color='var(--silk-light)')
+        stop(offset='.28' stop-color='var(--silk-mid)')
+        stop(offset='.65' stop-color='var(--silk-shadow)')
+        stop(offset='1' stop-color='var(--silk-clear)')
+      linearGradient#intro-silk-edge(x1='0' y1='0' x2='0' y2='1')
+        stop(offset='0' stop-color='var(--silk-light)')
+        stop(offset='.45' stop-color='var(--silk-clear)')
+        stop(offset='1' stop-color='var(--silk-mid)')
+    g.intro-liquid-fold
+      path(d='M-120 270 C100 380 260 30 470 120 S790 350 1080 40 L1080 130 C800 440 650 245 470 180 S100 410 -120 320Z' fill='url(#intro-silk-body)')
+      path(d='M-120 270 C100 380 260 30 470 120 S790 350 1080 40' fill='none' stroke='url(#intro-silk-edge)' stroke-width='2')
+    g.intro-liquid-fold
+      path(d='M80 400 C310 260 350 -70 590 60 S810 300 1100 200 L1100 270 C820 365 740 220 590 120 S310 315 80 440Z' fill='url(#intro-silk-body)')
+      path(d='M80 400 C310 260 350 -70 590 60 S810 300 1100 200' fill='none' stroke='url(#intro-silk-edge)' stroke-width='1.5')
+    g.intro-liquid-fold
+      path(d='M260 -100 C450 120 660 -20 720 190 S1000 390 1100 280 L1100 330 C980 430 710 410 670 210 S410 150 210 -100Z' fill='url(#intro-silk-edge)')
+  .intro-particles
+    each particle in [0, 1, 2, 3, 4, 5, 6, 7]
+      i(style='--particle-index:' + particle)
