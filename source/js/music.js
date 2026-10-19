@@ -37,8 +37,8 @@
     let lyricController;
     let loaded = false;
     let loadingPromise;
-    const timedFetch = async (url, kind, controller = new AbortController()) => {
-      const timeout = setTimeout(() => controller.abort(), 15000);
+    const timedFetch = async (url, kind, controller = new AbortController(), timeoutMs = 15000) => {
+      const timeout = setTimeout(() => controller.abort(), timeoutMs);
       try {
         const response = await fetch(url, { signal: controller.signal, credentials: 'omit' });
         if (!response.ok) throw new Error('request failed');
@@ -94,17 +94,30 @@
         if (state.tracks.length && !player.getAttribute('src')) prepare(0);
         emit(); return Promise.resolve();
       }
+      const cacheKey = `morii-music:${config.remote.server}:${config.remote.type}:${config.remote.id}`;
+      if (!loaded) {
+        try {
+          const cached = JSON.parse(sessionStorage.getItem(cacheKey) || 'null');
+          const tracks = cached && Date.now() - cached.at < 1800000 ? normalize(cached.tracks) : [];
+          if (tracks.length) {
+            state.tracks = tracks; prepare(0); loaded = true;
+            state.fetchStatus = `已获取 ${tracks.length} 首歌曲`;
+            emit(); return Promise.resolve();
+          }
+        } catch { /* Continue with the network when storage is unavailable. */ }
+      }
       state.loading = true; state.failed = false; state.fetchStatus = '正在获取歌单…'; emit();
       loadingPromise = (async () => {
         try {
           const values = { ...config.remote, r: String(Math.random()) };
           const endpoint = safeURL(config.remote.api.replace(/:(server|type|id|r)\b/g, (_, key) => encodeURIComponent(values[key])));
           if (!endpoint) throw new Error('invalid endpoint');
-          const tracks = normalize(await timedFetch(endpoint, 'json'));
+          const tracks = normalize(await timedFetch(endpoint, 'json', new AbortController(), 8000));
           if (!tracks.length) throw new Error('empty playlist');
           if (state.activated) { state.fetchStatus = '当前播放队列已保留。'; return; }
           state.tracks = tracks; prepare(0); loaded = true;
           state.fetchStatus = `已获取 ${tracks.length} 首歌曲`;
+          try { sessionStorage.setItem(cacheKey, JSON.stringify({ at: Date.now(), tracks })); } catch { /* Playback does not depend on storage. */ }
         } catch {
           state.failed = true;
           state.fetchStatus = state.tracks.length ? '在线歌单获取失败，可播放本地曲目。' : '歌单获取失败，请重试或打开原平台歌单。';
@@ -148,6 +161,9 @@
     let frame;
     let shellActive = false;
     let currentURL = location.href;
+    let pendingDocument;
+    let readyTimer;
+    let fallbackTimer;
     const musicPath = new URL(hub.dataset.musicPage, location.href).pathname;
     const updateFloating = () => {
       const inRoom = new URL(currentURL).pathname === musicPath;
@@ -156,43 +172,58 @@
     const visit = (url, push = true) => {
       if (push) history.pushState({ moriiMusic: true }, '', url);
       currentURL = url; updateFloating();
+      clearInterval(readyTimer); clearTimeout(fallbackTimer);
       if (new URL(url).pathname === originURL.pathname && new URL(url).search === originURL.search) {
-        shellActive = false; document.body.classList.remove('music-shell-active');
+        shellActive = false; document.body.classList.remove('music-shell-active', 'music-shell-loading');
         if (frame) frame.hidden = true;
         document.title = originTitle;
         document.getElementById('main')?.setAttribute('tabindex', '-1');
         document.getElementById('main')?.focus({ preventScroll: true });
         window.dispatchEvent(new Event('morii:music-view')); return;
       }
-      shellActive = true; document.body.classList.add('music-shell-active');
+      shellActive = true; document.body.classList.add('music-shell-loading');
       if (!frame) {
         frame = document.createElement('iframe'); frame.id = 'morii-site-frame'; frame.title = '网站内容';
-        frame.addEventListener('load', () => {
-          try {
-            const frameURL = frame.contentWindow.location.href;
-            if (frameURL === 'about:blank' || !shellActive) return;
-            currentURL = frameURL;
-            if (location.href !== frameURL) history.replaceState({ moriiMusic: true }, '', frameURL);
-            const frameTheme = frame.contentDocument.documentElement.dataset.theme;
-            if (frameTheme) document.documentElement.dataset.theme = frameTheme;
-            document.title = frame.contentDocument.title;
-            frame.title = frame.contentDocument.title || '网站内容';
-            bindNavigation(frame.contentDocument); updateFloating();
-            frame.contentDocument.getElementById('main')?.setAttribute('tabindex', '-1');
-            frame.contentDocument.getElementById('main')?.focus({ preventScroll: true });
-          } catch { /* External navigation is left to the browser. */ }
-        });
+        frame.addEventListener('load', showFrame);
         document.body.append(frame);
       }
-      frame.hidden = false;
+      const oldDocument = frame.contentDocument;
+      pendingDocument = oldDocument;
+      if (!document.body.classList.contains('music-shell-active')) frame.hidden = true;
       frame.contentWindow.location.replace(url);
+      readyTimer = setInterval(showFrame, 80);
+      fallbackTimer = setTimeout(() => {
+        if (shellActive && document.body.classList.contains('music-shell-loading')) location.assign(currentURL);
+      }, 12000);
+    };
+    const showFrame = () => {
+      if (!document.body.classList.contains('music-shell-loading')) return;
+      try {
+        const content = frame?.contentDocument;
+        if (!shellActive || !content || content === pendingDocument || content.readyState === 'loading' || !content.getElementById('main')) return;
+        const frameURL = frame.contentWindow.location.href;
+        if (frameURL === 'about:blank') return;
+        clearInterval(readyTimer); clearTimeout(fallbackTimer);
+        document.body.classList.remove('music-shell-loading');
+        document.body.classList.add('music-shell-active');
+        frame.hidden = false;
+        currentURL = frameURL;
+        if (location.href !== frameURL) history.replaceState({ moriiMusic: true }, '', frameURL);
+        const frameTheme = content.documentElement.dataset.theme;
+        if (frameTheme) document.documentElement.dataset.theme = frameTheme;
+        document.title = content.title;
+        frame.title = content.title || '网站内容';
+        bindNavigation(content); updateFloating();
+        content.getElementById('main')?.setAttribute('tabindex', '-1');
+        content.getElementById('main')?.focus({ preventScroll: true });
+      } catch { /* External navigation is left to the browser. */ }
     };
     const boundDocuments = new WeakSet();
     const bindNavigation = doc => {
       if (boundDocuments.has(doc)) return;
       boundDocuments.add(doc);
       doc.addEventListener('click', event => {
-        if (!state.tracks.length || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        if (!state.activated || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
         const link = event.target.closest?.('a[href]');
         if (!link || link.hasAttribute('download') || (link.target && link.target !== '_self') || link.closest('[data-music-view] .music-track-list') || link.hasAttribute('data-no-music-nav')) return;
         const url = new URL(link.href, doc.location.href);

@@ -52,7 +52,10 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       }
       const music = JSON.parse(document.querySelector('#morii-audio-hub').dataset.musicConfig);
       assert.ok(music.remote && music.remote.api.startsWith('https://'));
-      if (file === 'music/index.html') assert.match(document.querySelector('link[href*="music.css"]').href, /music\.css\?v=full-stage-1$/);
+      const musicStyle = document.querySelector('link[href*="music.css"]');
+      assert.match(musicStyle.href, /music\.css\?v=full-stage-2$/);
+      assert.equal(musicStyle.media, file === 'music/index.html' ? '' : 'print', `${file}: inactive music styles must not block first paint`);
+      for (const name of ['search', 'motion']) assert.equal(document.querySelector(`link[href$="/css/${name}.css"]`)?.media, 'print');
       dom.window.close();
     }
     const index = JSON.parse(fs.readFileSync(path.join(output, 'morii-search.json'), 'utf8'));

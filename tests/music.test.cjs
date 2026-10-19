@@ -114,7 +114,37 @@ test('remote music retries failure, normalizes Meting fields and rejects unsafe 
   assert.equal(document.querySelector('#music-player').paused, true);
   assert.equal(document.querySelector('#music-retry').hidden, true);
   assert.ok(document.querySelector('#music-fetch-status').textContent.includes('2 首'));
+  const cacheKey = 'morii-music:tencent:playlist:123&456';
+  const cached = window.sessionStorage.getItem(cacheKey);
+  assert.equal(JSON.parse(cached).tracks.length, 2);
   window.close();
+  const repeat = browser(html);
+  repeat.window.sessionStorage.setItem(cacheKey, cached);
+  let repeatedFetches = 0;
+  repeat.window.fetch = () => { repeatedFetches++; throw Error('cache should avoid the request'); };
+  repeat.window.eval(script('music.js'));
+  assert.equal(repeat.window.document.querySelectorAll('.music-track-row').length, 2);
+  assert.equal(repeatedFetches, 0);
+  repeat.window.close();
+});
+
+test('unplayed music does not take over normal page navigation', () => {
+  const dom = browser(musicMarkup({ title: '音乐', tracks: [{ title: '第一首', url: '/one.mp3' }] }) + '<a href="/archives/"><span>文章</span></a>');
+  const { window } = dom;
+  const audio = window.document.querySelector('#music-player');
+  audio.play = async () => {};
+  window.eval(script('music.js'));
+  const link = window.document.querySelector('a[href="/archives/"] span');
+  const click = () => {
+    let intercepted;
+    const inspect = event => { intercepted = event.defaultPrevented; event.preventDefault(); };
+    window.document.addEventListener('click', inspect);
+    link.dispatchEvent(new window.MouseEvent('click', { bubbles: true, cancelable: true, button: 0 }));
+    window.document.removeEventListener('click', inspect);
+    return intercepted;
+  };
+  assert.equal(click(), false);
+  dom.window.close();
 });
 
 test('music lyrics reject stale responses, follow time and support seeking', async () => {

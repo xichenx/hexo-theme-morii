@@ -25,11 +25,11 @@ html(lang=config.language || 'zh-CN' style=morii_accent() data-motion=(!theme.mo
     script(src=url_for('/js/theme-init.js'))
     link(rel='stylesheet' href=url_for('/css/style.css'))
     link(rel='stylesheet' href=url_for('/css/media.css'))
-    link(rel='stylesheet' href=url_for('/css/search.css'))
+    link(rel='stylesheet' href=url_for('/css/search.css') media='print' data-deferred-style)
     if visualEffects.enabled
       link(rel='stylesheet' href=url_for('/css/effects.css'))
     if !theme.motion || theme.motion.enable !== false
-      link(rel='stylesheet' href=url_for('/css/motion.css'))
+      link(rel='stylesheet' href=url_for('/css/motion.css') media='print' data-deferred-style)
     if is_archive()
       link(rel='stylesheet' href=url_for('/css/archive.css'))
     if page.type === 'categories' || is_category()
@@ -38,7 +38,10 @@ html(lang=config.language || 'zh-CN' style=morii_accent() data-motion=(!theme.mo
       link(rel='stylesheet' href=url_for('/css/github-calendar.css'))
     if page.type === 'link'
       link(rel='stylesheet' href=url_for('/css/friends.css'))
-    link(rel='stylesheet' href=url_for('/css/music.css') + '?v=full-stage-1')
+    if page.type === 'music'
+      link(rel='stylesheet' href=url_for('/css/music.css') + '?v=full-stage-2')
+    else
+      link(rel='stylesheet' href=url_for('/css/music.css') + '?v=full-stage-2' media='print' data-deferred-style)
     if page.type === 'cinema'
       link(rel='stylesheet' href=url_for('/css/cinema.css') + '?v=wide-catalog-1')
     if is_post()
@@ -166,10 +169,10 @@ html(lang=config.language || 'zh-CN' style=morii_accent() data-motion=(!theme.mo
     button.icon-button.back-to-top#back-to-top(type='button' aria-label='返回顶部' hidden) ↑
     .sr-only#theme-announcement(role='status' aria-live='polite')
     include music-hub.pug
-    script(src=url_for('/js/music.js') defer)
+    script(src=url_for('/js/theme.js') + '?v=nav-performance-2' defer)
+    script(src=url_for('/js/music.js') + '?v=nav-performance-1' defer)
     if page.type === 'cinema'
       script(src=url_for('/js/cinema.js') + '?v=wide-catalog-1' defer)
-    script(src=url_for('/js/theme.js') defer)
     if visualEffects.enabled
       script(src=url_for('/js/effects.js') defer data-spotlight=visualEffects.spotlight ? 'on' : 'off' data-tilt=visualEffects.tilt ? 'on' : 'off' data-ripple=visualEffects.ripple ? 'on' : 'off')
     if !theme.motion || theme.motion.enable !== false

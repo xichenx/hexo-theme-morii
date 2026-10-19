@@ -1,5 +1,7 @@
 (() => {
   const root = document.documentElement;
+  // Hidden dialogs, motion and the inactive music capsule do not block first paint.
+  document.querySelectorAll('link[data-deferred-style]').forEach(link => { link.media = 'all'; });
   const themeButton = document.getElementById('theme-toggle');
   const syncThemeButton = () => {
     if (!themeButton) return;
@@ -135,4 +137,37 @@
   backToTop?.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
   });
+
+  // Warm a same-origin page only when a visitor shows intent to open it.
+  // This is especially useful when the HTML response has a variable network delay.
+  const prefetched = new Set();
+  let pendingPrefetch;
+  const prefetch = link => {
+    if (!link || prefetched.size >= 4 || navigator.connection?.saveData || /(^|-)2g$/.test(navigator.connection?.effectiveType || '')) return;
+    if (link.hasAttribute('download') || link.target && link.target !== '_self') return;
+    let url;
+    try { url = new URL(link.href, location.href); } catch { return; }
+    if (url.origin !== location.origin || !/^https?:$/.test(url.protocol) || !/\/$|\.html?$/.test(url.pathname)) return;
+    if (url.pathname === location.pathname && url.search === location.search) return;
+    url.hash = '';
+    if (prefetched.has(url.href)) return;
+    prefetched.add(url.href);
+    const hint = document.createElement('link');
+    hint.rel = 'prefetch'; hint.as = 'document'; hint.href = url.href;
+    document.head.append(hint);
+  };
+  document.addEventListener('pointerover', event => {
+    const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
+    if (!link || link.contains(event.relatedTarget)) return;
+    clearTimeout(pendingPrefetch);
+    pendingPrefetch = setTimeout(() => prefetch(link), 90);
+  }, { passive: true });
+  document.addEventListener('pointerout', event => {
+    const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
+    if (link && !link.contains(event.relatedTarget)) clearTimeout(pendingPrefetch);
+  }, { passive: true });
+  document.addEventListener('focusin', event => {
+    if (event.target instanceof Element) prefetch(event.target.closest('a[href]'));
+  });
+  window.addEventListener('pagehide', () => clearTimeout(pendingPrefetch));
 })();

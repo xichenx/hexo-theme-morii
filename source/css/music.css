@@ -103,6 +103,7 @@
 }
 .music-shell-active { overflow: hidden; }
 .music-shell-active > :not(#morii-audio-hub):not(#morii-site-frame):not(script):not(style):not(link) { display: none !important; }
+.music-shell-loading::after { content: '正在打开页面…'; position: fixed; z-index: 1101; top: 91px; right: 24px; padding: 9px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); box-shadow: 0 8px 24px #1c25502b; font-size: 12px; font-weight: 750; pointer-events: none; }
 #morii-site-frame { position: fixed; z-index: 1000; inset: 0; width: 100%; height: 100dvh; border: 0; background: var(--bg); }
 @keyframes music-record-turn { to { transform: rotate(360deg); } }
 @media (max-width: 1100px) {
@@ -111,6 +112,7 @@
   .music-queue { padding-left: 18px; }
 }
 @media (max-width: 760px) {
+  .music-shell-loading::after { top: 74px; right: 14px; }
   .is-music .listing-page { width: 100%; padding: 0; }
   .music-room { height: auto; min-height: calc(100dvh - 64px); padding: 20px 18px 26px; overflow: visible; }
   .music-atmosphere { inset: 0; width: 100%; height: 100%; }

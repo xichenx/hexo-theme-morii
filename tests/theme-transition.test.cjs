@@ -82,3 +82,24 @@ test('mobile menu reports its state and returns keyboard focus when dismissed', 
   assert.equal(window.document.querySelector('.site-nav').classList.contains('is-open'), false);
   dom.window.close();
 });
+
+test('navigation prefetches intended local pages without fetching external links', () => {
+  const dom = new JSDOM('<html><head></head><body><a id="internal" href="/archives/">文章</a><a id="external" href="https://elsewhere.test/">外站</a></body></html>', { url: 'https://example.test/', runScripts: 'outside-only', pretendToBeVisual: true });
+  const { window } = dom;
+  window.eval(source);
+  const internal = window.document.getElementById('internal');
+  const external = window.document.getElementById('external');
+  internal.dispatchEvent(new window.FocusEvent('focusin', { bubbles: true }));
+  internal.dispatchEvent(new window.FocusEvent('focusin', { bubbles: true }));
+  external.dispatchEvent(new window.FocusEvent('focusin', { bubbles: true }));
+  assert.deepEqual([...window.document.querySelectorAll('link[rel="prefetch"]')].map(node => node.href), ['https://example.test/archives/']);
+  dom.window.close();
+});
+
+test('deferred noncritical styles activate when theme behavior starts', () => {
+  const dom = new JSDOM('<html><head><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/search.css" media="print" data-deferred-style></head><body></body></html>', { url: 'https://example.test/', runScripts: 'outside-only' });
+  dom.window.eval(source);
+  assert.equal(dom.window.document.querySelector('[data-deferred-style]').media, 'all');
+  assert.equal(dom.window.document.querySelector('link[href="/css/style.css"]').media, '');
+  dom.window.close();
+});
