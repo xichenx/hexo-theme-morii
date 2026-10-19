@@ -65,12 +65,17 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
     cinemaDom.window.HTMLElement.prototype.scrollIntoView = () => {};
     cinemaDom.window.eval(fs.readFileSync(path.join(__dirname, '../source/js/cinema.js'), 'utf8'));
     assert.equal(cinema.querySelectorAll('[data-cinema-card]').length, 3);
+    assert.equal(cinema.querySelector('[data-cinema-stage]').hidden, true);
     cinema.querySelector('[data-cinema-card] [data-cinema-select]').click();
+    assert.equal(cinema.querySelector('[data-cinema-stage]').hidden, false);
     assert.equal(cinema.querySelector('[data-cinema-title]').textContent, '花朵 · 播放示例');
     assert.equal(cinema.querySelector('[data-cinema-card] [data-cinema-select]').getAttribute('aria-pressed'), 'true');
-    assert.equal(cinema.querySelector('.cinema-episodes').nextElementSibling.className, 'cinema-now-foot');
+    assert.equal(cinema.querySelector('.cinema-episodes').parentElement.className, 'cinema-episodes-anchor');
     cinema.querySelector('.cinema-episodes button').click();
     assert.equal(cinemaVideo.src, 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4');
+    cinema.querySelector('[data-cinema-close]').click();
+    assert.equal(cinema.querySelector('[data-cinema-stage]').hidden, true);
+    assert.equal(cinemaVideo.hasAttribute('src'), false);
     cinema.querySelector('[data-cinema-filter="anime"]').click();
     assert.equal(cinema.querySelectorAll('[data-cinema-card]:not([hidden])').length, 1);
     cinema.querySelector('[data-cinema-search]').value = '无结果';

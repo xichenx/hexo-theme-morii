@@ -3,7 +3,7 @@ extends includes/layout.pug
 block content
   - var categoryLayout = morii_layout('categories')
   - var categoryEditorial = page.type === 'categories' && categoryLayout !== 'cards'
-  .wrap.listing-page(class=categoryEditorial ? 'category-directory-page category-overview' : '')
+  .wrap.listing-page(class=page.type === 'cinema' ? 'cinema-page' : categoryEditorial ? 'category-directory-page category-overview' : '')
     .page-intro(class=page.type === 'link' ? 'friends-intro' : page.type === 'music' ? 'music-page-heading' : page.type === 'cinema' ? 'cinema-page-heading' : categoryEditorial ? 'category-directory-intro' : '')
       - var pageKickers = { about: 'ABOUT', link: 'FRIENDS', essay: 'MOMENTS', album: 'ALBUMS', album_detail: 'PHOTO JOURNAL', fcircle: 'FRIENDS FEED', music: 'MUSIC', cinema: 'CINEMA', categories: 'TOPICS', tags: 'TAGS' }
       span.section-kicker= pageKickers[page.type] || 'EXPLORE'

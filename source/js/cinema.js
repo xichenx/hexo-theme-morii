@@ -12,8 +12,13 @@
   const noResults = root.querySelector('[data-cinema-no-results]');
   const search = root.querySelector('[data-cinema-search]');
   const filters = [...root.querySelectorAll('[data-cinema-filter]')];
+  const stage = root.querySelector('[data-cinema-stage]');
+  const close = root.querySelector('[data-cinema-close]');
+  const episodeAnchor = root.querySelector('[data-cinema-episodes-anchor]');
+  if (!video || !embed) return;
   let activeFilter = 'all';
   let episodeList;
+  let selectedButton;
 
   function stop() {
     video.pause();
@@ -39,11 +44,12 @@
       video.play().catch(() => {});
     }
     document.getElementById('music-player')?.pause();
-    root.querySelector('.cinema-stage')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    stage?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   function select(card) {
     stop();
+    selectedButton = card.querySelector('[data-cinema-select]');
     cards.forEach(item => {
       const selected = item === card;
       item.classList.toggle('is-selected', selected);
@@ -75,9 +81,9 @@
       button.addEventListener('click', () => play(episode, button));
       episodeList.append(button);
     });
-    root.querySelector('.cinema-now-foot').before(episodeList);
-    root.querySelector('.cinema-now-foot small').textContent = episodes.length ? '点击上方片源，即可开始播放。' : '这部作品暂时还没有可播放的片源。';
-    root.querySelector('.cinema-stage')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    episodeAnchor.append(episodeList);
+    stage.hidden = false;
+    stage.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   function filter() {
@@ -92,6 +98,15 @@
   }
 
   cards.forEach(card => card.querySelector('[data-cinema-select]').addEventListener('click', () => select(card)));
+  close?.addEventListener('click', () => {
+    stop();
+    stage.hidden = true;
+    cards.forEach(card => {
+      card.classList.remove('is-selected');
+      card.querySelector('[data-cinema-select]').setAttribute('aria-pressed', 'false');
+    });
+    selectedButton?.focus();
+  });
   filters.forEach(button => button.addEventListener('click', () => {
     activeFilter = button.dataset.cinemaFilter;
     filters.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
