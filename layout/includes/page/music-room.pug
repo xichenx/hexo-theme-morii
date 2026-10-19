@@ -14,6 +14,8 @@
       .music-album
         .music-album-fallback(aria-hidden='true') ♫
         img(data-music-cover alt='歌曲封面' hidden)
+        span.music-album-spindle(aria-hidden='true')
+        span.music-album-arm(aria-hidden='true')
       .music-now-info
         span.music-player-kicker NOW PLAYING
         h3#music-current-title(data-music-title) 选择一首音乐
@@ -40,6 +42,10 @@
   section.music-control-bar(aria-label='播放控制')
     .music-playback-status
       p#music-play-status(data-music-status role='status') 选择一首音乐，开始聆听。
+    .music-timeline
+      span(data-music-elapsed) 0:00
+      input.music-seek(type='range' min='0' max='100' step='0.1' value='0' aria-label='播放进度' disabled)
+      span(data-music-duration) 0:00
     .music-transport
       button#music-mode(type='button' data-music-action='mode' aria-label='播放模式：顺序播放') 顺序
       button#music-previous(type='button' data-music-action='previous' aria-label='上一首') ⏮
@@ -49,9 +55,5 @@
         span(aria-hidden='true') ♪
         span.sr-only 音量
         input.music-volume(type='range' min='0' max='1' step='0.01' value=music.volume aria-label='音量')
-    .music-timeline
-      span(data-music-elapsed) 0:00
-      input.music-seek(type='range' min='0' max='100' step='0.1' value='0' aria-label='播放进度' disabled)
-      span(data-music-duration) 0:00
   noscript
     p 启用 JavaScript 后可在本站播放歌曲和显示歌词；也可打开上方原平台歌单。
