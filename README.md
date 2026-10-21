@@ -91,8 +91,8 @@ hexo server
 `logo` 控制顶部导航栏图标，`favicon` 控制浏览器标签页图标，两者可以分别替换，支持本站路径或完整图片网址。例如：
 
 ```yaml
-logo: /icons/brand/morii-logo.png
-favicon: /icons/brand/morii-favicon.png
+logo: /icons/brand/morii-logo-v2.png
+favicon: /icons/brand/morii-logo-v2.png
 ```
 
 本地图片放在主题的 `source/` 目录下，配置中省略 `source`。`logo` 留空时显示默认星形标记，图片加载失败时也会回退为星形。

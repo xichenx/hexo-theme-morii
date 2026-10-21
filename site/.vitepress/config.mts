@@ -6,8 +6,12 @@ export default defineConfig({
   description: 'Morii Hexo 主题安装、配置与使用指南',
   cleanUrls: true,
   lastUpdated: true,
+  head: [
+    ['link', { rel: 'icon', type: 'image/png', href: '/morii-logo-v2.png' }]
+  ],
   themeConfig: {
     siteTitle: 'Morii',
+    logo: { src: '/morii-logo-v2.png', alt: 'Morii' },
     nav: [
       { text: '从零开始', link: '/guide/getting-started' },
       { text: '功能指南', link: '/features/pages' },

@@ -24,8 +24,8 @@ github_calendar:
   user: xichenx
   # 支持兼容 GitHub Contributions API v4 的自建服务，{user} 会替换为账号。
   api: 'https://github-contributions-api.jogruber.de/v4/{user}?y=last'
-favicon: /icons/brand/morii-favicon.png
-logo: /icons/brand/morii-logo.png
+favicon: /icons/brand/morii-logo-v2.png
+logo: /icons/brand/morii-logo-v2.png
 footer:
   runtime:
     enable: true

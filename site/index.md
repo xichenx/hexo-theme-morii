@@ -5,6 +5,9 @@ hero:
   name: Morii
   text: 让博客成为你的作品
   tagline: 第一次接触 Hexo 也能跟着做：安装、写文章、配置页面，再发布自己的博客。
+  image:
+    src: /morii-logo-v2.png
+    alt: Morii Logo
   actions:
     - theme: brand
       text: 从零开始
