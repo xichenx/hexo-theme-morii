@@ -73,6 +73,51 @@ avatarImg: /images/avatar.png
 
 如果没有准备头像文件，请删除 `avatarImg` 这一行，页面会沿用 `_config.morii.yml` 里的 `avatar`。
 
+### 进一步填写技能、经历与兴趣
+
+下面的字段可以继续添加到**同一个** `source/_data/about.yml` 中。这是数据文件，不要放到 `_config.morii.yml`：
+
+```yaml
+maxim:
+  maxim_top: 保持好奇，
+  maxim_bottom: 慢慢积累。
+avatarSkills:
+  left:
+    - JavaScript
+    - 写作
+  right:
+    - 摄影
+    - 阅读
+careers:
+  list:
+    - desc: 2026：开始记录自己的学习过程
+music:
+  music_title: 喜欢安静的纯音乐
+like:
+  like_title: 阅读与旅行
+  like_bottom: 从书本和路上寻找新的灵感。
+```
+
+| 字段 | 展示内容 |
+| --- | --- |
+| `name`、`description` | 姓名与介绍，未填时使用站点备用资料 |
+| `avatarImg` | 关于页单独使用的头像 |
+| `subtitle` | 关于页补充介绍 |
+| `maxim.maxim_top` / `maxim_bottom` | 两段拼接为一句格言 |
+| `avatarSkills.left` / `right` | 合并展示的技能文字列表 |
+| `careers.list[].desc` | 经历说明列表 |
+| `music.music_title` | 音乐偏好文字，不是播放器歌单配置 |
+| `like.like_title` / `like_bottom` | 兴趣标题与说明 |
+
+兴趣与音乐偏好区域还受主题配置 `about.show_interests` 控制。想隐藏它，在 `_config.morii.yml` 中设置：
+
+```yaml
+about:
+  show_interests: false
+```
+
+`source/about/index.md` 在 Front Matter 后也可以继续写 Markdown 正文，适合补充较长的个人介绍。
+
 ## 3. 创建即刻页
 
 运行 `hexo new page essay`，把 `source/essay/index.md` 改为：

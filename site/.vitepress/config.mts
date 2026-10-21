@@ -12,8 +12,10 @@ export default defineConfig({
   themeConfig: {
     siteTitle: 'Morii',
     logo: { src: '/morii-logo-v2.png', alt: 'Morii' },
+    outline: { level: [2, 3], label: '本页目录' },
     nav: [
       { text: '从零开始', link: '/guide/getting-started' },
+      { text: '配置手册', link: '/config/' },
       { text: '功能指南', link: '/features/pages' },
       { text: '发布博客', link: '/guide/publishing' },
       { text: 'GitHub', link: 'https://github.com/xichenx/hexo-theme-morii' }
@@ -27,6 +29,18 @@ export default defineConfig({
           { text: '第一篇文章', link: '/guide/first-post' },
           { text: '发布博客：平台选择', link: '/guide/publishing' },
           { text: '更新主题', link: '/guide/updating' }
+        ]
+      },
+      {
+        text: '配置手册',
+        items: [
+          { text: '配置总览与填写方法', link: '/config/' },
+          { text: '基本信息、头像与 Logo', link: '/config/basic' },
+          { text: '外观、导航与特效', link: '/features/customization' },
+          { text: '首页内容与推荐', link: '/config/home' },
+          { text: '文章与阅读功能', link: '/config/article' },
+          { text: '侧栏、小组件与页脚', link: '/config/widgets' },
+          { text: '搜索、社交与评论', link: '/features/interaction' }
         ]
       },
       {
@@ -44,9 +58,7 @@ export default defineConfig({
         items: [
           { text: '创建常用页面', link: '/features/pages' },
           { text: '相册与友链', link: '/features/album-links' },
-          { text: '音乐馆与电影院', link: '/features/media' },
-          { text: '外观与导航', link: '/features/customization' },
-          { text: '搜索、社交与评论', link: '/features/interaction' }
+          { text: '音乐馆与电影院', link: '/features/media' }
         ]
       },
       {

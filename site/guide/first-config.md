@@ -103,7 +103,7 @@ my-blog/source/images/avatar.png
 avatar: /images/avatar.png
 ```
 
-文件系统中的 `source/images/avatar.png` 会变成网站中的 `/images/avatar.png`。**网站路径不写 `source`**。如果还没有自己的图片，保留主题内置图标即可。顶部 logo 和浏览器 favicon 也可用 `logo`、`favicon` 设置，先保持默认就好。
+文件系统中的 `source/images/avatar.png` 会变成网站中的 `/images/avatar.png`。**网站路径不写 `source`**。如果还没有自己的图片，保留主题内置图标即可。顶部 Logo 和浏览器 favicon 也可用 `logo`、`favicon` 设置，详细步骤见[基本信息、头像与 Logo](/config/basic)。
 
 ## 4. 重新生成并核对
 
@@ -117,4 +117,4 @@ hexo server
 
 打开本地博客，检查站名、首页介绍、头像和页脚。此时顶部菜单应为空；确认没有出现主题作者账号、备案号、歌单或评论入口。如果仍显示旧内容，停止预览服务后重新启动，并检查文件是否确实叫 `_config.morii.yml`。
 
-**下一步：**写[第一篇文章](/guide/first-post)。想调整主题配色、菜单和特效时，看[外观与导航](/features/customization)。
+**下一步：**写[第一篇文章](/guide/first-post)。需要逐项调整主题时，进入[配置手册](/config/)，按基本信息、首页、阅读、侧栏和外部服务查找；里面还有可下载的带注释配置模板。

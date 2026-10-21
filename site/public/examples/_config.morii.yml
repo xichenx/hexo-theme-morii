@@ -1,0 +1,149 @@
+# Morii 起步配置：保存为博客根目录的 _config.morii.yml。
+# 已有配置时请先备份，不要直接覆盖自己的账号和服务地址。
+# 所有同名顶层字段只保留一份；每层使用 2 个空格缩进。
+# 完整说明：https://morii-docs.pages.dev/config/
+
+# 顶部站名、短句和首页介绍。
+# 作者姓名与侧栏简介仍在博客 _config.yml 的 author / description 中设置。
+brand: 我的博客
+tagline: 把每一天写成一页
+intro: 这里记录我的学习与生活。
+avatar: /icons/brand/morii-icon.png
+# 准备好自己的图片后，用下面的 avatar 替换上面的 avatar，避免重复字段。
+# logo / favicon 可取消注释；图片放在博客 source/images/ 中。
+# avatar: /images/avatar.png
+# logo: /images/logo.png
+# favicon: /images/favicon.png
+accent: '#5568f6'
+accent_dark: '#8c9aff'
+
+hero:
+  title:
+    0: 你好，欢迎来坐坐。
+    1: 这是我的新博客。
+  note: 从第一篇文章开始，慢慢把这里填满。
+
+# 先建页面、填写自己的账号，再按配置手册替换以下 false。
+# [] 不能清除主题默认列表。
+menu: false
+explore: false
+social: false
+featured: false
+quick_navigation:
+  enable: false
+
+home:
+  # 仅取消指定名单，精选区仍可能展示标记文章或最新文章。
+  selected_posts: false
+  selected_limit: 3
+  moments:
+    enable: true
+    limit: 5
+  random:
+    enable: true
+
+appearance:
+  layouts:
+    home: featured
+    categories: atlas
+    category: list
+    archives: timeline
+  effects:
+    enable: true
+    aurora: true
+    particles: true
+    density: 48
+    glass: true
+    spotlight: true
+    tilt: true
+    ripple: true
+    theme_transition: true
+motion:
+  enable: true
+
+article:
+  resume:
+    enable: true
+  share:
+    enable: true
+  print:
+    enable: true
+  reading_settings: true
+  navigation: true
+  outdated:
+    enable: true
+    days: 365
+  related:
+    enable: true
+    limit: 3
+  code:
+    collapse: true
+    lines: 18
+reading_list:
+  enable: true
+search:
+  content: true
+  page_size: 10
+
+sidebar:
+  announcement:
+    enable: true
+    title: 小站公告
+    content: 欢迎来到我的博客。
+  tags:
+    enable: true
+    limit: 12
+  stats:
+    enable: true
+about:
+  show_interests: true
+
+# 没有填写自己的用户名和城市前，保持关闭。
+github_calendar:
+  enable: false
+  user: ''
+clock:
+  enable: false
+  city: 北京市
+  latitude: 39.90
+  longitude: 116.40
+  timezone: Asia/Shanghai
+
+friends_feed:
+  endpoint: ''
+  page_size: 12
+music:
+  title: 我的音乐
+  description: 给日常留一点旋律。
+  playlist_url: ''
+  playlist_label: 打开我的歌单
+  volume: 0.7
+  embed_url: ''
+  meting:
+    enable: false
+    id: ''
+  tracks: []
+cinema:
+  enable: false
+  title: 我的电影院
+  description: 收藏自己的影像记录。
+  items: []
+comments:
+  enable: false
+  provider: twikoo
+  env_id: ''
+
+footer:
+  runtime:
+    enable: false
+    # 改成自己的起始时间后，再启用。
+    start: '2026-10-21T00:00:00+08:00'
+    label: 本站已运行
+  filing:
+    enable: false
+    icp:
+      number: ''
+      url: https://beian.miit.gov.cn/
+    police:
+      number: ''
+      url: ''

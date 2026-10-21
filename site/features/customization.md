@@ -42,7 +42,54 @@ hero:
   note: 这里有我最近的文章和想法。
 ```
 
-颜色用 `#RRGGBB` 格式，建议加引号。`hero.title` 下的 `0:`、`1:` 分别是首页标题的第一行和第二行；当前 npm 版本需要这种写法才能覆盖默认文字。修改后重新生成，并检查浅色、深色两种模式下的可读性。
+颜色用 `#RRGGBB` 格式，必须加引号，避免 `#` 被 YAML 当作注释。`hero.title` 下的 `0:`、`1:` 分别是首页标题的第一行和第二行；当前 npm 版本需要这种写法才能覆盖默认文字。修改后重新生成，并检查浅色、深色两种模式下的可读性。
+
+深色模式可以设置单独的强调色：
+
+```yaml
+accent: '#5568f6'
+accent_dark: '#8c9aff'
+```
+
+只支持六位十六进制颜色，不要写 `blue`、`#fff` 或 `rgb(...)`。`accent` 默认是 `#5568f6`，`accent_dark` 默认是 `#8c9aff`。访客可通过主题切换按钮选择明暗模式；偏好保存在当前浏览器，没有偏好时跟随系统。当前没有 `darkmode:` 这样的主题配置。
+
+头像和 Logo 的路径详解见[基本信息与图片](/config/basic)，首页卡片详解见[首页内容](/config/home)。
+
+## 探索链接和快捷导航
+
+`explore` 是页脚探索入口列表，也会加入快捷导航面板。它不会自动创建页面。当前默认有六项，想开启时请完整覆盖六项；下面使用常用页面作为示例，请先确认每个页面都已存在：
+
+```yaml
+explore:
+  - name: 文章归档
+    path: /archives/
+  - name: 分类目录
+    path: /categories/
+  - name: 标签索引
+    path: /tags/
+  - name: 即刻短文
+    path: /essay/
+  - name: 友情链接
+    path: /link/
+  - name: 关于本站
+    path: /about/
+quick_navigation:
+  enable: true
+```
+
+启用 `quick_navigation` 后，顶部会出现导航面板入口。面板汇总菜单、标签、探索链接，以及启用后的稍后阅读入口；重复路径会去重。关闭面板用 `quick_navigation.enable: false`，关闭探索列表用 `explore: false`，两者互不替代。
+
+菜单 / 探索项的 `name` 是显示文字，`path` 是地址。可以额外写 `icon` 和 `description`，用于快捷导航面板的展示，不会把顶部文字菜单自动变成图标菜单。例如：
+
+```yaml
+# 这是单个列表项示例，替换完整 menu / explore 列表中的一项。
+- name: 我的开源项目
+  path: https://github.com/你的用户名
+  icon: code
+  description: 看看我正在做的项目
+```
+
+内置图标名包括 `home`、`archive`、`categories`、`tags`、`essay`、`album`、`link`、`about`、`music`、`cinema`、`friends`、`comments`、`game`、`snowflake`、`bookmark`、`external`、`book`、`code`、`sparkles`、`sun`。
 
 ## 选择页面布局
 
@@ -57,12 +104,14 @@ appearance:
     archives: timeline
 ```
 
-| 字段 | 可选值 |
-| --- | --- |
-| `home` | `featured`、`grid` |
-| `categories` | `atlas`、`directory`、`cards` |
-| `category` | `list`、`cards` |
-| `archives` | `timeline`、`grouped` |
+| 字段 | 可选值与含义 | 默认值 |
+| --- | --- | --- |
+| `home` | `featured`：文章数为奇数时突出第一篇；`grid`：等宽网格 | `featured` |
+| `categories` | `atlas`：双列主题导航；`directory`：分类目录；`cards`：分类卡片 | `atlas` |
+| `category` | `list`：某个分类下的文章行列表；`cards`：文章卡片与侧栏 | `list` |
+| `archives` | `timeline`：时间树；`grouped`：按年份分组的卡片 | `timeline` |
+
+注意 `categories` 控制分类**总览页**，`category` 控制点击某个分类后进入的**文章列表页**。字段值拼写错误时主题会警告并回退默认布局。
 
 如果你已经有 `appearance:` 分组，把 `layouts:` 放在这个分组内部，**不要再写第二个 `appearance:`**。页面布局更改后运行 `hexo clean && hexo generate` 并重启本地服务。
 
@@ -83,4 +132,49 @@ motion:
   enable: false
 ```
 
-以上代码展示的是**所在层级**，不是让你把已有 `appearance` 全部删除。修改前可备份 `_config.morii.yml`。更细的单项开关与默认值见[主题配置源码](https://github.com/xichenx/hexo-theme-morii/blob/main/_config.yml)。
+以上代码展示的是**所在层级**，不是让你把已有 `appearance` 全部删除。修改前可备份 `_config.morii.yml`。
+
+## 单独控制每种特效
+
+下面展示布局与特效同时存在时的完整层级；合并到已有的 `appearance:` 中：
+
+```yaml
+appearance:
+  layouts:
+    home: featured
+    categories: atlas
+    category: list
+    archives: timeline
+  effects:
+    enable: true
+    aurora: true
+    particles: true
+    density: 48
+    glass: true
+    spotlight: true
+    tilt: true
+    ripple: true
+    theme_transition: true
+motion:
+  enable: true
+```
+
+| 字段（位于 `appearance.effects` 下） | 默认值 | 作用 |
+| --- | --- | --- |
+| `enable` | `true` | 视觉特效总开关；不改变页面布局 |
+| `aurora` | `true` | 页面渐变极光背景 |
+| `particles` | `true` | 星尘粒子和近邻连线 |
+| `density` | `48` | 桌面粒子数量，范围 12–80，手机最多 18 |
+| `glass` | `true` | 导航和展示卡片的毛玻璃效果 |
+| `spotlight` | `true` | 精细指针设备上的卡片跟随光晕 |
+| `tilt` | `true` | 精细指针设备上的卡片轻微倾斜 |
+| `ripple` | `true` | 按钮点击波纹 |
+| `theme_transition` | `true` | 明暗切换圆形扩散；不支持时直接切换 |
+
+想保留配色但减少动态效果，可把 `particles`、`spotlight`、`tilt`、`ripple`、`theme_transition` 设为 `false`，同时设 `motion.enable: false`。`density: 0` 不等于关闭粒子，关闭应使用 `particles: false`。
+
+主题遵循系统的减少动态效果设置，触屏设备也不会呈现所有鼠标效果。因此电脑上有光晕、手机上没有，并不一定是配置失败。
+
+## 检查修改结果
+
+重新生成后，分别检查首页、分类总览、某个分类和归档页；再切换明暗模式、缩小浏览器宽度。菜单地址应逐个点击验证，颜色应保证文字可读。完整的配置文件组织方法见[配置手册](/config/)。

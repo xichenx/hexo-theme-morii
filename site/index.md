@@ -29,9 +29,9 @@ features:
   - title: 发布自己的博客
     details: 比较五个平台，跟着独立教程发布到 Cloudflare、GitHub Pages、Vercel、Netlify 或 EdgeOne。
     link: /guide/publishing
-  - title: 个人配置
-    details: 替换作者示例信息，保护自己的站点资料。
-    link: /guide/first-config
+  - title: 配置手册
+    details: 从头像和菜单到首页、阅读、侧栏与页脚，逐项查看字段说明和可复制示例。
+    link: /config/
   - title: 遇到问题
     details: 根据症状检查构建日志、路径和数据文件。
     link: /troubleshooting
