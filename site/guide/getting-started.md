@@ -1,33 +1,105 @@
-# 安装 Morii
+# 从零安装 Morii
 
-本页从一个**已经可以运行的 Hexo 8 博客**开始。如果还没有博客，先按 [Hexo 官方指南](https://hexo.io/zh-cn/docs/)创建站点。Morii 要求 Node.js 20.19.0 或更高版本，主题模板还需要 `hexo-renderer-pug`。
+这篇教程适合第一次使用 Hexo 的读者。跟着做完，你会在自己的电脑上看到 Morii 博客。已经有 **Hexo 8** 博客的读者，可以从[第 3 步：安装主题](#_3-安装-morii-主题)开始。
 
-## 1. 安装主题
+::: tip 先分清两个网站
+你正在阅读的是 **Morii 主题文档站**。下面创建的是**你自己的博客**。文档站部署在 Cloudflare Pages，不会替你的博客自动上线。
+:::
 
-在**博客根目录**运行：
+## 开始前准备
+
+你需要一台能联网的电脑、一个文本编辑器，以及 [Node.js](https://nodejs.org/) 和 [Git](https://git-scm.com/downloads)。Windows 可以使用 PowerShell，macOS 使用“终端”，Linux 使用自己的终端。推荐安装 Node.js **24**；Morii 最低要求 Node.js **20.19.0**。
+
+安装完后，**关闭并重新打开终端**，依次输入：
+
+```bash
+node --version
+npm --version
+git --version
+```
+
+每条命令都应显示版本号。如果提示“找不到命令”，说明软件未安装完成或终端还没有刷新；先解决这一点再继续。Node.js 安装程序会附带 npm。Hexo 官方也把 Node.js 和 Git 列为前置软件，参见 [Hexo 安装说明](https://hexo.io/zh-cn/docs/)。
+
+## 1. 创建博客文件夹
+
+打开终端，先进入你想保存博客的目录。下面以用户主目录为例：
+
+```bash
+cd ~
+npm install -g hexo-cli
+hexo init my-blog
+cd my-blog
+npm install
+```
+
+Windows PowerShell 中的 `cd ~` 同样表示进入用户主目录。`my-blog` 是**你自己博客的文件夹名**，可以改成喜欢的英文名字；后面的命令都要在这个文件夹中执行。
+
+完成后应能看到这些文件：
+
+```text
+my-blog/                 ← 博客根目录，以后说“在博客根目录运行”就是这里
+├─ _config.yml           ← Hexo 站点配置
+├─ package.json          ← 博客依赖
+├─ source/
+│  └─ _posts/            ← 文章
+└─ themes/               ← 通过 Git 安装主题时使用
+```
+
+::: warning 不要进入主题源码仓库操作
+这篇教程中的 `npm install`、`npx hexo ...` 都是在**自己的博客根目录**执行，不是在 `hexo-theme-morii` 主题仓库中执行。
+:::
+
+## 2. 确认 Hexo 版本
+
+在博客根目录运行：
+
+```bash
+npx hexo version
+```
+
+找到输出中的 `hexo` 版本。Morii 面向 **Hexo 8**；如果不是 8.x，先在博客根目录运行：
+
+```bash
+npm install hexo@^8
+```
+
+然后再运行一次 `npx hexo version` 确认版本。
+
+## 3. 安装 Morii 主题
+
+推荐使用 npm。仍在**博客根目录**运行：
 
 ```bash
 npm install hexo-theme-morii@latest hexo-renderer-pug
 ```
 
-如果需要直接使用 Git 仓库，也可以在博客根目录运行：
+`hexo-renderer-pug` 用来渲染主题页面，必须安装在博客里。安装完成后，可以运行 `npm list hexo-theme-morii hexo-renderer-pug` 核对两项依赖。
+
+::: details 我更想用 Git 安装
+在博客根目录执行下面两条命令，**不要再执行上面的 npm 主题安装命令**：
 
 ```bash
 git clone https://github.com/xichenx/hexo-theme-morii.git themes/morii
 npm install hexo-renderer-pug
 ```
 
-两种方式任选一种。npm 安装的主题位于 `node_modules/hexo-theme-morii/`；Git 安装的主题位于 `themes/morii/`。
+Git 安装把主题放在 `themes/morii/`；npm 安装把主题放在 `node_modules/hexo-theme-morii/`。两种方式任选其一即可。
+:::
 
-## 2. 启用主题
+## 4. 启用主题
 
-编辑**博客根目录**的 `_config.yml`，把 `theme` 改为：
+用文本编辑器打开**博客根目录**的 `_config.yml`。找到原有的 `theme:` 一行，把它改成：
 
 ```yaml
 theme: morii
+language: zh-CN
 ```
 
-## 3. 本地预览
+如果文件中已有 `language:`，也修改**原有的那一行**，不要写出两个同名配置项。保存文件。此时先不用修改主题安装目录中的 `_config.yml`，个人设置会放在单独的 `_config.morii.yml` 中。
+
+## 5. 生成并预览
+
+回到博客根目录，依次运行：
 
 ```bash
 npx hexo clean
@@ -35,10 +107,8 @@ npx hexo generate
 npx hexo server
 ```
 
-打开终端显示的本地地址。能看到 Morii 首页和你的文章，就说明主题已启用。
+终端应显示本地预览地址，通常是 `http://localhost:4000/`。在浏览器打开它。如果看到 Morii 风格的首页，即表示安装成功。第一次建站时首页可能只有 Hexo 的示例文章，这是正常的。
 
-::: tip 配置放在哪里？
-建议在博客根目录创建 `_config.morii.yml`，写入自己的主题设置。这样更新主题安装包时，个人配置不会被覆盖。下一步请看[首次配置](/guide/first-config)。
-:::
+`npx hexo server` 会持续运行。想停止预览时，在该终端按 **Ctrl+C**。以后修改配置后，建议停止服务、重新生成并再次启动。
 
-如果页面空白或构建失败，先查看[常见问题](/troubleshooting)。
+**下一步：**按[首次配置](/guide/first-config)替换示例资料，再写[第一篇文章](/guide/first-post)。遇到报错可按[常见问题](/troubleshooting)逐项检查。

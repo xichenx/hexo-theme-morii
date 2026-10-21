@@ -9,30 +9,38 @@ export default defineConfig({
   themeConfig: {
     siteTitle: 'Morii',
     nav: [
-      { text: '快速开始', link: '/guide/getting-started' },
+      { text: '从零开始', link: '/guide/getting-started' },
       { text: '功能指南', link: '/features/pages' },
+      { text: '发布博客', link: '/guide/publishing' },
       { text: 'GitHub', link: 'https://github.com/xichenx/hexo-theme-morii' }
     ],
     sidebar: [
       {
-        text: '开始使用',
+        text: '从零开始',
         items: [
-          { text: '安装主题', link: '/guide/getting-started' },
+          { text: '安装 Hexo 与 Morii', link: '/guide/getting-started' },
           { text: '首次配置', link: '/guide/first-config' },
+          { text: '第一篇文章', link: '/guide/first-post' },
+          { text: '发布自己的博客', link: '/guide/publishing' },
           { text: '更新主题', link: '/guide/updating' }
         ]
       },
       {
         text: '功能指南',
         items: [
-          { text: '页面与数据文件', link: '/features/pages' },
+          { text: '创建常用页面', link: '/features/pages' },
           { text: '相册与友链', link: '/features/album-links' },
-          { text: '音乐馆与电影院', link: '/features/media' }
+          { text: '音乐馆与电影院', link: '/features/media' },
+          { text: '外观与导航', link: '/features/customization' },
+          { text: '搜索、社交与评论', link: '/features/interaction' }
         ]
       },
       {
         text: '帮助',
-        items: [{ text: '常见问题', link: '/troubleshooting' }]
+        items: [
+          { text: '常见问题', link: '/troubleshooting' },
+          { text: '新手术语表', link: '/guide/glossary' }
+        ]
       }
     ],
     search: { provider: 'local' },

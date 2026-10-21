@@ -193,7 +193,7 @@ social:
     description: 使用微信扫一扫关注
 ```
 
-`url` 支持 HTTP/HTTPS 主页，`qrcode` 支持站内绝对路径或 HTTP/HTTPS 图片，可同时配置；需要自己提供真实二维码。只配置二维码时显示扫码按钮，同时配置时显示主页和扫码入口。`enable: false` 可隐藏单项，`social: []` 隐藏全部。无效地址与重复项会被忽略。
+`url` 支持 HTTP/HTTPS 主页，`qrcode` 支持站内绝对路径或 HTTP/HTTPS 图片，可同时配置；需要自己提供真实二维码。只配置二维码时显示扫码按钮，同时配置时显示主页和扫码入口。`enable: false` 可隐藏单项。在博客根目录的 `_config.morii.yml` 中，使用 `social: false` 隐藏全部；Hexo 8 合并配置时，`social: []` 不会清除主题默认列表。无效地址与重复项会被忽略。
 
 可用平台图标包括 `github`、`csdn`、`bilibili`、`wechat`、`weibo`、`zhihu`、`douyin`、`xiaohongshu`、`telegram`，使用主题内的本地资源，来源见 `source/icons/social/NOTICE.md`；其他平台默认使用名称前两个字符。二维码弹窗提供加载提示、原图链接和键盘关闭，不会自动执行关注或发送消息。
 
