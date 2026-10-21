@@ -1,5 +1,7 @@
 # Morii 文档站
 
+线上地址：[morii-docs.pages.dev](https://morii-docs.pages.dev/)。Cloudflare Pages 已连接 `main` 分支，推送后自动构建和部署。
+
 文档源文件位于 `site/`，使用 VitePress 构建。运行环境建议 Node.js 24。
 
 ```bash

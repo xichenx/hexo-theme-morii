@@ -1,6 +1,6 @@
 # Morii Theme
 
-📖 [使用文档](https://github.com/xichenx/hexo-theme-morii/blob/main/site/guide/getting-started.md) · [文档站开发与部署](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/DOCS-SITE.md)
+📖 [使用文档](https://morii-docs.pages.dev/) · [文档站开发与部署](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/DOCS-SITE.md)
 
 **Morii by Morainet · 用卡片，收藏技术与生活。**
 
