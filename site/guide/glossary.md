@@ -15,6 +15,10 @@
 | Front Matter | Markdown 开头两条 `---` 之间的标题、日期、`type` 等设置 |
 | `type` | Morii 判断页面样式的字段，例如 `type: album` |
 | `public/` | 在博客运行 `hexo generate` 后得到的静态网站文件 |
+| 构建命令 | 托管平台生成网站时运行的命令；本文的 Git 部署通常用 `npm run build` |
+| 输出目录 | 构建完成后平台要发布的文件夹；Hexo 博客填写 `public` |
+| 生产分支 | 推送后自动更新正式网站的 Git 分支；教程示例使用 `main` |
+| `url` / `root` | Hexo 站点配置中的正式网址和站点路径；GitHub Pages 子目录尤其要填对 |
 | YAML | 配置和数据文件使用的格式；依靠空格缩进表示层级 |
 
 看到文档中的 `my-blog/`、`你的用户名` 或 `你的服务地址`，它们是**示例占位文字**，需要替换为你自己的值。以 `/` 开头的地址（如 `/images/avatar.png`）是网站路径；以 `source/` 开头的是电脑上的文件路径。

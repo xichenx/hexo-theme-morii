@@ -1,51 +1,64 @@
-# 把自己的博客发布到网上
+# 发布自己的博客：先选平台
 
-本地的 `http://localhost:4000/` 只有你的电脑能访问。要让别人看到博客，需要把 Hexo 生成的静态文件放到网站托管平台。**主题文档站的 Cloudflare Pages 项目与自己的博客是两个独立项目。**
+本地的 `http://localhost:4000/` 只有你的电脑能访问。要让别人看到博客，需要发布 Hexo 生成的网页。**Morii 文档站和你自己的博客是两个网站**；下面部署的是你的博客。
 
-第一次上线可选**方式 A**：自己生成网页并上传，步骤少。希望以后写完文章只需推送到 GitHub，就选**方式 B**：Cloudflare 自动构建。请先选一种；Cloudflare 的直接上传项目不能改成 Git 集成项目，想换方式需要建新项目。
+| 平台 | 开始条件 | 本教程的方式 |
+| --- | --- | --- |
+| [Cloudflare Pages](/guide/deploy/cloudflare) | Cloudflare 账号 | 手动上传或 Git 自动部署 |
+| [GitHub Pages](/guide/deploy/github-pages) | GitHub 仓库 | GitHub Actions 自动部署 |
+| [Vercel](/guide/deploy/vercel) | GitHub 仓库 | Git 自动部署 |
+| [Netlify](/guide/deploy/netlify) | Netlify 账号 | 手动上传或 Git 自动部署 |
+| [EdgeOne Pages](/guide/deploy/edgeone) | 腾讯云账号、GitHub 仓库 | Git 自动部署 |
 
-## 发布前检查
+**选一个平台即可。**完全不会 Git，可以先用 Cloudflare Pages 或 Netlify 手动上传；想在以后每次推送文章时自动更新，再用 Git 自动部署。
 
-先确认博客里已替换默认头像、账号、歌单、备案和评论地址，详见[首次配置](/guide/first-config)。再确认文章和页面在本地能打开、图片没有 404。
+## 所有平台都要做的检查
 
-Hexo 在博客根目录的 `_config.yml` 中使用 `url` 与 `root` 生成链接。如果你准备把博客放在域名根路径，例如 `https://my-morii-blog.pages.dev/`，应设置：
-
-```yaml
-url: https://my-morii-blog.pages.dev
-root: /
-```
-
-这里的地址只是**示例**。实际项目名由你创建时决定，务必换成自己的地址。修改后重新生成网站。
-
-## 方式 A：先用 Cloudflare Pages 手动上传
-
-这个方式适合第一次上线、还不熟悉 Git 的读者。以后每次更新文章，都要重新上传生成结果。
-
-1. 注册或登录 [Cloudflare](https://dash.cloudflare.com/)，进入 **Workers 和 Pages**。
-2. 选择创建应用，并找到 **Pages → 拖放文件 / Drag and drop your files**。
-3. 为**你的博客**取一个项目名，例如 `my-morii-blog`。先记下预计地址 `https://my-morii-blog.pages.dev/`。项目名可能被占用，最终地址以 Cloudflare 页面显示的为准。
-4. 回到博客根目录，把 `_config.yml` 的 `url` 改成实际地址，`root` 设为 `/`。
-5. 在博客根目录运行：
+先完成[首次配置](/guide/first-config)、[第一篇文章](/guide/first-post)，再在**自己的博客根目录**运行：
 
 ```bash
 hexo clean
 hexo generate
+hexo server
 ```
 
-6. 生成完成后，博客根目录会出现 `public/` 文件夹。**把这个 `public/` 文件夹拖进上传区域**，不要上传整个博客，也不要上传 Morii 主题仓库。如果浏览器不能选择文件夹，可先把 `public/` 压缩成 ZIP 再上传。
-7. 点击部署，完成后打开 Cloudflare 给出的 `*.pages.dev` 地址，检查首页、文章、图片和内页链接。如果实际地址与第 4 步填写的不同，回到 `_config.yml` 修改 `url`，重新生成并创建一次新部署。
+本地打开 `http://localhost:4000/`，确认站名、文章、图片和内页正确，没有主题作者的账号、备案或评论地址。按 **Ctrl+C** 停止预览。博客根目录应有 `public/index.html`。**发布的是 `public/` 中的网页**，不是主题仓库，也不是文档站的 `site/`。
 
-Cloudflare 的[直接上传说明](https://developers.cloudflare.com/pages/get-started/direct-upload/)也列出了最新的界面步骤。直接上传项目**不能事后改成 Git 集成项目**；以后想自动部署，需要重新创建一个 Git 集成的 Pages 项目。
+打开博客根目录的 `package.json`，确认依赖中有 `hexo`、`hexo-theme-morii`、`hexo-renderer-pug`，且 `scripts` 中有 `"build": "hexo generate"`。用本教程的 `hexo init` 创建的博客通常已有这个脚本。缺少主题或渲染器时，在博客根目录运行 `npm install hexo-theme-morii@latest hexo-renderer-pug`。
 
-## 方式 B：连接 Git 仓库，自动部署
+::: warning 通过 Git 安装主题的读者
+`themes/morii/` 可能有自己的 `.git`；普通的 `git add .` 不会把主题源码完整上传。初学者可以先手动上传 `public/`。改用 npm 安装主题前，先备份主题目录中的个人修改，把它们迁到博客根目录 `_config.morii.yml`，再移走 `themes/morii/`、安装 npm 版并在本地确认能生成网页。已经熟悉 Git 的读者也可正确配置子模块。
+:::
 
-这一方式把**自己的博客根目录**放进单独的 GitHub 仓库，再连接 Cloudflare Pages。不要连接 `xichenx/hexo-theme-morii`：那是主题源码仓库，不包含你的文章。
+## `url` 与 `root` 怎么填？
 
-### 1. 把博客放到 GitHub
+打开博客根目录的 `_config.yml`，**修改原有的** `url:`、`root:`，不要写第二组。大多数平台把网站放在域名根路径：
 
-先登录 [GitHub](https://github.com/) 并创建一个**空仓库**，例如 `my-morii-blog`。创建时不要勾选“添加 README”“添加 .gitignore”或“添加许可证”，这样第一次推送比较简单。复制 GitHub 显示的仓库地址，形如 `https://github.com/你的用户名/my-morii-blog.git`。
+```yaml
+url: https://你的实际站点地址
+root: /
+```
 
-在博客根目录打开 `.gitignore`，确认至少包含下面几行；缺少的行可以追加，**不要删掉原有内容**：
+`url` 要填平台**最终显示的地址**，结尾不加 `/`；`root` 是网站在域名下的路径。不要把中文占位文字直接发布。GitHub Pages 的“项目仓库”通常放在 `/仓库名/` 子路径，需要按[GitHub Pages 教程](/guide/deploy/github-pages)设置，例如：
+
+```yaml
+url: https://yourname.github.io/my-blog
+root: /my-blog/
+```
+
+如果第一次部署后的实际地址与你预想的不同，回来修改 `_config.yml`，重新发布一次。绑定自己的域名后也要同步修改 `url`。
+
+## 需要自动部署？先把博客上传到 GitHub
+
+五个平台的 Git 自动部署都可以使用你的 GitHub **博客仓库**。它应包含**你的文章与博客配置**，不要只上传 Morii 主题源码。
+
+### 1. 创建空仓库
+
+登录 [GitHub](https://github.com/)，新建仓库，例如 `my-morii-blog`。初次推送时，不勾选自动生成 README、`.gitignore` 或许可证。记下仓库地址，形如 `https://github.com/你的用户名/my-morii-blog.git`。
+
+### 2. 检查要上传的文件
+
+在**博客根目录**打开 `.gitignore`，确认至少有下面三行；缺少就追加，不要删除原有内容：
 
 ```text
 node_modules/
@@ -53,63 +66,40 @@ public/
 db.json
 ```
 
-`node_modules/` 是电脑上的依赖安装结果，`public/` 是生成的网站，`db.json` 是本地缓存。Cloudflare 会根据 `package.json` 自己安装依赖、重新生成网站。确认博客根目录有 `package.json` 和 `package-lock.json`，然后在博客根目录运行：
+博客根目录应有 `package.json`、`package-lock.json`、`_config.yml`、`_config.morii.yml` 和 `source/`。`node_modules/` 是本地依赖，`public/` 是生成结果，`db.json` 是 Hexo 缓存，都不需要提交。
 
-打开 `package.json`，确认 `scripts` 中有 `"build": "hexo generate"`。按本文 `hexo init` 创建的博客通常已经有这一项；如果你用的是自己改过的博客模板，缺少时需要补上。
+### 3. 首次提交并推送
+
+在**博客根目录**运行，先把仓库地址里的用户名、仓库名换成自己的：
 
 ```bash
 git init
 git add .
 git status --short
-git commit -m "创建 Morii 博客"
+git commit -m "创建博客"
 git branch -M main
 git remote add origin https://github.com/你的用户名/my-morii-blog.git
 git push -u origin main
 ```
 
-把远程地址里的“你的用户名”和仓库名换成真实值。执行 `git status --short` 时，确认待提交列表里**没有** `node_modules/`、`public/`、`db.json`。如果 Git 提示先填写姓名和邮箱，按终端提示设置后重试提交；如果 GitHub 要求登录，请按它给出的浏览器认证流程操作。刷新 GitHub 仓库页面，应能看到 `source/`、`_config.yml` 和 `package.json`。
+`git status --short` 列出的待提交文件里**不应出现** `node_modules/`、`public/` 或 `db.json`。Git 要求姓名和邮箱时，按终端提示设置后重试提交；GitHub 要求登录时，按它给出的浏览器认证步骤操作。刷新 GitHub 仓库页面，应能看到 `source/`、`_config.yml` 和 `package.json`。如果博客已有自己的 Git 远程仓库，保留现有设置，确认代码已推送即可。
 
-::: tip 使用 Git 安装主题的读者
-如果博客的主题在 `themes/morii/`，这个文件夹里可能有自己的 `.git`，普通 `git add .` 不会把主题源码完整上传。初学者可以先用**方式 A** 手动上传博客；要用自动部署，先把主题安装方式整理为 npm 依赖，或学习 [Git 子模块](https://git-scm.com/book/zh/v2/Git-工具-子模块)后再提交仓库。不要在不清楚结果时直接推送一个不完整的 `themes/morii/`。
-:::
+## 以后怎么更新网站？
 
-### 2. 连接 Cloudflare Pages
-
-1. 进入 Cloudflare 控制台的 **Workers 和 Pages**，点击创建应用，选择 **Pages → 连接 Git**（界面文字可能是 *Connect to Git* 或 *Import an existing Git repository*）。
-2. 选择 GitHub 并按页面提示授权，选中刚创建的**博客仓库**，开始设置。
-3. 按下表填写构建配置；如果没有框架选项，可选“None”或保持默认。
-
-| Cloudflare 字段 | 填写值 |
-| --- | --- |
-| 生产分支 | `main` |
-| 构建命令 | `npm run build` |
-| 输出目录 | `public` |
-| 根目录 | 留空，表示仓库根目录 |
-| 环境变量 | `NODE_VERSION` = `24` |
-
-4. 点击保存并部署。等待构建完成，Cloudflare 会给出一个 `*.pages.dev` 地址。打开它检查文章与图片。
-5. 如果实际地址与 `_config.yml` 的 `url` 不同，修改成实际地址，`root` 保持 `/`，再按下一节提交并推送一次。链接、图片和搜索结果会随下一次部署更新。
-
-Cloudflare 的构建环境没有你电脑上全局安装的 `hexo-cli`；`npm run build` 会使用博客 `package.json` 中的脚本和本地依赖，因此适合自动构建。
-
-Cloudflare 的 [Hexo 部署指南](https://developers.cloudflare.com/pages/framework-guides/deploy-a-hexo-site/)和 [Git 集成说明](https://developers.cloudflare.com/pages/get-started/git-integration/)可用于对照当前界面。
-
-### 3. 以后如何更新文章
-
-在本地编辑 `source/_posts/` 里的文章并预览确认后，回到博客根目录运行：
+使用**手动上传**：在本地修改文章后运行 `hexo clean`、`hexo generate`，再上传新的 `public/`。使用**Git 自动部署**：在博客根目录运行：
 
 ```bash
 git add .
-git commit -m "更新博客文章"
+git commit -m "更新博客"
 git push
 ```
 
-到 Cloudflare 项目的“部署”页面等待最新一次构建成功，再打开线上地址检查。只修改本地文件而**没有推送**时，线上不会变化；`public/` 是构建产物，无需提交。
+到平台的“部署”页面等待最新构建成功，再打开线上网站检查。**保存本地文件不等于上线**。
 
-## 其他平台
+## 上线后检查什么？
 
-Morii 生成的是静态网页，也可部署到 GitHub Pages 等静态托管平台。若使用 `https://用户名.github.io/仓库名/` 这种**子目录地址**，必须按实际地址配置博客的 `url` 和 `root`，否则图片、搜索索引或页面链接可能失效。按 [Hexo 官方 GitHub Pages 指南](https://hexo.io/zh-cn/docs/github-pages.html)设置即可。
+依次打开首页、一篇文章、分类页和一张图片，再试站内搜索。如果首页能打开、内页或图片却是 404，优先检查 `_config.yml` 的 `url` 与 `root`，重新部署。更多症状见[常见问题](/troubleshooting)。
 
-::: tip 文档站的发布方式
-这份 Morii 文档使用 VitePress，构建输出是 `site/.vitepress/dist`；你的 Hexo 博客构建输出是 `public/`。这两个目录不能混用。
+::: tip 两个构建输出不要混用
+你的 Hexo 博客输出在 `public/`。这份 VitePress 文档站输出在 `site/.vitepress/dist/`，属于 Morii 主题源码仓库。
 :::

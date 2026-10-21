@@ -21,8 +21,18 @@ export default defineConfig({
           { text: '安装 Hexo 与 Morii', link: '/guide/getting-started' },
           { text: '首次配置', link: '/guide/first-config' },
           { text: '第一篇文章', link: '/guide/first-post' },
-          { text: '发布自己的博客', link: '/guide/publishing' },
+          { text: '发布博客：平台选择', link: '/guide/publishing' },
           { text: '更新主题', link: '/guide/updating' }
+        ]
+      },
+      {
+        text: '平台部署',
+        items: [
+          { text: 'Cloudflare Pages', link: '/guide/deploy/cloudflare' },
+          { text: 'GitHub Pages', link: '/guide/deploy/github-pages' },
+          { text: 'Vercel', link: '/guide/deploy/vercel' },
+          { text: 'Netlify', link: '/guide/deploy/netlify' },
+          { text: 'EdgeOne Pages', link: '/guide/deploy/edgeone' }
         ]
       },
       {

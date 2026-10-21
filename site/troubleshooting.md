@@ -56,9 +56,9 @@ hexo generate
 
 先查看博客根目录 `_config.yml` 的 `url` 和 `root`。部署在域名根路径时通常是 `root: /`；部署在 `用户名.github.io/仓库名/` 之类子目录时，需要按平台说明设置子路径。重新生成并重新发布。注意 **Morii 文档站上线**不等于**你的博客上线**。
 
-## Cloudflare 构建失败或推送后没有更新
+## 平台构建失败或推送后没有更新
 
-先到 Cloudflare 项目的“部署”页面打开最新一次构建日志。检查连接的是**自己的博客仓库**，生产分支是否为 `main`，构建命令是否为 `npm run build`，输出目录是否为 `public`，环境变量 `NODE_VERSION` 是否为 `24`。博客的 `package.json` 应有 `"build": "hexo generate"` 脚本；GitHub 仓库里应有 `package.json`、`package-lock.json`、`_config.yml`、`_config.morii.yml` 和 `source/`。如果日志提示找不到 `morii`，检查主题是否作为 npm 依赖写入 `package.json`；若安装在 `themes/morii/`，还需正确处理 Git 子模块。完整流程见[发布博客](/guide/publishing)。
+先到平台项目的“部署”页面打开**最新一次**构建日志。对照[平台部署总览](/guide/publishing)进入对应教程，核对连接的是**自己的博客仓库**、分支是 `main`、构建命令是 `npm run build`、输出目录是 `public`、Node.js 版本满足 Hexo 8 要求。博客的 `package.json` 应有 `"build": "hexo generate"` 脚本；仓库里应有 `package.json`、`package-lock.json`、`_config.yml`、`_config.morii.yml` 和 `source/`。如果日志提示找不到 `morii`，检查主题是否作为 npm 依赖写入博客 `package.json`；若安装在 `themes/morii/`，还需正确处理 Git 子模块。GitHub Pages 还要检查仓库的 Actions 运行记录和 **Settings → Pages** 中的发布来源。
 
 ## 评论或在线音乐无法使用
 

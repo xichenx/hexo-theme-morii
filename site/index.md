@@ -24,7 +24,7 @@ features:
     details: 先建页面，再放数据，逐步开启相册、友链、音乐等功能。
     link: /features/pages
   - title: 发布自己的博客
-    details: 看懂 public 文件夹，把博客放到静态托管平台。
+    details: 比较五个平台，跟着独立教程发布到 Cloudflare、GitHub Pages、Vercel、Netlify 或 EdgeOne。
     link: /guide/publishing
   - title: 个人配置
     details: 替换作者示例信息，保护自己的站点资料。
