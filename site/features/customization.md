@@ -64,7 +64,7 @@ appearance:
 | `category` | `list`、`cards` |
 | `archives` | `timeline`、`grouped` |
 
-如果你已经有 `appearance:` 分组，把 `layouts:` 放在这个分组内部，**不要再写第二个 `appearance:`**。页面布局更改后运行 `npx hexo clean && npx hexo generate` 并重启本地服务。
+如果你已经有 `appearance:` 分组，把 `layouts:` 放在这个分组内部，**不要再写第二个 `appearance:`**。页面布局更改后运行 `hexo clean && hexo generate` 并重启本地服务。
 
 ## 减少视觉特效
 

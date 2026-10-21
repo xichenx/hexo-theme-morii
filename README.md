@@ -78,9 +78,11 @@ theme: morii
 主题使用 Pug 模板与原生 CSS / JavaScript，无额外前端打包步骤。当前开发环境为 Hexo 8.1.2。npm 安装会使用 `node_modules/hexo-theme-morii`；建议通过站点根目录的 `_config.morii.yml` 覆盖主题配置，避免修改安装包。首次安装请按自己的信息修改头像、社交账号、备案号、建站时间和音乐歌单；这些配置目前保留作者站点的示例值。
 
 ```bash
-npx hexo generate
-npx hexo server
+hexo generate
+hexo server
 ```
+
+这里的 `hexo` 命令需要先全局安装 `hexo-cli`（`npm install -g hexo-cli`）。从零建站请按[新手教程](https://morii-docs.pages.dev/guide/getting-started)操作。
 
 ## 配置
 
@@ -395,7 +397,7 @@ github_calendar:
 
 ### 页面布局配置
 
-推荐在**博客根目录**创建或编辑 `_config.morii.yml`，通过 Hexo 的主题覆盖配置选择布局。这样升级 `themes/morii` 时可保留自己的设置；直接修改主题的 `_config.yml` 也支持。布局配置在生成站点时生效，修改后执行 `npx hexo clean && npx hexo generate`，本地预览服务需重新启动。
+推荐在**博客根目录**创建或编辑 `_config.morii.yml`，通过 Hexo 的主题覆盖配置选择布局。这样升级 `themes/morii` 时可保留自己的设置；直接修改主题的 `_config.yml` 也支持。布局配置在生成站点时生效，修改后执行 `hexo clean && hexo generate`，本地预览服务需重新启动。
 
 ```yaml
 appearance:

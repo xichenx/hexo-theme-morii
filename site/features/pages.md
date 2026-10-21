@@ -24,8 +24,8 @@
 在博客根目录运行：
 
 ```bash
-npx hexo new page categories
-npx hexo new page tags
+hexo new page categories
+hexo new page tags
 ```
 
 打开 `source/categories/index.md`，把文件内容改为：
@@ -52,7 +52,7 @@ comments: false
 
 ## 2. 创建关于页
 
-在博客根目录运行 `npx hexo new page about`，把 `source/about/index.md` 改为：
+在博客根目录运行 `hexo new page about`，把 `source/about/index.md` 改为：
 
 ```yaml
 ---
@@ -75,7 +75,7 @@ avatarImg: /images/avatar.png
 
 ## 3. 创建即刻页
 
-运行 `npx hexo new page essay`，把 `source/essay/index.md` 改为：
+运行 `hexo new page essay`，把 `source/essay/index.md` 改为：
 
 ```yaml
 ---
@@ -99,4 +99,4 @@ comments: false
 
 ## 4. 重新生成并检查页面
 
-运行 `npx hexo clean`、`npx hexo generate`，然后重启 `npx hexo server`。先**直接访问** `/categories/`、`/tags/`、`/about/`、`/essay/`，确认不再是 404。首页固定的“关于我”“看看即刻”和侧栏入口此时也应能打开。接着按[相册与友链](/features/album-links)建立其余页面，再按[外观与导航](/features/customization)开启顶部菜单。
+运行 `hexo clean`、`hexo generate`，然后重启 `hexo server`。先**直接访问** `/categories/`、`/tags/`、`/about/`、`/essay/`，确认不再是 404。首页固定的“关于我”“看看即刻”和侧栏入口此时也应能打开。接着按[相册与友链](/features/album-links)建立其余页面，再按[外观与导航](/features/customization)开启顶部菜单。

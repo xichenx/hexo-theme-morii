@@ -7,7 +7,7 @@
 在**博客根目录**运行：
 
 ```bash
-npx hexo new "我的第一篇文章"
+hexo new "我的第一篇文章"
 ```
 
 终端会打印新文件路径，一般在 `source/_posts/` 里。用文本编辑器打开这个 `.md` 文件。**编辑终端实际显示的文件**，不必自己猜文件名。
@@ -52,12 +52,12 @@ cover: /images/first-cover.jpg
 在博客根目录运行：
 
 ```bash
-npx hexo clean
-npx hexo generate
-npx hexo server
+hexo clean
+hexo generate
+hexo server
 ```
 
-首页应出现新文章。点开它，检查标题、正文、分类和标签。以后写文章时重复 `npx hexo new "文章标题"`，或者直接在 `source/_posts/` 新建 `.md` 文件。
+首页应出现新文章。点开它，检查标题、正文、分类和标签。以后写文章时重复 `hexo new "文章标题"`，或者直接在 `source/_posts/` 新建 `.md` 文件。
 
 ::: tip 保存不等于上线
 修改本地文章后，需要重新生成网站并按你的博客托管方式发布。Morii 文档站在 Cloudflare Pages 上，不会同步发布你的个人文章。下一步看[发布自己的博客](/guide/publishing)。

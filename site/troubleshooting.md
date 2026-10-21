@@ -1,6 +1,6 @@
 # 常见问题：按现象一步步排查
 
-先确认你在**自己的博客根目录**，而不是主题仓库。博客根目录应包含 `_config.yml`、`package.json` 和 `source/`。大部分问题可先按顺序尝试：停止预览服务（Ctrl+C）→ `npx hexo clean` → `npx hexo generate` → `npx hexo server`。
+先确认你在**自己的博客根目录**，而不是主题仓库。博客根目录应包含 `_config.yml`、`package.json` 和 `source/`。大部分问题可先按顺序尝试：停止预览服务（Ctrl+C）→ `hexo clean` → `hexo generate` → `hexo server`。
 
 ## 输入 `node` 或 `npm` 提示找不到命令
 
@@ -8,7 +8,7 @@ Node.js 尚未安装好，或安装后终端没有重新打开。先按[从零�
 
 ## 输入 `hexo` 提示找不到命令
 
-先在博客根目录尝试 `npx hexo version`。如果这条命令能运行，后续继续使用文档中的 `npx hexo ...` 即可。如果不能运行，检查博客根目录的 `package.json` 是否包含 `hexo`，再执行 `npm install`。
+说明全局 CLI 没有安装好，或终端还没刷新。运行 `npm install -g hexo-cli`，关闭并重新打开终端，再试 `hexo version`。如果命令能运行，但提示博客项目缺少 Hexo，请回到博客根目录执行 `npm install`，并检查 `package.json` 中是否有 `hexo` 依赖。
 
 ## 安装后还是原来的主题
 
@@ -20,8 +20,8 @@ Node.js 尚未安装好，或安装后终端没有重新打开。先按[从零�
 
 ```bash
 npm install hexo-renderer-pug
-npx hexo clean
-npx hexo generate
+hexo clean
+hexo generate
 ```
 
 ## 修改了 `_config.morii.yml`，页面没有变化
@@ -58,7 +58,7 @@ npx hexo generate
 
 ## Cloudflare 构建失败或推送后没有更新
 
-先到 Cloudflare 项目的“部署”页面打开最新一次构建日志。检查连接的是**自己的博客仓库**，生产分支是否为 `main`，构建命令是否为 `npx hexo generate`，输出目录是否为 `public`，环境变量 `NODE_VERSION` 是否为 `24`。GitHub 仓库里应有 `package.json`、`package-lock.json`、`_config.yml`、`_config.morii.yml` 和 `source/`。如果日志提示找不到 `morii`，检查主题是否作为 npm 依赖写入 `package.json`；若安装在 `themes/morii/`，还需正确处理 Git 子模块。完整流程见[发布博客](/guide/publishing)。
+先到 Cloudflare 项目的“部署”页面打开最新一次构建日志。检查连接的是**自己的博客仓库**，生产分支是否为 `main`，构建命令是否为 `npm run build`，输出目录是否为 `public`，环境变量 `NODE_VERSION` 是否为 `24`。博客的 `package.json` 应有 `"build": "hexo generate"` 脚本；GitHub 仓库里应有 `package.json`、`package-lock.json`、`_config.yml`、`_config.morii.yml` 和 `source/`。如果日志提示找不到 `morii`，检查主题是否作为 npm 依赖写入 `package.json`；若安装在 `themes/morii/`，还需正确处理 Git 子模块。完整流程见[发布博客](/guide/publishing)。
 
 ## 评论或在线音乐无法使用
 

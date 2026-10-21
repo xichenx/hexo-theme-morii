@@ -14,7 +14,7 @@
 | `source/album/index.md` | `/album/` 对应的页面文件；相册内容仍需 `source/_data/album.yml` |
 | Front Matter | Markdown 开头两条 `---` 之间的标题、日期、`type` 等设置 |
 | `type` | Morii 判断页面样式的字段，例如 `type: album` |
-| `public/` | 在博客运行 `npx hexo generate` 后得到的静态网站文件 |
+| `public/` | 在博客运行 `hexo generate` 后得到的静态网站文件 |
 | YAML | 配置和数据文件使用的格式；依靠空格缩进表示层级 |
 
 看到文档中的 `my-blog/`、`你的用户名` 或 `你的服务地址`，它们是**示例占位文字**，需要替换为你自己的值。以 `/` 开头的地址（如 `/images/avatar.png`）是网站路径；以 `source/` 开头的是电脑上的文件路径。

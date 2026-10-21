@@ -110,9 +110,9 @@ avatar: /images/avatar.png
 在博客根目录运行：
 
 ```bash
-npx hexo clean
-npx hexo generate
-npx hexo server
+hexo clean
+hexo generate
+hexo server
 ```
 
 打开本地博客，检查站名、首页介绍、头像和页脚。此时顶部菜单应为空；确认没有出现主题作者账号、备案号、歌单或评论入口。如果仍显示旧内容，停止预览服务后重新启动，并检查文件是否确实叫 `_config.morii.yml`。

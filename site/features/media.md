@@ -4,7 +4,7 @@
 
 ## 音乐馆：先建页面
 
-在博客根目录运行 `npx hexo new page music`，把 `source/music/index.md` 改为：
+在博客根目录运行 `hexo new page music`，把 `source/music/index.md` 改为：
 
 ```yaml
 ---

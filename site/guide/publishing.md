@@ -28,8 +28,8 @@ root: /
 5. 在博客根目录运行：
 
 ```bash
-npx hexo clean
-npx hexo generate
+hexo clean
+hexo generate
 ```
 
 6. 生成完成后，博客根目录会出现 `public/` 文件夹。**把这个 `public/` 文件夹拖进上传区域**，不要上传整个博客，也不要上传 Morii 主题仓库。如果浏览器不能选择文件夹，可先把 `public/` 压缩成 ZIP 再上传。
@@ -54,6 +54,8 @@ db.json
 ```
 
 `node_modules/` 是电脑上的依赖安装结果，`public/` 是生成的网站，`db.json` 是本地缓存。Cloudflare 会根据 `package.json` 自己安装依赖、重新生成网站。确认博客根目录有 `package.json` 和 `package-lock.json`，然后在博客根目录运行：
+
+打开 `package.json`，确认 `scripts` 中有 `"build": "hexo generate"`。按本文 `hexo init` 创建的博客通常已经有这一项；如果你用的是自己改过的博客模板，缺少时需要补上。
 
 ```bash
 git init
@@ -80,13 +82,15 @@ git push -u origin main
 | Cloudflare 字段 | 填写值 |
 | --- | --- |
 | 生产分支 | `main` |
-| 构建命令 | `npx hexo generate` |
+| 构建命令 | `npm run build` |
 | 输出目录 | `public` |
 | 根目录 | 留空，表示仓库根目录 |
 | 环境变量 | `NODE_VERSION` = `24` |
 
 4. 点击保存并部署。等待构建完成，Cloudflare 会给出一个 `*.pages.dev` 地址。打开它检查文章与图片。
 5. 如果实际地址与 `_config.yml` 的 `url` 不同，修改成实际地址，`root` 保持 `/`，再按下一节提交并推送一次。链接、图片和搜索结果会随下一次部署更新。
+
+Cloudflare 的构建环境没有你电脑上全局安装的 `hexo-cli`；`npm run build` 会使用博客 `package.json` 中的脚本和本地依赖，因此适合自动构建。
 
 Cloudflare 的 [Hexo 部署指南](https://developers.cloudflare.com/pages/framework-guides/deploy-a-hexo-site/)和 [Git 集成说明](https://developers.cloudflare.com/pages/get-started/git-integration/)可用于对照当前界面。
 

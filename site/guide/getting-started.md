@@ -34,6 +34,8 @@ npm install
 
 Windows PowerShell 中的 `cd ~` 同样表示进入用户主目录。`my-blog` 是**你自己博客的文件夹名**，可以改成喜欢的英文名字；后面的命令都要在这个文件夹中执行。
 
+这里已经用 `npm install -g hexo-cli` 安装了全局命令，因此后续在自己电脑上直接输入 `hexo`。它会在博客目录使用该博客安装的 Hexo 版本。只有没有安装全局 CLI 时，才需要用 `npx hexo` 调用本地命令。[Hexo 官方安装说明](https://hexo.io/zh-cn/docs/#安装-Hexo)
+
 完成后应能看到这些文件：
 
 ```text
@@ -46,7 +48,7 @@ my-blog/                 ← 博客根目录，以后说“在博客根目录运
 ```
 
 ::: warning 不要进入主题源码仓库操作
-这篇教程中的 `npm install`、`npx hexo ...` 都是在**自己的博客根目录**执行，不是在 `hexo-theme-morii` 主题仓库中执行。
+建好博客文件夹后，后文的 `npm install`、`hexo ...` 都在**自己的博客根目录**执行，不是在 `hexo-theme-morii` 主题仓库中执行。
 :::
 
 ## 2. 确认 Hexo 版本
@@ -54,7 +56,7 @@ my-blog/                 ← 博客根目录，以后说“在博客根目录运
 在博客根目录运行：
 
 ```bash
-npx hexo version
+hexo version
 ```
 
 找到输出中的 `hexo` 版本。Morii 面向 **Hexo 8**；如果不是 8.x，先在博客根目录运行：
@@ -63,7 +65,7 @@ npx hexo version
 npm install hexo@^8
 ```
 
-然后再运行一次 `npx hexo version` 确认版本。
+然后再运行一次 `hexo version` 确认版本。
 
 ## 3. 安装 Morii 主题
 
@@ -102,13 +104,13 @@ language: zh-CN
 回到博客根目录，依次运行：
 
 ```bash
-npx hexo clean
-npx hexo generate
-npx hexo server
+hexo clean
+hexo generate
+hexo server
 ```
 
 终端应显示本地预览地址，通常是 `http://localhost:4000/`。在浏览器打开它。如果看到 Morii 风格的首页，即表示安装成功。第一次建站时首页可能只有 Hexo 的示例文章，这是正常的。
 
-`npx hexo server` 会持续运行。想停止预览时，在该终端按 **Ctrl+C**。以后修改配置后，建议停止服务、重新生成并再次启动。
+`hexo server` 会持续运行。想停止预览时，在该终端按 **Ctrl+C**。以后修改配置后，建议停止服务、重新生成并再次启动。
 
 **下一步：**按[首次配置](/guide/first-config)替换示例资料，再写[第一篇文章](/guide/first-post)。遇到报错可按[常见问题](/troubleshooting)逐项检查。

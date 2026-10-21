@@ -4,7 +4,7 @@
 
 ## 创建相册列表页
 
-运行 `npx hexo new page album`，把 `source/album/index.md` 改为：
+运行 `hexo new page album`，把 `source/album/index.md` 改为：
 
 ```yaml
 ---
@@ -43,7 +43,7 @@ comments: false
 
 ## 创建友链页
 
-运行 `npx hexo new page link`，把 `source/link/index.md` 改为：
+运行 `hexo new page link`，把 `source/link/index.md` 改为：
 
 ```yaml
 ---
@@ -68,7 +68,7 @@ comments: false
 
 ## 生成并检查
 
-在博客根目录运行 `npx hexo clean`、`npx hexo generate`，重新启动预览。分别打开 `/album/`、`/album/travel/` 和 `/link/`：相册卡片应能点进详情，照片应能加载，友链应能打开。确认后，再按[外观与导航](/features/customization)把首次配置中的 `menu: false` 改成完整菜单。
+在博客根目录运行 `hexo clean`、`hexo generate`，重新启动预览。分别打开 `/album/`、`/album/travel/` 和 `/link/`：相册卡片应能点进详情，照片应能加载，友链应能打开。确认后，再按[外观与导航](/features/customization)把首次配置中的 `menu: false` 改成完整菜单。
 
 ::: tip 图片路径怎么写？
 文件 `source/images/travel/photo-1.jpg` 对应网页地址 `/images/travel/photo-1.jpg`。如果图片是网上的完整 HTTPS 链接，也可以直接填 URL。显示不出来时，先在浏览器地址栏单独打开图片地址。

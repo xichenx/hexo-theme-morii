@@ -46,9 +46,9 @@ cd ../..
 ## 4. 重新生成并检查
 
 ```bash
-npx hexo clean
-npx hexo generate
-npx hexo server
+hexo clean
+hexo generate
+hexo server
 ```
 
 检查首页、文章、你已经启用的相册或音乐等页面。如果本地正常、线上仍是旧版，还需要按你的博客托管方式重新发布；更新本地 npm 包不会自动更新网站。
