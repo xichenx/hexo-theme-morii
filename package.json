@@ -40,7 +40,10 @@
     "build:demo": "node tools/demo.cjs",
     "audit:performance": "node tools/performance.cjs",
     "release:check": "node tools/release.cjs check",
-    "package:theme": "node tools/release.cjs pack"
+    "package:theme": "node tools/release.cjs pack",
+    "docs:dev": "vitepress dev site",
+    "docs:build": "vitepress build site",
+    "docs:preview": "vitepress preview site"
   },
   "dependencies": {
     "hexo-util": "^3.3.0"
@@ -58,6 +61,7 @@
     "hexo-renderer-marked": "7.0.1",
     "hexo-renderer-pug": "3.0.0",
     "js-yaml": "4.1.1",
-    "jsdom": "25.0.1"
+    "jsdom": "25.0.1",
+    "vitepress": "^1.6.4"
   }
 }

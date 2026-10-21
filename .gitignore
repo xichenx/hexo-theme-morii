@@ -4,3 +4,5 @@ node_modules/
 *.log
 .cache/
 dist/
+site/.vitepress/cache/
+site/.vitepress/dist/

@@ -1,5 +1,7 @@
 # Morii Theme
 
+📖 [使用文档](https://github.com/xichenx/hexo-theme-morii/blob/main/site/guide/getting-started.md) · [文档站开发与部署](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/DOCS-SITE.md)
+
 **Morii by Morainet · 用卡片，收藏技术与生活。**
 
 为“心灵涂鸦”重新开发的 Hexo 主题。保留丰富卡片的视觉方向，模板、样式和交互独立实现。
@@ -54,7 +56,7 @@
 
 ## 安装
 
-在已有 Hexo 8 站点根目录安装 alpha 版本：
+在已有 Hexo 8 站点根目录安装最新版本：
 
 ```bash
 npm install hexo-theme-morii@latest hexo-renderer-pug
