@@ -1,0 +1,69 @@
+# 保存位置：博客根目录 _config.morii.yml
+# 这是完成入门第 4 步后的完整文件。已有个人配置时请先备份。
+brand: 小林的笔记
+tagline: 记录学习与生活
+intro: 你好，我是小林。这里记录我的学习笔记和日常。
+avatar: /icons/brand/morii-icon.png
+
+hero:
+  title:
+    0: 你好，我是小林。
+    1: 欢迎来到我的笔记本。
+  note: 从第一篇文章开始，慢慢把这里填满。
+
+# 此菜单与示例 source/ 中的页面对应，请先建好页面。
+menu:
+  - name: 首页
+    path: /
+  - name: 文章
+    path: /archives/
+  - name: 分类
+    path: /categories/
+  - name: 标签
+    path: /tags/
+  - name: 即刻
+    path: /essay/
+  - name: 友链
+    path: /link/
+  - name: 关于
+    path: /about/
+explore: false
+social: false
+featured: false
+home:
+  selected_posts: false
+quick_navigation:
+  enable: false
+reading_list:
+  enable: false
+sidebar:
+  announcement:
+    enable: false
+
+# 尚未配置自己的资料与服务，先关闭这些入口。
+github_calendar:
+  enable: false
+  user: ''
+clock:
+  enable: false
+friends_feed:
+  endpoint: ''
+music:
+  playlist_url: ''
+  meting:
+    enable: false
+    id: ''
+cinema:
+  enable: false
+comments:
+  enable: false
+  env_id: ''
+footer:
+  runtime:
+    enable: false
+  filing:
+    enable: false
+    icp:
+      number: ''
+    police:
+      number: ''

@@ -1,0 +1,6 @@
+- class_name: 常用网站
+  class_desc: 学习与写作时会打开的网站。
+  link_list:
+    - name: Hexo
+      link: https://hexo.io/
+      descr: 博客生成工具的官方网站

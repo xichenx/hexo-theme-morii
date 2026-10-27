@@ -1,4 +1,13 @@
-# 发布自己的博客：先选平台
+---
+prev:
+  text: '第 4 步：补齐页面和菜单'
+  link: /guide/complete-site
+next: false
+---
+
+# 第 5 步：发布自己的博客
+
+**开始条件：**已经在本地检查过文章和全部菜单。**本页目标：**选一个平台，把自己的博客发布到正式网址。
 
 本地的 `http://localhost:4000/` 只有你的电脑能访问。要让别人看到博客，需要发布 Hexo 生成的网页。**Morii 文档站和你自己的博客是两个网站**；下面部署的是你的博客。
 
@@ -14,7 +23,7 @@
 
 ## 所有平台都要做的检查
 
-先完成[首次配置](/guide/first-config)、[第一篇文章](/guide/first-post)，再在**自己的博客根目录**运行：
+先完成[修改资料](/guide/first-config)、[第一篇文章](/guide/first-post)和[页面菜单](/guide/complete-site)，再在**自己的博客根目录**运行：
 
 ```bash
 hexo clean

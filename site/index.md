@@ -3,36 +3,30 @@ layout: home
 
 hero:
   name: Morii
-  text: 让博客成为你的作品
-  tagline: 第一次接触 Hexo 也能跟着做：安装、写文章、配置页面，再发布自己的博客。
+  text: 跟着示例，搭好你的博客
+  tagline: 用「小林的笔记」贯穿 5 个步骤。每一步都说明改哪个文件、复制什么、完成后应该看到什么。
   image:
     src: /morii-logo-v2.png
     alt: Morii Logo
   actions:
     - theme: brand
-      text: 从零开始
-      link: /guide/getting-started
+      text: 按 5 步开始接入
+      link: /guide/
     - theme: alt
-      text: 查看源码
-      link: https://github.com/xichenx/hexo-theme-morii
+      text: 查看完整示例
+      link: /examples/
 
 features:
-  - title: 从零搭建
-    details: 安装 Node.js、创建 Hexo 博客、启用 Morii，每一步都有检查方法。
-    link: /guide/getting-started
-  - title: 写出第一篇文章
-    details: 找到文章文件，写标题、分类和正文，再在本地确认效果。
-    link: /guide/first-post
-  - title: 按需添加页面
-    details: 先建页面，再放数据，逐步开启相册、友链、音乐等功能。
-    link: /features/pages
-  - title: 发布自己的博客
-    details: 比较五个平台，跟着独立教程发布到 Cloudflare、GitHub Pages、Vercel、Netlify 或 EdgeOne。
-    link: /guide/publishing
-  - title: 配置手册
-    details: 从头像和菜单到首页、阅读、侧栏与页脚，逐项查看字段说明和可复制示例。
+  - title: 第一次接入
+    details: 安装 → 修改资料 → 写文章 → 补齐页面和菜单 → 发布。按顺序做，不必先读完所有配置。
+    link: /guide/
+  - title: 想照着文件改
+    details: 一份完整主题配置、一篇文章、页面与数据文件，再加头像、封面、公告的修改前后对照。
+    link: /examples/
+  - title: 已经跑通，查设置
+    details: 按页面区域查找字段：基本信息、首页、阅读、侧栏和页脚。
     link: /config/
-  - title: 遇到问题
-    details: 根据症状检查构建日志、路径和数据文件。
-    link: /troubleshooting
+  - title: 继续添加功能
+    details: 需要相册、音乐、电影或评论时，再选择对应教程逐个接入。
+    link: /features/
 ---

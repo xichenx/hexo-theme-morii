@@ -1,120 +1,89 @@
-# 首次配置：把示例站变成自己的博客
+---
+prev:
+  text: '第 1 步：安装主题'
+  link: /guide/getting-started
+next:
+  text: '第 3 步：写第一篇文章'
+  link: /guide/first-post
+---
 
-安装完成后，先别急着上线。Morii 的默认配置带有作者的头像、账号、城市、备案和音乐歌单等**演示值**。本页会教你把个人设置放在博客里，并先关闭尚未配置的功能。
+# 第 2 步：换成自己的资料
 
-## 先认识三个位置
+**开始条件：**已经在本地看到 Morii 首页。**本页目标：**站名、作者和介绍改成「小林的笔记」，未配置的服务先关闭。
 
-| 位置 | 你应该做什么 |
-| --- | --- |
-| 博客根目录 `_config.yml` | 设置博客标题、作者、网址、语言和 `theme: morii` |
-| 博客根目录 `_config.morii.yml` | 设置 Morii 的外观、头像、菜单和功能开关；**推荐修改这里** |
-| `node_modules/hexo-theme-morii/` 或 `themes/morii/` | 主题安装目录；更新时可能被替换，初学者不要在这里保存个人资料 |
+这一步只修改两个文件，都在博客根目录 `my-blog/`，不需要进入 `themes/` 或 `node_modules/`。
 
-`_config.morii.yml` 是一个**新文件**。文件名以英文下划线开头，扩展名是 `.yml`，不要保存成 `_config.morii.yml.txt`。Windows 用户如果看不到扩展名，先在文件管理器中打开“显示文件扩展名”。
+## 1. 修改博客身份
 
-## 1. 填写博客基本信息
+**在哪里改：**`my-blog/_config.yml`。**怎么改：**找到下列字段，修改原有值，其他内容保留。
 
-打开博客根目录的 `_config.yml`，找到相应配置并修改**原有的行**：
-
-```yaml
-title: 我的博客
+```yaml [_config.yml：只修改这些字段]
+title: 小林的笔记
 subtitle: 记录学习与生活
-description: 我的个人博客
-author: 我的名字
+description: 分享编程实践、阅读心得与生活片段。
+author: 小林
 language: zh-CN
 timezone: Asia/Shanghai
 theme: morii
 ```
 
-这里不用替换整个 `_config.yml`；它还有许多 Hexo 自带设置。`title` 是浏览器标签和首页的站名，`author` 是文章作者。`url` 先保持当前值，**正式上线前**再按[发布博客](/guide/publishing)填写真实地址。
+| 修改的字段 | 去哪里看结果 |
+| --- | --- |
+| `title` | 浏览器标签里的站名 |
+| `author` | 作者卡片的姓名 |
+| `description` | 作者卡片里的介绍 |
 
-## 2. 创建个人主题配置
+不要用这个片段覆盖整个 `_config.yml`，它还有 Hexo 的网址、文章和分页设置。正式网址等到[第 5 步](/guide/publishing)再填写。
 
-在博客根目录新建 `_config.morii.yml`，先复制以下**完整起步配置**：
+## 2. 新建个人主题配置
 
-```yaml
-brand: 我的博客
-tagline: 欢迎来到我的小站
-intro: 这里记录我的学习与生活。
-avatar: /icons/brand/morii-icon.png
+**在哪里改：**新建 `my-blog/_config.morii.yml`，与 `_config.yml` 放在一起。**怎么改：**将下面的**完整文件**复制进去并保存。
 
-hero:
-  title:
-    0: 你好，欢迎来坐坐。
-    1: 这是我的新博客。
-  note: 从第一篇文章开始，慢慢把这里填满。
+也可以<a href="/examples/minimal/_config.morii.yml" download="_config.morii.yml">下载这一份最小配置</a>。已有个人配置的读者先备份，再合并字段；不要直接覆盖原来的服务与账号。
 
-social: false
-featured: false
-menu: false
-explore: false
+<<< @/public/examples/minimal/_config.morii.yml{yaml} [_config.morii.yml：完整文件]
 
-home:
-  selected_posts: false
-github_calendar:
-  enable: false
-clock:
-  enable: false
-quick_navigation:
-  enable: false
-reading_list:
-  enable: false
-sidebar:
-  announcement:
-    enable: false
-friends_feed:
-  endpoint: ''
-music:
-  playlist_url: ''
-  meting:
-    enable: false
-cinema:
-  enable: false
-comments:
-  enable: false
-footer:
-  runtime:
-    enable: false
-  filing:
-    enable: false
-```
+`brand` 控制顶部站名，`intro` 控制首页介绍，`hero.title` 控制首页两行大标题。先照抄，看到效果后再把“小林”换成你的名字。
 
-这份配置先隐藏作者的社交链接、首页推荐卡片、菜单、探索链接和公告，并关闭未填好的第三方服务与个人信息。`avatar` 暂时使用主题内置图标，因此不会出现作者的头像。首页仍有一些固定的“关于我”“即刻”等入口；按[创建常用页面](/features/pages)补齐后就能打开。
+### 为什么暂时没有菜单？
 
-::: warning 为什么这里写 `false`，而不是 `[]`？
-当前发布的 Morii 版本在合并博客配置与主题默认配置时，空列表 `[]` **不会清除**默认列表。写 `social: []` 仍可能显示主题作者的社交链接；短于默认长度的 `menu` 列表也可能留下多余菜单项。`hero.title` 同样不能用 `[第一行, 第二行]` 覆盖，所以示例用 `0:`、`1:` 指定两行文字。照抄即可。上面的写法已按当前版本实测。准备开启菜单和社交链接时，请照[外观与导航](/features/customization)和[搜索、社交与评论](/features/interaction)的完整示例操作。
+对应页面还没建好，先用 `menu: false` 隐藏入口。[第 4 步](/guide/complete-site)会一起创建页面并开启菜单。
+
+默认配置带有主题作者的账号、城市和外部服务。本示例先关闭这些功能，准备好自己的资料后再逐项开启。头像使用主题自带图片，暂时不需要准备图片文件。
+
+::: details 为什么标题写成 `0:`、`1:`，列表写成 `false`？
+当前配置合并方式会保留部分默认列表。这里使用已经验证的写法，覆盖首页标题并清除默认入口。先保留示例的结构即可，详细解释见[配置手册](/config/#_4-理解默认值和列表合并)。
 :::
 
-::: warning YAML 缩进很重要
-使用**空格**缩进，不要用 Tab。冒号后面留一个空格，例如 `enable: false`。同一个文件中不要重复写两个 `music:` 或两个 `footer:`；需要新增设置时，把它放进已有分组。
+::: tip 保存文件时检查
+文件名必须是 `_config.morii.yml`，不是 `_config.morii.yml.txt`。缩进用空格；同一文件里不要重复写两个 `home:` 或两个 `music:`。编辑器保存快捷键是 Windows 的 Ctrl+S 或 macOS 的 ⌘S。
 :::
 
-## 3. 换自己的头像和图标
+## 3. 重新启动并对照结果
 
-在博客根目录创建 `source/images/` 文件夹，把头像文件命名为 `avatar.png` 放进去：
+先在运行预览服务的终端按 **Ctrl+C**，再在 `my-blog/` 执行：
 
-```text
-my-blog/source/images/avatar.png
-```
-
-然后把 `_config.morii.yml` 中的头像改为：
-
-```yaml
-avatar: /images/avatar.png
-```
-
-文件系统中的 `source/images/avatar.png` 会变成网站中的 `/images/avatar.png`。**网站路径不写 `source`**。如果还没有自己的图片，保留主题内置图标即可。顶部 Logo 和浏览器 favicon 也可用 `logo`、`favicon` 设置，详细步骤见[基本信息、头像与 Logo](/config/basic)。
-
-## 4. 重新生成并核对
-
-在博客根目录运行：
-
-```bash
+```bash [终端：my-blog/]
 hexo clean
 hexo generate
 hexo server
 ```
 
-打开本地博客，检查站名、首页介绍、头像和页脚。此时顶部菜单应为空；确认没有出现主题作者账号、备案号、歌单或评论入口。如果仍显示旧内容，停止预览服务后重新启动，并检查文件是否确实叫 `_config.morii.yml`。
+打开终端显示的地址，通常是 `http://localhost:4000/`。
 
-**下一步：**写[第一篇文章](/guide/first-post)。需要逐项调整主题时，进入[配置手册](/config/)，按基本信息、首页、阅读、侧栏和外部服务查找；里面还有可下载的带注释配置模板。
+| 页面位置 | 本示例的预期结果 |
+| --- | --- |
+| 顶部左侧 | 小林的笔记 |
+| 首页大标题 | 你好，我是小林。 / 欢迎来到我的笔记本。 |
+| 大标题下的介绍 | 你好，我是小林。这里记录我的学习笔记和日常。 |
+| 作者卡片 | 小林；分享编程实践、阅读心得与生活片段。 |
+| 顶部菜单 | 暂时没有文章、相册等菜单项 |
+| 页脚 | 不展示主题作者的运行时间与备案信息 |
+
+如果站名正确而作者卡片仍是旧内容，回到 `_config.yml` 检查 `author` 和 `description`。全部没变化则检查文件位置和扩展名。
+
+::: details 我想现在换头像
+把方形图片放到博客 `source/images/avatar.png`，然后在已有 `_config.morii.yml` 中把 `avatar` 那一行改为 `avatar: /images/avatar.png`。没有图片时保持示例即可。Logo 和浏览器图标的区别见[图片配置](/config/basic)。
+:::
+
+**本页完成标志：**你能在首页认出自己的站名、姓名和介绍。接着写[第一篇文章](/guide/first-post)。

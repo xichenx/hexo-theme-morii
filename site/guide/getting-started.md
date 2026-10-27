@@ -1,6 +1,21 @@
-# 从零安装 Morii
+---
+prev:
+  text: 接入路线
+  link: /guide/
+next:
+  text: '第 2 步：修改资料'
+  link: /guide/first-config
+---
 
-这篇教程适合第一次使用 Hexo 的读者。跟着做完，你会在自己的电脑上看到 Morii 博客。已经有 **Hexo 8** 博客的读者，可以从[第 3 步：安装主题](#_3-安装-morii-主题)开始。
+# 第 1 步：安装并启用 Morii
+
+**本页目标：**在自己的电脑上打开 Morii 首页。新建博客时按顺序往下做；教程统一把博客文件夹叫作 `my-blog`。完整学习顺序见[接入路线](/guide/)。
+
+## 已有 Hexo 博客？ {#existing-blog}
+
+先备份自己的博客配置和内容，然后在**原来的博客目录**运行 `hexo version`。已经是 Hexo 8 的读者，可以从本页[安装主题](#_3-安装-morii-主题)开始，不要再运行 `hexo init`。
+
+如果旧博客不是 Hexo 8，先在备份或测试副本中确认升级和插件兼容性，再换主题。下面“创建博客文件夹”的步骤只针对新博客。
 
 ::: tip 先分清两个网站
 你正在阅读的是 **Morii 主题文档站**。下面创建的是**你自己的博客**。文档站部署在 Cloudflare Pages，不会替你的博客自动上线。
@@ -47,7 +62,7 @@ my-blog/                 ← 博客根目录，以后说“在博客根目录运
 └─ themes/               ← 通过 Git 安装主题时使用
 ```
 
-::: warning 不要进入主题源码仓库操作
+::: tip 命令到底在哪个目录执行？
 建好博客文件夹后，后文的 `npm install`、`hexo ...` 都在**自己的博客根目录**执行，不是在 `hexo-theme-morii` 主题仓库中执行。
 :::
 
@@ -92,7 +107,7 @@ Git 安装把主题放在 `themes/morii/`；npm 安装把主题放在 `node_modu
 
 用文本编辑器打开**博客根目录**的 `_config.yml`。找到原有的 `theme:` 一行，把它改成：
 
-```yaml
+```yaml [_config.yml：修改已有字段]
 theme: morii
 language: zh-CN
 ```
@@ -113,4 +128,6 @@ hexo server
 
 `hexo server` 会持续运行。想停止预览时，在该终端按 **Ctrl+C**。以后修改配置后，建议停止服务、重新生成并再次启动。
 
-**下一步：**按[首次配置](/guide/first-config)替换示例资料，再写[第一篇文章](/guide/first-post)。遇到报错可按[常见问题](/troubleshooting)逐项检查。
+**本页完成标志：**浏览器中能看到 Morii 首页，终端没有生成错误。此时显示主题作者的演示信息是正常的。
+
+**下一步：**[第 2 步：换成自己的资料](/guide/first-config)。遇到报错可按[常见问题](/troubleshooting)逐项检查。
