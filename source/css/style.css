@@ -89,8 +89,8 @@ button{
   backdrop-filter:blur(18px)
 }
 .site-header__inner{
+  /* Match the page gutter used by .wrap; a separate max-width misaligns wide screens. */
   width:100%;
-  max-width:1440px;
   height:100%;
   margin:auto;
   display:flex;
