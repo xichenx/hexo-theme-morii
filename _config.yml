@@ -188,4 +188,6 @@ featured:
 comments:
   enable: true
   provider: twikoo
+  # 可指定同域脚本或 CDN；前端版本应与后端一致。留空沿用默认脚本。
+  script_url: ''
   env_id: https://martinleo-twikoo.hf.space

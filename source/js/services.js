@@ -110,7 +110,7 @@
   let script;
 
   const loadScript = () => {
-    if (window.twikoo) return Promise.resolve();
+    if (typeof window.twikoo?.init === 'function') return Promise.resolve();
     return new Promise((resolve, reject) => {
       script?.remove();
       script = document.createElement('script');
@@ -130,7 +130,7 @@
     status.textContent = '正在加载评论…';
     try {
       await loadScript();
-      if (!window.twikoo || !service.dataset.env) throw new Error('Comment configuration unavailable');
+      if (typeof window.twikoo?.init !== 'function' || !service.dataset.env) throw new Error('Comment configuration unavailable');
       let initTimeout;
       try {
         await Promise.race([
@@ -141,9 +141,10 @@
       loaded = true;
       button.hidden = true;
       status.hidden = true;
-    } catch {
+    } catch (error) {
       status.hidden = false;
       status.textContent = '评论服务暂时不可用，可以稍后重新加载。';
+      console.warn('[Morii comments]', error);
       button.textContent = '重新加载评论';
     } finally {
       loading = false;
