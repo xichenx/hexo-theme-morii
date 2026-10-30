@@ -38,6 +38,8 @@
   "scripts": {
     "check": "node tools/check.cjs",
     "test": "npm run check && node --test tests/*.test.cjs",
+    "test:browser": "playwright test",
+    "test:browser:report": "playwright show-report .cache/browser-layout-report",
     "build:demo": "node tools/demo.cjs",
     "audit:performance": "node tools/performance.cjs",
     "release:check": "node tools/release.cjs check",
@@ -55,6 +57,7 @@
     "hexo-renderer-pug": ">=3.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.64.1",
     "hexo": "8.1.2",
     "hexo-generator-archive": "2.0.0",
     "hexo-generator-category": "2.0.0",

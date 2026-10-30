@@ -8,6 +8,7 @@ const files = dir => fs.readdirSync(dir, { withFileTypes: true }).flatMap(entry 
   const file = path.join(dir, entry.name);
   return entry.isDirectory() ? files(file) : [file];
 });
+execFileSync(process.execPath, ['--check', path.join(root, 'playwright.config.cjs')], { stdio: 'inherit' });
 for (const directory of ['scripts', 'source/js', 'tools', 'tests']) {
   for (const file of files(path.join(root, directory)).filter(file => /\.(?:js|cjs)$/.test(file))) execFileSync(process.execPath, ['--check', file], { stdio: 'inherit' });
 }

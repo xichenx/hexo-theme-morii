@@ -34,3 +34,29 @@ jobs:
       - run: npm run docs:build
       - run: npm run audit:performance
       - run: npm run package:theme
+
+  browser-layout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npm run test:browser
+      - name: Upload browser layout report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: browser-layout-report
+          path: |
+            .cache/browser-layout-report/
+            .cache/browser-layout-results/
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 7

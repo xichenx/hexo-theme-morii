@@ -6,11 +6,12 @@ const yaml = require('js-yaml');
 const repository = path.resolve(__dirname, '..');
 const manifest = require('../package.json');
 
-async function buildDemo({ root = process.env.MORII_DEMO_ROOT || '/', url = process.env.MORII_DEMO_URL || 'https://example.test', themeOverrides = {}, language, sourceOverrides = {} } = {}) {
+async function buildDemo({ root = process.env.MORII_DEMO_ROOT || '/', url = process.env.MORII_DEMO_URL || 'https://example.test', themeOverrides = {}, language, sourceOverrides = {}, fixture = 'demo' } = {}) {
   if (!root.startsWith('/') || root.startsWith('//') || !root.endsWith('/') || /[?#\\]|\.\./.test(root)) throw new Error('Demo root must be an absolute directory path ending in /.');
   const base = new URL(url);
   if (!/^https?:$/.test(base.protocol) || base.username || base.password) throw new Error('Demo URL must use HTTP(S) without credentials.');
-  const site = path.join(repository, '.cache', 'demo');
+  if (typeof fixture !== 'string' || !/^[a-z][a-z0-9-]*$/.test(fixture)) throw new Error('Fixture name must contain only lowercase letters, numbers and hyphens.');
+  const site = path.join(repository, '.cache', fixture);
   fs.rmSync(site, { recursive: true, force: true });
   fs.mkdirSync(path.join(site, 'themes'), { recursive: true });
   fs.cpSync(path.join(repository, 'demo/source'), path.join(site, 'source'), { recursive: true });

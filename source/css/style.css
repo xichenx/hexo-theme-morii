@@ -2294,7 +2294,7 @@ a.footer-filing__item:focus-visible { outline: 2px solid var(--accent); outline-
 [data-cover-frame][data-image-state='error'] > img { opacity:0; }
 @keyframes cover-loading { to { background-position:-220% 0; } }
 @media(prefers-reduced-motion:reduce) { [data-cover-frame] { animation:none !important; } }
-.post-card__body h3,.selected-card__body strong,.category-post-row h2 { overflow-wrap:anywhere; word-break:normal; }
+.post-card__body h3,.selected-card__body strong,.category-post-row h2,.recent-list a{overflow-wrap:anywhere;word-break:normal}
 .navigation-card > div { min-width:0; }
 .navigation-card strong,.navigation-card small { overflow-wrap:anywhere; }
 @media(max-width:600px) {
