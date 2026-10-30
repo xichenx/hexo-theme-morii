@@ -165,13 +165,54 @@
     let pendingDocument;
     let readyTimer;
     let fallbackTimer;
+    const scrollPositions = new Map();
+    let entrySerial = 0;
+    let activeEntry = 'origin';
+    let pendingStarted = 0;
+    let notice;
+    const recordScroll = () => {
+      if (document.body.classList.contains('music-shell-loading') || shellActive && frame?.hidden) return;
+      try { const view = shellActive && frame && !frame.hidden ? frame.contentWindow : window; if (view.location.href === currentURL) scrollPositions.set(activeEntry, { x: view.scrollX, y: view.scrollY }); } catch { /* Same-origin pages only. */ }
+    };
+    const restoreScroll = view => {
+      const position = scrollPositions.get(activeEntry);
+      view.requestAnimationFrame(() => {
+        if (position) view.scrollTo(position.x, position.y);
+        else if (new URL(currentURL).hash) {
+          try { view.document.getElementById(decodeURIComponent(new URL(currentURL).hash.slice(1)))?.scrollIntoView(); } catch { /* Invalid fragment. */ }
+        } else view.scrollTo(0, 0);
+      });
+    };
+    const announceNavigation = status => window.dispatchEvent(new CustomEvent('morii:navigation', { detail: { url: currentURL, status, duration: Math.round(performance.now() - pendingStarted) } }));
+    const failure = () => {
+      clearInterval(readyTimer); clearTimeout(fallbackTimer);
+      document.body.classList.remove('music-shell-loading');
+      announceNavigation('timeout');
+      if (!notice) {
+        notice = document.createElement('div'); notice.className = 'music-navigation-notice'; notice.setAttribute('role', 'status');
+        const text = document.createElement('span'); text.textContent = t("页面加载较慢，可以重试或直接打开。");
+        const retry = document.createElement('button'); retry.type = 'button'; retry.textContent = t("重试"); retry.addEventListener('click', () => visit(currentURL, false, activeEntry));
+        const direct = document.createElement('a'); direct.textContent = t("直接打开"); direct.dataset.noMusicNav = '';
+        const close = document.createElement('button'); close.type = 'button'; close.textContent = '×'; close.setAttribute('aria-label', t("关闭")); close.addEventListener('click', () => { notice.hidden = true; });
+        notice.append(text, retry, direct, close); document.body.append(notice);
+      }
+      notice.querySelector('a').href = currentURL; notice.hidden = false;
+    };
     const musicPath = new URL(hub.dataset.musicPage, location.href).pathname;
     const updateFloating = () => {
       const inRoom = new URL(currentURL).pathname === musicPath;
       hub.querySelector('.music-float').hidden = !state.tracks.length || inRoom;
     };
-    const visit = (url, push = true) => {
-      if (push) history.pushState({ moriiMusic: true }, '', url);
+    const visit = (url, push = true, entry) => {
+      recordScroll();
+      if (notice) notice.hidden = true;
+      if (history.scrollRestoration !== 'manual') {
+        history.scrollRestoration = 'manual';
+        history.replaceState({ ...history.state, moriiMusicKey: activeEntry }, '', location.href);
+      }
+      activeEntry = push ? `morii-${++entrySerial}` : entry || 'origin';
+      if (push) history.pushState({ moriiMusic: true, moriiMusicKey: activeEntry }, '', url);
+      pendingStarted = performance.now();
       currentURL = url; updateFloating();
       clearInterval(readyTimer); clearTimeout(fallbackTimer);
       if (new URL(url).pathname === originURL.pathname && new URL(url).search === originURL.search) {
@@ -180,6 +221,7 @@
         document.title = originTitle;
         document.getElementById('main')?.setAttribute('tabindex', '-1');
         document.getElementById('main')?.focus({ preventScroll: true });
+        restoreScroll(window); announceNavigation('ready');
         window.dispatchEvent(new Event('morii:music-view')); return;
       }
       shellActive = true; document.body.classList.add('music-shell-loading');
@@ -193,9 +235,7 @@
       if (!document.body.classList.contains('music-shell-active')) frame.hidden = true;
       frame.contentWindow.location.replace(url);
       readyTimer = setInterval(showFrame, 80);
-      fallbackTimer = setTimeout(() => {
-        if (shellActive && document.body.classList.contains('music-shell-loading')) location.assign(currentURL);
-      }, 12000);
+      fallbackTimer = setTimeout(failure, 12000);
     };
     const showFrame = () => {
       if (!document.body.classList.contains('music-shell-loading')) return;
@@ -215,6 +255,7 @@
         document.title = content.title;
         frame.title = content.title || t("网站内容");
         bindNavigation(content); updateFloating();
+        restoreScroll(frame.contentWindow); announceNavigation('ready');
         content.getElementById('main')?.setAttribute('tabindex', '-1');
         content.getElementById('main')?.focus({ preventScroll: true });
       } catch { /* External navigation is left to the browser. */ }
@@ -242,7 +283,8 @@
       if (event.key === 'morii-theme' && ['dark', 'light'].includes(event.newValue)) document.documentElement.dataset.theme = event.newValue;
     });
     bindNavigation(document);
-    window.addEventListener('popstate', () => { if (frame || shellActive) visit(location.href, false); });
+    window.addEventListener('popstate', event => { if (frame || shellActive) visit(location.href, false, event.state?.moriiMusicKey); });
+    window.addEventListener('pagehide', () => { recordScroll(); clearInterval(readyTimer); clearTimeout(fallbackTimer); });
     api.subscribe(updateFloating);
     const float = hub.querySelector('.music-float');
     const ball = hub.querySelector('.music-ball');

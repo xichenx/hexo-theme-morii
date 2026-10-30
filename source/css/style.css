@@ -2280,3 +2280,17 @@ a.footer-filing__item:focus-visible { outline: 2px solid var(--accent); outline-
 /* Keep every page and nested panel scrollable without showing the scrollbar. */
 * { scrollbar-width: none !important; }
 *::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+.navigation-tools { margin:0 28px 20px; padding:16px; border:1px solid var(--line); border-radius:18px; background:var(--surface); }
+.navigation-tool-actions,.navigation-tool-music { display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+.navigation-tool-actions button,.navigation-tool-music button { padding:7px 11px; border:1px solid var(--line); border-radius:10px; color:var(--ink); background:var(--surface); cursor:pointer; font-size:12px; }
+.navigation-tool-actions button[aria-pressed='true'] { background:var(--brand-color); color:white; }
+.navigation-tool-actions button:disabled { opacity:.45; cursor:default; }
+.navigation-tool-actions output { font-size:12px; }
+.navigation-tool-music { margin-top:12px; padding-top:12px; border-top:1px solid var(--line); font-size:12px; color:var(--muted); }
+.navigation-tool-music span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:65%; }
+.recent-comments ul { list-style:none; margin:0; padding:0; }
+.recent-comments li + li { border-top:1px solid var(--line); }
+.recent-comments li a { display:grid; gap:5px; padding:12px 0; font-size:12px; }
+.recent-comments li span { color:var(--muted); overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+#waline { --waline-theme-color:var(--brand-color); --waline-font-size:15px; --waline-color:var(--ink); --waline-bgcolor:var(--surface); --waline-border-color:var(--line); }

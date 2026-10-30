@@ -133,6 +133,8 @@
       const language = document.createElement('span');
       const languageClass = [...(code.querySelector('code')?.classList || [])].find(name => name.startsWith('language-'));
       language.textContent = languageClass?.replace('language-', '') || [...block.classList].find(name => !['highlight', 'plaintext'].includes(name)) || 'CODE';
+      const filename = block.closest('.code-file')?.dataset.filename;
+      if (filename) { const label = document.createElement('strong'); label.className = 'code-filename'; label.textContent = filename; tools.append(label); }
       const button = document.createElement('button');
       button.type = 'button';
       button.textContent = t("复制代码");

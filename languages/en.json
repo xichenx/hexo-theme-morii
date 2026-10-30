@@ -614,5 +614,19 @@
   "第 {0} / {1} 页": "Page {0} of {1}",
   "共 {0} 张照片 · 点击图片浏览": "{0} photos · Select a photo to browse",
   "共 {0} 个链接": "{0} links in total",
-  "正在打开页面…": "Opening page…"
+  "正在打开页面…": "Opening page…",
+  "页面加载较慢，可以重试或直接打开。": "This page is taking a while. Retry or open it directly.",
+  "直接打开": "Open directly",
+  "渲染失败，点击重试": "Rendering failed. Retry",
+  "查看图表源码": "View diagram source",
+  "按分类筛选": "Filter by category",
+  "全部分类": "All categories",
+  "部分正文未能加载，当前结果可能不完整。": "Some content could not be loaded. Results may be incomplete.",
+  "阅读中控台": "Reading controls",
+  "深色模式": "Dark mode",
+  "收藏本文": "Save this post",
+  "最新评论": "Recent comments",
+  "访客": "Visitor",
+  "暂时还没有评论。": "No comments yet.",
+  "搜索加载失败，请重试。": "Search could not be loaded. Please retry."
 }

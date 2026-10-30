@@ -1,0 +1,31 @@
+'use strict';
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const pug = require('pug');
+const { JSDOM } = require('jsdom');
+
+test('navigation controls reuse reading preferences, bookmark and the existing audio player', () => {
+  const markup = pug.renderFile(path.join(__dirname, '../layout/includes/navigation-panel.pug'), { theme: {}, is_post: () => true, morii_t: key => key, morii_navigation: () => [] });
+  const settings = pug.renderFile(path.join(__dirname, '../layout/includes/reading-settings.pug'), { theme: {}, morii_t: key => key });
+  const dom = new JSDOM(`<button id="navigation-open"></button><button id="theme-toggle"></button><button data-save-post="/post/" aria-pressed="false"></button><article class="article-body"></article>${settings}${markup}`, { url: 'https://example.test/post/', runScripts: 'outside-only' });
+  const w = dom.window, d = w.document, dialog = d.getElementById('navigation-dialog');
+  dialog.showModal = () => { dialog.open = true; }; dialog.close = () => { dialog.open = false; dialog.dispatchEvent(new w.Event('close')); };
+  const toggle = d.getElementById('theme-toggle'); toggle.addEventListener('click', () => { d.documentElement.dataset.theme = d.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; });
+  const saved = d.querySelector('[data-save-post]'); saved.addEventListener('click', () => saved.setAttribute('aria-pressed', String(saved.getAttribute('aria-pressed') !== 'true')));
+  const state = { tracks: [{ title: 'Original track' }], current: 0, playing: false }; let listener; let toggles = 0; let subscribed = 0; let released = 0;
+  const player = w.MoriiMusic = { subscribe(fn) { subscribed++; listener = fn; fn(state); return () => { released++; listener = null; }; }, toggle() { toggles++; state.playing = !state.playing; listener(state); } };
+  w.eval(fs.readFileSync(path.join(__dirname, '../source/js/reading-preferences.js'), 'utf8'));
+  w.eval(fs.readFileSync(path.join(__dirname, '../source/js/navigation.js'), 'utf8'));
+  d.getElementById('navigation-open').click(); assert.equal(dialog.open, true);
+  d.querySelector('[data-control="reading-font-larger"]').click(); assert.equal(d.querySelector('[data-control-font]').textContent, '19 px');
+  d.querySelector('[data-control="reading-focus-toggle"]').click(); assert.equal(d.documentElement.classList.contains('reading-focus'), true);
+  d.querySelector('[data-control="theme-toggle"]').click(); assert.equal(d.documentElement.dataset.theme, 'dark');
+  d.querySelector('[data-control-bookmark]').click(); assert.equal(saved.getAttribute('aria-pressed'), 'true');
+  d.querySelector('[data-control-music]').click(); assert.equal(toggles, 1); assert.equal(w.MoriiMusic, player); assert.equal(d.querySelector('[data-control-track]').textContent, 'Original track');
+  w.dispatchEvent(new w.Event('pagehide')); assert.equal(released, 1);
+  w.dispatchEvent(new w.Event('pageshow')); w.dispatchEvent(new w.Event('pageshow')); assert.equal(subscribed, 2);
+  d.querySelector('[data-control-music]').click(); assert.equal(toggles, 2);
+  dom.window.close();
+});

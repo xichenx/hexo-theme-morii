@@ -49,3 +49,5 @@ aside.sidebar(aria-label=morii_t("站点信息"))
           a(href=url_for(year.path))
             strong= year.year
             span #{year.count} #{morii_t("篇 →")}
+
+  include recent-comments.pug

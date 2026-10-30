@@ -47,7 +47,8 @@
     "docs:preview": "vitepress preview site"
   },
   "dependencies": {
-    "hexo-util": "^3.3.0"
+    "hexo-util": "^3.3.0",
+    "js-yaml": "^4.1.1"
   },
   "peerDependencies": {
     "hexo": ">=8.0.0",
@@ -61,7 +62,6 @@
     "hexo-generator-tag": "2.0.0",
     "hexo-renderer-marked": "7.0.1",
     "hexo-renderer-pug": "3.0.0",
-    "js-yaml": "4.1.1",
     "jsdom": "25.0.1",
     "vitepress": "^1.6.4"
   }

@@ -239,3 +239,42 @@ function loadHelpers(file, theme = {}, config = {}) {
   return helpers;
 }
 
+
+test('activated music keeps audio, restores original scroll on back and offers retry after timeout', async () => {
+  const dom = browser(musicMarkup({ title: '音乐', tracks: [{ title: '第一首', url: '/one.mp3' }] }) + '<main id="main"></main><a id="next-page" href="/archives/">文章</a>');
+  const w = dom.window; const d = w.document;
+  let scrollY = 350;
+  Object.defineProperty(w, 'scrollY', { get: () => scrollY });
+  w.scrollTo = (x, y) => { scrollY = y; };
+  w.requestAnimationFrame = callback => { callback(); return 1; };
+  const timers = [];
+  const setTimeout = w.setTimeout.bind(w);
+  w.setTimeout = (callback, delay) => { if (delay === 12000) { timers.push(callback); return 999; } return setTimeout(callback, delay); };
+  w.setInterval = () => 1; w.clearInterval = () => {};
+  const create = d.createElement.bind(d);
+  const child = new JSDOM('<main id="main"></main>', { url: 'https://blog.example.test/archives/' });
+  Object.defineProperty(child.window.document, 'readyState', { get: () => 'complete' });
+  const frameWindow = { close() {}, location: { href: 'about:blank', replace(url) { this.href = url; } }, requestAnimationFrame: callback => callback(), scrollTo() {}, scrollX: 0, scrollY: 0 };
+  let currentDocument = null;
+  d.createElement = tag => {
+    const element = create(tag);
+    if (tag === 'iframe') {
+      Object.defineProperty(element, 'contentWindow', { get: () => frameWindow });
+      Object.defineProperty(element, 'contentDocument', { get: () => currentDocument });
+    }
+    return element;
+  };
+  const audio = d.getElementById('music-player'); audio.play = async () => { audio.dispatchEvent(new w.Event('playing')); };
+  w.eval(script('music.js')); await w.MoriiMusic.play(0);
+  d.getElementById('next-page').dispatchEvent(new w.MouseEvent('click', { bubbles: true, cancelable: true }));
+  assert.equal(w.location.pathname, '/archives/'); assert.equal(d.querySelectorAll('#music-player').length, 1);
+  const frame = d.getElementById('morii-site-frame'); currentDocument = child.window.document; frame.dispatchEvent(new w.Event('load'));
+  assert.equal(frame.hidden, false); assert.equal(w.MoriiMusic.player, audio);
+  w.history.replaceState({ moriiMusicKey: 'origin' }, '', '/'); w.dispatchEvent(new w.PopStateEvent('popstate', { state: { moriiMusicKey: 'origin' } }));
+  assert.equal(frame.hidden, true); assert.equal(scrollY, 350);
+  d.getElementById('next-page').dispatchEvent(new w.MouseEvent('click', { bubbles: true, cancelable: true }));
+  timers.at(-1)();
+  assert.equal(d.querySelector('.music-navigation-notice').hidden, false); assert.equal(w.MoriiMusic.player, audio);
+  assert.equal(d.querySelector('.music-navigation-notice a').pathname, '/archives/');
+  child.window.close(); dom.window.close();
+});

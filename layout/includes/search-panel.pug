@@ -1,4 +1,4 @@
-dialog.search-dialog#search-dialog(aria-labelledby='search-heading' data-search-index=url_for('/morii-search.json') data-page-size=(theme.search && theme.search.page_size) || 10)
+dialog.search-dialog#search-dialog(aria-labelledby='search-heading' data-search-script=morii_asset('/js/search.js') data-search-index=url_for(morii_search_index()) data-page-size=(theme.search && theme.search.page_size) || 10)
   .search-header
     .search-dialog__top
       div
@@ -17,6 +17,12 @@ dialog.search-dialog#search-dialog(aria-labelledby='search-heading' data-search-
       button(type='button' data-search-scope='all' aria-pressed='true') #{morii_t("全部内容")}
       button(type='button' data-search-scope='title' aria-pressed='false') #{morii_t("仅标题")}
       button(type='button' data-search-scope='topics' aria-pressed='false') #{morii_t("分类与标签")}
+    label.search-category(for='search-category')
+      span #{morii_t("按分类筛选")}
+      select#search-category
+        option(value='') #{morii_t("全部分类")}
+        each category in site.categories.toArray()
+          option(value=category.name)= category.name
     if site.tags.length
       .search-suggestions(aria-label=morii_t("快速查找"))
         span #{morii_t("快速查找")}
@@ -31,8 +37,8 @@ dialog.search-dialog#search-dialog(aria-labelledby='search-heading' data-search-
       strong #{morii_t("没有找到相关文章")}
       p #{morii_t("换个关键词，或切换到“全部内容”试试。")}
     ul#search-results(aria-labelledby='search-results-heading')
-      each post in site.posts.sort('date', -1).toArray()
-        li(data-search=morii_search_text(post) data-topics=post.password ? '' : Array.from(new Set(post.categories.toArray().concat(post.tags.toArray()).map(item => item.name))).join(' ') data-protected=post.password ? 'true' : 'false')
+      each post in site.posts.sort('date', -1).limit(20).toArray()
+        li(data-categories=JSON.stringify(post.password ? [] : post.categories.toArray().map(item => item.name)) data-search=morii_search_text(post) data-topics=post.password ? '' : Array.from(new Set(post.categories.toArray().concat(post.tags.toArray()).map(item => item.name))).join(' ') data-protected=post.password ? 'true' : 'false')
           a(href=url_for(post.path))
             span.search-result-icon(aria-hidden='true') ≡
             .search-result-content

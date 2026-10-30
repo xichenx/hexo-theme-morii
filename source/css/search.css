@@ -74,3 +74,5 @@
 }
 @media (max-height: 560px) { .search-suggestions { display: none; } .search-header { padding-top: 12px; padding-bottom: 10px; } .search-dialog .search-dialog__top { margin-bottom: 10px; } }
 @media (prefers-reduced-motion: reduce) { .search-dialog * { transition: none !important; } }
+.search-category { display:flex; align-items:center; gap:12px; margin-top:12px; font-size:12px; color:var(--muted); }
+.search-category select { max-width:65%; padding:6px 10px; border:1px solid var(--line); border-radius:10px; background:var(--surface); color:var(--ink); }

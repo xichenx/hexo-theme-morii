@@ -129,3 +129,5 @@ comments: true
 ```
 
 直接访问 `/comments/` 检查，确认正常后再把链接加入[菜单或探索入口](/features/customization)。创建文件和添加菜单是两个步骤。
+
+新增的搜索分片、阅读中控台、Waline 与最新评论配置见[增强配置说明](/config/iteration)。

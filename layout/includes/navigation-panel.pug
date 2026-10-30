@@ -6,6 +6,20 @@ if !theme.quick_navigation || theme.quick_navigation.enable !== false
         h2#navigation-heading #{morii_t("去哪里逛逛")}
         p #{morii_t("技术笔记、生活片段，还有一点小乐趣。")}
       button.icon-button#navigation-close(type='button' aria-label=morii_t("关闭快捷导航")) ×
+    section.navigation-tools(aria-label=morii_t("阅读中控台"))
+      .navigation-tool-actions
+        button(type='button' data-control='theme-toggle' aria-pressed='false') #{morii_t("深色模式")}
+        if is_post()
+          if !theme.article || theme.article.reading_settings !== false
+            button(type='button' data-control='reading-font-smaller') A−
+            output(data-control-font) 17 px
+            button(type='button' data-control='reading-font-larger') A＋
+            button(type='button' data-control='reading-focus-toggle' aria-pressed='false') #{morii_t("专注阅读")}
+          if !theme.reading_list || theme.reading_list.enable !== false
+            button(type='button' data-control-bookmark) #{morii_t("收藏本文")}
+      .navigation-tool-music
+        button(type='button' data-control-music disabled) #{morii_t("播放音乐")}
+        span(data-control-track) #{morii_t("未选择音乐")}
     nav.navigation-grid(aria-label=morii_t("全站快捷导航"))
       each item in morii_navigation()
         a.navigation-card(href=url_for(item.path))

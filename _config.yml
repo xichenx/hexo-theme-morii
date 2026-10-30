@@ -74,6 +74,7 @@ home:
 about:
   show_interests: true
 search:
+  shard_size: 100 # 超过此篇数使用分片；标题/分类搜索无需下载全文分片
   content: true
   page_size: 10
 reading_list:
@@ -87,6 +88,13 @@ clock:
   longitude: 112.98
   timezone: Asia/Shanghai
 article:
+  enhancements:
+    # 默认不下载渲染库；单篇文章也可用 mermaid: true / math: true 开启。
+    mermaid: false
+    math: false
+    mermaid_url: ''
+    math_url: ''
+    math_css: ''
   resume:
     enable: true
   share:
@@ -187,7 +195,21 @@ featured:
     tone: orange
 comments:
   enable: true
-  provider: twikoo
+  provider: twikoo # twikoo / waline
+  server_url: ''  # 使用 Waline 时填写服务端地址
+  style_url: ''   # Waline 样式地址，可自托管
+  recent:
+    enable: false # 可选的 Twikoo 最新评论侧栏
+    limit: 5
   # 可指定同域脚本或 CDN；前端版本应与后端一致。留空沿用默认脚本。
   script_url: ''
   env_id: https://martinleo-twikoo.hf.space
+
+# 默认关闭；也可在单次访问链接添加 ?morii-debug=1 开启本地加载诊断。
+performance:
+  diagnostics: false
+
+seo:
+  structured_data: true
+  # 全站分享图；单篇文章 share_image 优先于 cover，建议填写站内路径或 HTTPS 地址。
+  default_image: ''

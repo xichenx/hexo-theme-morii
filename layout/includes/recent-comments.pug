@@ -1,0 +1,8 @@
+- var recentSettings = morii_comments()
+if recentSettings.recent
+  section.side-card.recent-comments(data-recent-comments data-env=recentSettings.env data-script=url_for(recentSettings.script) data-limit=recentSettings.recentLimit)
+    .side-card__heading
+      h2 #{morii_t("最新评论")}
+    ul(data-recent-list)
+    p(data-recent-status role='status') #{morii_t("正在加载评论…")}
+    button.button.service-button(type='button' data-recent-retry hidden) #{morii_t("重试")}

@@ -72,8 +72,42 @@ test('search index cannot inject markup, expose protected text or navigate off-s
 
 test('index snippets decode numeric entities without exposing protected content', () => {
   const vm = require('node:vm'); let generate;
-  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../scripts/search-index.js'), 'utf8'), { require, hexo: { config: { root: '/blog/' }, theme: { config: {} }, extend: { generator: { register(name, fn) { generate = fn; } } } } });
-  const data = JSON.parse(generate({ posts: [{ title: 'Code', path: 'code/', categories: [{ name: 'Hexo' }], tags: [{ name: 'Hexo' }], content: '<p>const theme = &#x27;Morii&#x27;; &#123; &#x110000;</p>' }, { title: 'Locked', path: 'locked/', password: true, content: '&#x73;ecret' }] }).data);
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../scripts/search-index.js'), 'utf8'), { require, hexo: { config: { root: '/blog/' }, theme: { config: {} }, extend: { helper: { register() {} }, generator: { register(name, fn) { generate = fn; } } } } });
+  const data = JSON.parse(generate({ posts: [{ title: 'Code', path: 'code/', categories: [{ name: 'Hexo' }], tags: [{ name: 'Hexo' }], content: '<p>const theme = &#x27;Morii&#x27;; &#123; &#x110000;</p>' }, { title: 'Locked', path: 'locked/', password: true, content: '&#x73;ecret' }] }).find(route => route.path === 'morii-search.json').data);
   assert.match(data[0].content, /'Morii'; \{/); assert.ok(data[0].content.includes('&#x110000;'));
   assert.equal(data[0].topics, 'Hexo'); assert.equal(data[0].url, '/blog/code/'); assert.equal(data[1].content, '');
+});
+
+test('large search indexes load bodies only for full-text queries and retry incomplete shards', async () => {
+  const entries = [{ title: '主题配置', url: '/config/', topics: 'Hexo', categories: ['技术'] }, { title: '生活笔记', url: '/life/', topics: '', categories: ['生活'] }];
+  const requested = []; let fail = true;
+  const f = fixture();
+  f.w.fetch = async url => {
+    requested.push(String(url));
+    if (String(url).endsWith('morii-search.json')) return { ok: true, json: async () => ({ version: 2, entries, shards: ['/search/a.json', '/search/b.json'] }) };
+    if (String(url).endsWith('a.json')) return { ok: true, json: async () => [{ ...entries[0], content: 'bodyneedle' }] };
+    if (fail) throw new Error('offline');
+    return { ok: true, json: async () => [{ ...entries[1], content: 'bodyneedle' }] };
+  };
+  await f.open(); assert.equal(requested.length, 1);
+  f.d.querySelector('[data-search-scope="title"]').click(); f.query('主题配置');
+  await settle(); assert.equal(requested.length, 1); assert.match(f.links()[0].textContent, /主题配置/);
+  f.d.querySelector('[data-search-scope="all"]').click(); f.query('bodyneedle');
+  await settle(); await settle();
+  assert.equal(f.links().length, 1); assert.equal(f.d.querySelector('#search-retry').hidden, false);
+  fail = false; f.d.querySelector('#search-retry').click(); await settle(); await settle();
+  assert.equal(f.links().length, 2); assert.equal(requested.filter(url => url.endsWith('a.json')).length, 1);
+  f.dom.window.close();
+});
+
+test('generated search manifests use hashed shards and omit protected bodies and category names', () => {
+  const vm = require('node:vm'); let generate;
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../scripts/search-index.js'), 'utf8'), { require, hexo: { config: { root: '/blog/' }, theme: { config: { search: { shard_size: 20 } } }, extend: { helper: { register() {} }, generator: { register(name, fn) { generate = fn; } } } } });
+  const posts = Array.from({ length: 21 }, (_, index) => ({ title: `Post ${index}`, path: `post-${index}/`, content: 'needle', categories: [{ name: '技术' }] }));
+  posts[0].password = true; posts[0].content = 'secret';
+  const routes = generate({ posts }); const index = JSON.parse(routes.find(route => route.path === 'morii-search.json').data);
+  assert.equal(index.version, 2); assert.equal(index.shards.length, 2); assert.equal(index.entries[0].categories.length, 0);
+  assert.ok(index.entries.every(entry => !Object.hasOwn(entry, 'content')));
+  assert.ok(!JSON.stringify(routes).includes('secret'));
+  assert.match(index.shards[0], /^\/blog\/search\/part-0\.[a-f0-9]{12}\.json$/);
 });

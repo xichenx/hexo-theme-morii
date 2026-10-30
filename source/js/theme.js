@@ -89,6 +89,25 @@
 
   const dialog = document.getElementById('search-dialog');
   const input = document.getElementById('search-input');
+  let searchScript;
+  let searchReady = false;
+  const loadSearch = () => {
+    if (!dialog?.dataset.searchScript || searchReady) return Promise.resolve();
+    if (searchScript) return searchScript;
+    searchScript = new Promise((resolve, reject) => {
+      const node = document.createElement('script'); node.src = dialog.dataset.searchScript;
+      const timer = setTimeout(() => { node.remove(); reject(new Error('Search timeout')); }, 10000);
+      node.onload = () => { clearTimeout(timer); searchReady = true; resolve(); };
+      node.onerror = () => { clearTimeout(timer); node.remove(); reject(new Error('Search unavailable')); };
+      document.head.append(node);
+    }).then(() => { if (dialog.open) dialog.dispatchEvent(new Event('morii:search-open')); }).catch(() => {
+      searchScript = null;
+      const status = document.getElementById('search-service-status'); if (status) status.textContent = t("搜索加载失败，请重试。");
+      const retry = document.getElementById('search-retry'); if (retry) retry.hidden = false;
+    });
+    return searchScript;
+  };
+  document.getElementById('search-retry')?.addEventListener('click', () => { if (!searchReady) loadSearch(); });
   const openSearch = () => {
     if (root.dataset.printPreview === 'true') return;
     if (!dialog || dialog.open) return;
@@ -97,7 +116,8 @@
     closeMenu();
     dialog.showModal();
     input?.focus();
-    dialog.dispatchEvent(new Event('morii:search-open'));
+    if (searchReady || !dialog.dataset.searchScript) dialog.dispatchEvent(new Event('morii:search-open'));
+    else loadSearch();
   };
   document.querySelectorAll('#search-open, [data-open-search]').forEach(button => button.addEventListener('click', openSearch));
   document.getElementById('search-close')?.addEventListener('click', () => dialog?.close());

@@ -1,7 +1,11 @@
-if theme.comments && theme.comments.enable && theme.comments.provider === 'twikoo' && page.comments !== false
+- var commentSettings = morii_comments()
+if commentSettings.enable && page.comments !== false
   section.comments-card(class=is_post() ? '' : 'page-comments' aria-labelledby='comments-heading')
     h2#comments-heading #{morii_t("留下你的想法")}
-    #comment-service(data-env=theme.comments.env_id data-script=url_for(theme.comments.script_url || 'https://cdn.jsdelivr.net/npm/twikoo@1.6.44/dist/twikoo.all.min.js') aria-busy='false')
+    #comment-service(data-provider=commentSettings.provider data-env=commentSettings.env data-server=commentSettings.server data-script=url_for(commentSettings.script) data-style=commentSettings.provider === 'waline' ? url_for(commentSettings.css) : null aria-busy='false')
       p.comment-status(role='status') #{morii_t("与路过的朋友聊聊这篇内容。")}
       button.button.service-button#comments-load(type='button') #{morii_t("加载评论")}
-      #twikoo
+      if commentSettings.provider === 'waline'
+        #waline
+      else
+        #twikoo

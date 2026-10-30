@@ -38,3 +38,14 @@ console.log(`Hello, ${theme}!`);
 {% folding 点击展开更多 %}
 折叠内容也应在独立站点正常渲染。
 {% endfolding %}
+
+## 提示与代码文件
+
+{% note tip 阅读提示 %}
+快捷导航中的阅读中控台可以调整字号、专注阅读和音乐状态。
+{% endnote %}
+
+{% codefile app.js, javascript, 2 %}
+const theme = 'Morii';
+console.log(`Hello, ${theme}`);
+{% endcodefile %}

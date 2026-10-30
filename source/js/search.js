@@ -16,8 +16,20 @@
     content: item.dataset.protected === 'true' ? '' : item.querySelector('.search-result-summary')?.textContent || '',
     topics: item.dataset.topics || '',
     date: item.querySelector('small')?.textContent || '',
+    categories: (() => { try { return JSON.parse(item.dataset.categories || '[]'); } catch { return []; } })(),
     protected: item.dataset.protected === 'true'
   }));
+  let shards = [];
+  let bodyLoading;
+  const loadedShards = new Set();
+  const category = document.getElementById('search-category');
+  const seenCategories = new Set(category ? [...category.options].map(option => option.value) : []);
+  const updateCategories = () => {
+    if (!category) return;
+    for (const entry of entries) for (const name of entry.categories || []) if (!seenCategories.has(name)) {
+      seenCategories.add(name); const option = document.createElement('option'); option.value = name; option.textContent = name; category.append(option);
+    }
+  };
   let loaded = false;
   let scope = 'all';
   const scroll = dialog.querySelector('.search-scroll');
@@ -25,7 +37,9 @@
   const heading = document.getElementById('search-results-heading');
   let loading;
   let visible = pageSize;
-  const words = () => [...new Set(input.value.trim().toLowerCase().split(/\s+/).filter(Boolean))].slice(0, 20);
+  let segmenter;
+  try { segmenter = new Intl.Segmenter(window.MoriiI18n?.locale || 'zh-CN', { granularity: 'word' }); } catch { /* Exact words remain available. */ }
+  const words = () => [...new Set(input.value.trim().toLowerCase().split(/\s+/).flatMap(word => segmenter ? [...segmenter.segment(word)].filter(part => part.isWordLike).map(part => part.segment) : [word]).filter(Boolean))].slice(0, 20);
   const highlight = (element, text, keywords) => {
     const lower = text.toLowerCase();
     let position = 0;
@@ -49,7 +63,7 @@
     const matches = entries.map((entry, index) => {
       const title = entry.title.toLowerCase();
       const haystack = scope === 'title' ? title : scope === 'topics' ? entry.topics.toLowerCase() : `${title} ${entry.content.toLowerCase()} ${entry.topics.toLowerCase()}`;
-      return { entry, index, match: keywords.every(word => haystack.includes(word)), score: keywords.reduce((sum, word) => sum + (title.includes(word) ? 3 : entry.topics.toLowerCase().includes(word) ? 1 : 0), 0) };
+      return { entry, index, match: (!category?.value || entry.categories?.includes(category.value)) && keywords.every(word => haystack.includes(word)), score: (input.value.trim() && title === input.value.trim().toLowerCase() ? 20 : input.value.trim() && title.includes(input.value.trim().toLowerCase()) ? 10 : 0) + keywords.reduce((sum, word) => sum + (title.includes(word) ? 3 : entry.topics.toLowerCase().includes(word) ? 1 : 0), 0) };
     }).filter(item => item.match).sort((a, b) => b.score - a.score || a.index - b.index);
     const focused = document.activeElement?.closest?.('#search-results a');
     const focusedUrl = focused?.href;
@@ -85,42 +99,72 @@
     if (empty) empty.hidden = matches.length > 0;
     if (more) more.hidden = matches.length <= visible;
   };
+  const normalize = (data, seen = new Set()) => data.filter(entry => {
+    if (!entry || typeof entry.title !== 'string' || typeof entry.url !== 'string') return false;
+    try {
+      const url = new URL(entry.url, location.href);
+      if (url.origin !== location.origin || !/^https?:$/.test(url.protocol) || seen.has(url.href)) return false;
+      seen.add(url.href); entry.url = url.href;
+      entry.content = entry.protected ? '' : String(entry.content || '');
+      entry.topics = entry.protected ? '' : String(entry.topics || '');
+      entry.categories = entry.protected ? [] : Array.isArray(entry.categories) ? entry.categories.filter(name => typeof name === 'string') : [];
+      entry.date = String(entry.date || ''); return true;
+    } catch { return false; }
+  });
+  const json = async url => {
+    const controller = new AbortController(); const timer = setTimeout(() => controller.abort(), 10000);
+    try { const response = await fetch(url, { signal: controller.signal }); if (!response.ok) throw new Error('Index unavailable'); return await response.json(); }
+    finally { clearTimeout(timer); }
+  };
+  const ensureBodies = () => {
+    if (bodyLoading || !shards.length || scope !== 'all' || !words().length) return bodyLoading;
+    const pending = shards.filter(url => !loadedShards.has(url));
+    if (!pending.length) return;
+    if (service) service.textContent = t("正在加载正文搜索…");
+    bodyLoading = (async () => {
+      let cursor = 0;
+      const worker = async () => {
+        while (cursor < pending.length) {
+          const url = pending[cursor++]; const data = await json(url);
+          if (!Array.isArray(data)) throw new Error('Invalid shard');
+          const byURL = new Map(normalize(data).map(entry => [entry.url, entry]));
+          entries = entries.map(entry => byURL.get(entry.url) || entry); loadedShards.add(url); render();
+        }
+      };
+      const workers = await Promise.allSettled([worker(), worker()]);
+      if (workers.some(result => result.status === 'rejected')) {
+        if (service) service.textContent = t("部分正文未能加载，当前结果可能不完整。");
+        if (retry) retry.hidden = false;
+      } else {
+        if (service) service.textContent = t("全文索引已就绪 · 空格分隔多个关键词");
+        if (retry) retry.hidden = true;
+      }
+    })().finally(() => { bodyLoading = null; });
+    return bodyLoading;
+  };
   const load = () => {
     if (loaded || loading || !dialog.dataset.searchIndex) return loading;
     if (service) service.textContent = t("正在加载正文搜索…");
     if (retry) retry.hidden = true;
     results.setAttribute('aria-busy', 'true');
     loading = (async () => {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 10000);
       try {
-        const response = await fetch(dialog.dataset.searchIndex, { signal: controller.signal });
-        if (!response.ok) throw new Error('Index unavailable');
-        const data = await response.json();
-        if (!Array.isArray(data)) throw new Error('Invalid index');
-        const seen = new Set();
-        entries = data.filter(entry => {
-          if (!entry || typeof entry.title !== 'string' || typeof entry.url !== 'string') return false;
-          try {
-            const url = new URL(entry.url, location.href);
-            if (url.origin !== location.origin || !/^https?:$/.test(url.protocol) || seen.has(url.href)) return false;
-            seen.add(url.href);
-            entry.url = url.href;
-            entry.content = entry.protected ? '' : String(entry.content || '');
-            entry.topics = entry.protected ? '' : String(entry.topics || '');
-            entry.date = String(entry.date || '');
-            return true;
-          } catch { return false; }
-        });
+        const data = await json(dialog.dataset.searchIndex);
+        if (Array.isArray(data)) entries = normalize(data);
+        else if (data?.version === 2 && Array.isArray(data.entries) && Array.isArray(data.shards)) {
+          entries = normalize(data.entries);
+          shards = data.shards.map(value => new URL(value, location.href)).filter(url => url.origin === location.origin && /^https?:$/.test(url.protocol)).map(url => url.href);
+          if (shards.length !== data.shards.length || shards.length > 1000) throw new Error('Invalid manifest');
+        } else throw new Error('Invalid index');
+        updateCategories();
         loaded = true;
         dialog.dataset.searchReady = 'true';
         if (service) service.textContent = t("全文索引已就绪 · 空格分隔多个关键词");
-        render();
+        render(); ensureBodies();
       } catch {
         if (service) service.textContent = t("全文索引暂不可用，正在使用页面内标题、摘要和标签搜索");
         if (retry) retry.hidden = false;
       } finally {
-        clearTimeout(timeout);
         loading = null;
         results.setAttribute('aria-busy', 'false');
       }
@@ -128,8 +172,9 @@
     return loading;
   };
   dialog.addEventListener('morii:search-open', load);
-  const refresh = () => { visible = pageSize; if (scroll) scroll.scrollTop = 0; render(); };
+  const refresh = () => { visible = pageSize; if (scroll) scroll.scrollTop = 0; render(); ensureBodies(); };
   input.addEventListener('input', refresh);
+  category?.addEventListener('change', refresh);
   dialog.querySelectorAll('[data-search-scope]').forEach(button => button.addEventListener('click', () => {
     scope = button.dataset.searchScope;
     dialog.querySelectorAll('[data-search-scope]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
@@ -153,7 +198,7 @@
     if (event.key === 'ArrowUp' && index <= 0) { input.focus(); return; }
     links[Math.min(links.length - 1, event.key === 'ArrowDown' ? index + 1 : index - 1)].focus();
   });
-  retry?.addEventListener('click', load);
+  retry?.addEventListener('click', () => loaded ? ensureBodies() : load());
   more?.addEventListener('click', () => { visible += pageSize; render(); });
   clear?.addEventListener('click', () => {
     input.value = '';

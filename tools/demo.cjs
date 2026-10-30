@@ -6,7 +6,7 @@ const yaml = require('js-yaml');
 const repository = path.resolve(__dirname, '..');
 const manifest = require('../package.json');
 
-async function buildDemo({ root = process.env.MORII_DEMO_ROOT || '/', url = process.env.MORII_DEMO_URL || 'https://example.test', themeOverrides = {}, language } = {}) {
+async function buildDemo({ root = process.env.MORII_DEMO_ROOT || '/', url = process.env.MORII_DEMO_URL || 'https://example.test', themeOverrides = {}, language, sourceOverrides = {} } = {}) {
   if (!root.startsWith('/') || root.startsWith('//') || !root.endsWith('/') || /[?#\\]|\.\./.test(root)) throw new Error('Demo root must be an absolute directory path ending in /.');
   const base = new URL(url);
   if (!/^https?:$/.test(base.protocol) || base.username || base.password) throw new Error('Demo URL must use HTTP(S) without credentials.');
@@ -14,6 +14,12 @@ async function buildDemo({ root = process.env.MORII_DEMO_ROOT || '/', url = proc
   fs.rmSync(site, { recursive: true, force: true });
   fs.mkdirSync(path.join(site, 'themes'), { recursive: true });
   fs.cpSync(path.join(repository, 'demo/source'), path.join(site, 'source'), { recursive: true });
+  for (const [name, content] of Object.entries(sourceOverrides)) {
+    const source = path.join(site, 'source');
+    const destination = path.resolve(source, name);
+    if (!destination.startsWith(source + path.sep) || typeof content !== 'string') throw new Error('Invalid demo source override.');
+    fs.mkdirSync(path.dirname(destination), { recursive: true }); fs.writeFileSync(destination, content);
+  }
   // The fixture resolves only the dependencies declared by the standalone theme repo.
   const plugins = Object.fromEntries(Object.entries(manifest.devDependencies).filter(([name]) => name.startsWith('hexo-')));
   fs.writeFileSync(path.join(site, 'package.json'), JSON.stringify({ name: 'morii-demo', private: true, hexo: { version: manifest.devDependencies.hexo }, dependencies: plugins }));

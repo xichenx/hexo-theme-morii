@@ -103,63 +103,84 @@
   }
 
   const service = document.getElementById('comment-service');
+  const recent = document.querySelector('[data-recent-comments]');
+  if (!service && !recent) return;
+  const provider = service?.dataset.provider || 'twikoo';
+  const client = () => provider === 'waline' ? window.Waline : window.twikoo;
+  let script;
+  let scriptLoading;
+  const loadScript = () => {
+    if (typeof client()?.init === 'function') return Promise.resolve();
+    if (scriptLoading) return scriptLoading;
+    scriptLoading = new Promise((resolve, reject) => {
+      script?.remove(); script = document.createElement('script');
+      script.src = (service || recent).dataset.script; script.async = true;
+      const timer = setTimeout(() => { script.remove(); reject(new Error('Comment script timeout')); }, 12000);
+      script.onload = () => { clearTimeout(timer); resolve(); };
+      script.onerror = () => { clearTimeout(timer); script.remove(); reject(new Error('Comment script unavailable')); };
+      document.head.append(script);
+    }).finally(() => { scriptLoading = null; });
+    return scriptLoading;
+  };
+  const whenVisible = (element, action) => {
+    if (typeof IntersectionObserver !== 'function') { if (element === recent) action(); return; }
+    const observer = new IntersectionObserver(entries => { if (entries.some(entry => entry.isIntersecting)) { observer.disconnect(); action(); } }, { rootMargin: '180px' });
+    observer.observe(element);
+  };
+  if (recent) {
+    let pending = false;
+    const list = recent.querySelector('[data-recent-list]');
+    const status = recent.querySelector('[data-recent-status]');
+    const retry = recent.querySelector('[data-recent-retry]');
+    const loadRecent = async () => {
+      if (pending) return;
+      pending = true; retry.hidden = true; status.hidden = false; status.textContent = t("正在加载评论…");
+      let timeout;
+      try {
+        await loadScript();
+        if (typeof window.twikoo?.getRecentComments !== 'function') throw new Error('Recent comments unavailable');
+        const data = await Promise.race([window.twikoo.getRecentComments({ envId: recent.dataset.env, pageSize: Number(recent.dataset.limit) || 5, includeReply: false }), new Promise((resolve, reject) => { timeout = setTimeout(() => reject(new Error('Timeout')), 12000); })]);
+        if (!Array.isArray(data)) throw new Error('Invalid recent comments');
+        list.replaceChildren(...data.slice(0, 10).flatMap(item => {
+          let url; try { url = new URL(item.url, location.href); if (url.origin !== location.origin || !/^https?:$/.test(url.protocol)) return []; } catch { return []; }
+          const row = document.createElement('li'); const link = document.createElement('a'); link.href = url.href;
+          const nick = document.createElement('strong'); nick.textContent = String(item.nick || t("访客")).slice(0, 80);
+          const comment = document.createElement('span'); comment.textContent = String(item.commentText || '').slice(0, 120);
+          link.append(nick, comment); row.append(link); return [row];
+        }));
+        status.textContent = t("暂时还没有评论。"); status.hidden = list.children.length > 0;
+      } catch { status.textContent = t("评论服务暂时不可用，可以稍后重新加载。"); retry.hidden = false; }
+      finally { clearTimeout(timeout); pending = false; }
+    };
+    retry.addEventListener('click', loadRecent); whenVisible(recent, loadRecent);
+  }
   if (!service) return;
   const status = service.querySelector('.comment-status');
   const button = document.getElementById('comments-load');
   let loading = false;
   let loaded = false;
-  let script;
-
-  const loadScript = () => {
-    if (typeof window.twikoo?.init === 'function') return Promise.resolve();
-    return new Promise((resolve, reject) => {
-      script?.remove();
-      script = document.createElement('script');
-      script.src = service.dataset.script;
-      script.async = true;
-      const timer = setTimeout(() => { script.remove(); reject(new Error('Comment script timeout')); }, 12000);
-      script.onload = () => { clearTimeout(timer); resolve(); };
-      script.onerror = () => { clearTimeout(timer); script.remove(); reject(new Error('Comment script unavailable')); };
-      document.head.append(script);
-    });
-  };
   const loadComments = async () => {
     if (loading || loaded) return;
-    loading = true;
-    button.disabled = true;
-    service.setAttribute('aria-busy', 'true');
-    status.textContent = t("正在加载评论…");
+    loading = true; button.disabled = true; service.setAttribute('aria-busy', 'true'); status.textContent = t("正在加载评论…");
+    let initTimeout;
     try {
       await loadScript();
-      if (typeof window.twikoo?.init !== 'function' || !service.dataset.env) throw new Error('Comment configuration unavailable');
-      let initTimeout;
-      try {
-        await Promise.race([
-          window.twikoo.init({ el: '#twikoo', envId: service.dataset.env }),
-          new Promise((resolve, reject) => { initTimeout = setTimeout(() => reject(new Error('Comment service timeout')), 15000); })
-        ]);
-      } finally { clearTimeout(initTimeout); }
-      loaded = true;
-      button.hidden = true;
-      status.hidden = true;
+      if (typeof client()?.init !== 'function') throw new Error('Comment client unavailable');
+      let options;
+      if (provider === 'waline') {
+        if (!service.dataset.server) throw new Error('Comment configuration unavailable');
+        if (!document.querySelector('[data-waline-style]')) { const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = service.dataset.style; css.dataset.walineStyle = ''; document.head.append(css); }
+        options = { el: '#waline', serverURL: service.dataset.server, path: location.pathname, lang: document.documentElement.lang || 'zh-CN', dark: 'html[data-theme="dark"]' };
+      } else {
+        if (!service.dataset.env) throw new Error('Comment configuration unavailable');
+        options = { el: '#twikoo', envId: service.dataset.env, lang: document.documentElement.lang || 'zh-CN' };
+      }
+      await Promise.race([Promise.resolve(client().init(options)), new Promise((resolve, reject) => { initTimeout = setTimeout(() => reject(new Error('Comment service timeout')), 15000); })]);
+      loaded = true; button.hidden = true; status.hidden = true;
     } catch (error) {
-      status.hidden = false;
-      status.textContent = t("评论服务暂时不可用，可以稍后重新加载。");
-      console.warn('[Morii comments]', error);
-      button.textContent = t("重新加载评论");
-    } finally {
-      loading = false;
-      button.disabled = false;
-      service.setAttribute('aria-busy', 'false');
-    }
+      status.hidden = false; status.textContent = t("评论服务暂时不可用，可以稍后重新加载。");
+      console.warn('[Morii comments]', error); button.textContent = t("重新加载评论");
+    } finally { clearTimeout(initTimeout); loading = false; button.disabled = false; service.setAttribute('aria-busy', 'false'); }
   };
-  button.addEventListener('click', loadComments);
-  if (typeof IntersectionObserver === 'function') {
-    const observer = new IntersectionObserver(entries => {
-      if (!entries.some(entry => entry.isIntersecting)) return;
-      observer.disconnect();
-      loadComments();
-    }, { rootMargin: '180px' });
-    observer.observe(service);
-  }
+  button.addEventListener('click', loadComments); whenVisible(service, loadComments);
 })();

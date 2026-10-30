@@ -95,3 +95,17 @@
 @media (max-width: 800px) {
   .reading-resume { align-items: flex-start; flex-direction: column; gap: 14px; padding: 16px; }
 }
+
+.article-note { margin:24px 0; padding:18px 22px; border:1px solid var(--line); border-left:4px solid #648887; border-radius:14px; background:color-mix(in srgb,#648887 7%,var(--surface)); }
+.article-note--tip { border-left-color:#39966e; }
+.article-note--warning { border-left-color:#c7953b; }
+.article-note--danger { border-left-color:#cb6965; }
+.article-note > :first-child { margin-top:0; } .article-note > :last-child { margin-bottom:0; }
+.code-filename { margin-right:auto; font-size:12px; font-family:monospace; overflow-wrap:anywhere; }
+.article-body .highlight .line.marked { display:inline-block; min-width:100%; background:color-mix(in srgb,var(--brand-color) 15%,transparent); }
+.article-diagram { margin:24px 0; padding:18px; border:1px solid var(--line); border-radius:18px; background:var(--surface); }
+.article-diagram-image { overflow:auto; text-align:center; }
+.article-diagram-image svg { max-width:100%; height:auto; }
+.article-diagram summary,.enhancement-retry { color:var(--brand-color); font-size:13px; cursor:pointer; }
+.article-diagram details { margin-top:12px; }
+.morii-math[data-display='true'] { display:block; overflow-x:auto; margin:24px 0; }

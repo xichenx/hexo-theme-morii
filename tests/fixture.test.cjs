@@ -77,17 +77,17 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       }
       const music = JSON.parse(document.querySelector('#morii-audio-hub').dataset.musicConfig);
       assert.ok(music.remote && music.remote.api.startsWith('https://'));
-      const musicStyle = document.querySelector('link[href*="music.css"]');
-      assert.match(musicStyle.href, /music\.css\?v=full-stage-2$/);
+      const musicStyle = document.querySelector('link[href*="/css/music."]');
+      assert.match(musicStyle.href, /music\.[a-f0-9]{12}\.css$/);
       assert.equal(musicStyle.media, file === 'music/index.html' ? '' : 'print', `${file}: inactive music styles must not block first paint`);
-      for (const name of ['search', 'motion']) assert.equal(document.querySelector(`link[href$="/css/${name}.css"]`)?.media, 'print');
+      for (const name of ['search', 'motion']) assert.equal(document.querySelector(`link[href*="/css/${name}."]`)?.media, 'print');
       dom.window.close();
     }
     const index = JSON.parse(fs.readFileSync(path.join(output, 'morii-search.json'), 'utf8'));
     const cinemaDom = new JSDOM(fs.readFileSync(path.join(output, 'cinema/index.html'), 'utf8'), { url: `https://example.test${prefix}cinema/`, runScripts: 'outside-only' });
     const cinema = cinemaDom.window.document;
-    assert.match(cinema.querySelector('link[href*="cinema.css"]').href, /cinema\.css\?v=wide-catalog-1$/);
-    assert.match(cinema.querySelector('script[src*="cinema.js"]').src, /cinema\.js\?v=wide-catalog-1$/);
+    assert.match(cinema.querySelector('link[href*="/css/cinema."]').href, /cinema\.[a-f0-9]{12}\.css$/);
+    assert.match(cinema.querySelector('script[src*="/js/cinema."]').src, /cinema\.[a-f0-9]{12}\.js$/);
     const cinemaVideo = cinema.querySelector('[data-cinema-video]');
     cinemaVideo.load = () => {};
     cinemaVideo.pause = () => {};
@@ -158,7 +158,7 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
     const documentFor = file => new JSDOM(fs.readFileSync(path.join(output, file, 'index.html'), 'utf8')).window.document;
     const home = documentFor('');
     assert.equal(home.querySelector('.morii-atmosphere'), null);
-    assert.equal(home.querySelector('script[src$="/js/effects.js"], link[href$="/css/effects.css"]'), null);
+    assert.equal(home.querySelector('script[src*="/js/effects."], link[href*="/css/effects."]'), null);
     assert.equal(home.documentElement.hasAttribute('data-glass'), false);
     assert.equal(home.querySelector('#effects-dialog, [data-open-effects]'), null);
     const overview = documentFor('categories');
@@ -203,4 +203,29 @@ test('English and Traditional Chinese build at a subpath with cached locale asse
       dom.window.close();
     }
   }
+});
+
+test('optional enhancements and Waline produce configured assets and safe sharing metadata', async () => {
+  const output = await buildDemo({ root: '/theme/', sourceOverrides: { 'comments/index.md': '---\ntitle: 留言板\ncomments: true\n---\n欢迎留言。' }, themeOverrides: {
+    article: { enhancements: { mermaid: true, math: true } },
+    comments: { enable: true, provider: 'waline', server_url: 'https://comments.example.test' },
+    seo: { default_image: '/share.jpg', structured_data: true }
+  } });
+  const dom = new JSDOM(fs.readFileSync(path.join(output, 'posts/welcome/index.html'), 'utf8'));
+  const d = dom.window.document;
+  assert.match(d.querySelector('script[data-mermaid]').dataset.mermaid, /mermaid@11\.12\.0/);
+  assert.match(d.querySelector('script[data-math]').dataset.math, /katex@0\.19\.1/);
+  assert.ok(d.querySelector('.article-note--tip')); assert.equal(d.querySelector('.code-file').dataset.filename, 'app.js'); assert.ok(d.querySelector('.line.marked'));
+  const data = JSON.parse(d.querySelector('script[type="application/ld+json"]').textContent);
+  const article = data['@graph'].find(item => item['@type'] === 'BlogPosting');
+  assert.equal(article.mainEntityOfPage['@id'], 'https://example.test/theme/posts/welcome/');
+  assert.match(article.image[0], /\/theme\/images\/covers\/welcome.jpg$/);
+  assert.equal(d.querySelector('meta[name="twitter:card"]').content, 'summary_large_image');
+  // This article explicitly disables comments; a normal page uses the selected provider.
+  assert.equal(d.querySelector('#comment-service'), null);
+  const about = new JSDOM(fs.readFileSync(path.join(output, 'comments/index.html'), 'utf8'));
+  const service = about.window.document.getElementById('comment-service');
+  assert.equal(service.dataset.provider, 'waline'); assert.equal(service.dataset.server, 'https://comments.example.test/'); assert.ok(service.querySelector('#waline'));
+  assert.ok(about.window.document.querySelector('script[src*="/js/services."]'));
+  dom.window.close(); about.window.close();
 });

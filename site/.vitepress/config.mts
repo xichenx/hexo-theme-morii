@@ -20,7 +20,8 @@ const reference = {
     { text: '首页内容与推荐', link: '/config/home' },
     { text: '文章与阅读功能', link: '/config/article' },
     { text: '侧栏、小组件与页脚', link: '/config/widgets' },
-    { text: '搜索、社交与评论', link: '/features/interaction' }
+    { text: '搜索、社交与评论', link: '/features/interaction' },
+    { text: '稳定性与技术写作增强', link: '/config/iteration' }
   ]
 }
 const features = {
