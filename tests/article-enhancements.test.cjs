@@ -29,3 +29,19 @@ test('diagram failures preserve source and math rendering uses untrusted mode', 
   assert.equal(calls[0].securityLevel, 'strict'); assert.match(w.document.querySelector('.morii-diagram-source').textContent, /graph TD/); assert.ok(w.document.querySelector('.enhancement-retry'));
   assert.equal(w.document.querySelector('.morii-math').dataset.rendered, 'true'); dom.window.close();
 });
+
+test('diagrams redraw for theme changes while keeping one figure and the source disclosure state', async () => {
+  const dom = new JSDOM('<article class="article-body"><pre class="morii-diagram-source">graph TD; A-->B;</pre></article><script id="config" data-mermaid="/mermaid.js"></script>', { runScripts: 'outside-only' });
+  const w = dom.window; const themes = []; const ids = []; let fail = false;
+  Object.defineProperty(w.document, 'currentScript', { value: w.document.getElementById('config'), configurable: true });
+  w.mermaid = { initialize: options => themes.push(options.theme), render: async (id, code) => { assert.match(code, /A-->B/); ids.push(id); if (fail) throw Error('retry'); return { svg: `<svg id="${id}"><title>Graph</title></svg>` }; } };
+  w.eval(source); await new Promise(resolve => setImmediate(resolve));
+  w.document.querySelector('.article-diagram details').open = true;
+  w.document.documentElement.dataset.theme = 'dark'; await new Promise(resolve => setImmediate(resolve));
+  assert.equal(themes.at(-1), 'dark'); assert.equal(w.document.querySelectorAll('.article-diagram').length, 1); assert.equal(w.document.querySelector('details').open, true);
+  fail = true; w.document.documentElement.dataset.theme = 'light'; await new Promise(resolve => setImmediate(resolve));
+  assert.ok(w.document.querySelector('.article-diagram svg')); assert.ok(w.document.querySelector('.enhancement-retry'));
+  fail = false; w.document.querySelector('.enhancement-retry').click(); await new Promise(resolve => setImmediate(resolve));
+  assert.equal(themes.at(-1), 'default'); assert.equal(w.document.querySelectorAll('.article-diagram').length, 1); assert.equal(w.document.querySelector('.enhancement-retry'), null);
+  assert.equal(new Set(ids).size, ids.length); dom.window.close();
+});

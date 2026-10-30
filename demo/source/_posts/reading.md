@@ -1,4 +1,6 @@
 ---
+series: morii-guide
+series_order: 2
 title: 舒适的阅读体验
 date: 2026-10-14 12:00:00
 categories:

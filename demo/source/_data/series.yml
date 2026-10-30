@@ -1,0 +1,10 @@
+morii-guide:
+  title:
+    zh-CN: 用 Morii 开始写作
+    zh-TW: 用 Morii 開始寫作
+    en: Start writing with Morii
+  description:
+    zh-CN: 从基础配置到阅读体验，循序渐进地搭建自己的小站。
+    zh-TW: 從基本設定到閱讀體驗，循序漸進地建立自己的小站。
+    en: Build your own space, from basic settings to comfortable reading.
+  order: 1

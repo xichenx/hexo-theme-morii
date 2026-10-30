@@ -2,10 +2,21 @@ extends includes/layout.pug
 
 block content
   - var articleCover = page.top_img === false ? null : page.top_img || page.cover
-  header.article-header.post-hero(class=articleCover ? 'has-cover' : '')
+  - var heroCover = articleCover ? morii_cover(articleCover, page, 'hero') : null
+  header.article-header.post-hero(class=articleCover ? 'has-cover' : '' data-cover-frame=articleCover ? '' : null style=heroCover && heroCover.color && (!theme.images || theme.images.cover_tone !== false) ? '--cover-tone:' + heroCover.color : null)
     if articleCover
-      img.article-cover(src=url_for(articleCover) alt='' aria-hidden='true' fetchpriority='high')
+      img.article-cover(src=heroCover.src srcset=heroCover.srcset sizes=heroCover.sizes width=heroCover.width height=heroCover.height alt='' aria-hidden='true' fetchpriority='high' decoding='async')
     .post-hero-inner
+      nav.article-breadcrumb(aria-label=morii_t('面包屑导航'))
+        a(href=url_for('/')) #{morii_t('首页')}
+        span(aria-hidden='true') /
+        a(href=url_for('/archives/')) #{morii_t('文章')}
+        - var breadcrumbSeries = morii_series(page)
+        if breadcrumbSeries
+          span(aria-hidden='true') /
+          a(href=url_for(breadcrumbSeries.path))= breadcrumbSeries.title
+        span(aria-hidden='true') /
+        span(aria-current='page')= page.title
       .article-kicker
         a.article-type(href=url_for('/archives/')) #{morii_t("文章")}
         if page.categories && page.categories.length
@@ -39,6 +50,7 @@ block content
           .reading-resume__actions
             button.reading-preference-button#reading-resume-continue(type='button') #{morii_t("继续阅读 →")}
             button.reading-preference-button#reading-resume-clear(type='button') #{morii_t("清除本篇记录")}
+      include includes/article-series.pug
       include includes/outdated-notice.pug
       details.mobile-toc
         summary #{morii_t("本文目录")}
@@ -61,6 +73,7 @@ block content
         .print-source
           p #{config.title} · #{config.author}
           p #{morii_t("原文：")}#[a(href=full_url_for((page.path || '').replace(/index\.html$/, '')))=full_url_for((page.path || '').replace(/index\.html$/, ''))]
+      include includes/series-navigation.pug
       include includes/article-discovery.pug
       include includes/comments.pug
     aside.reading-aside

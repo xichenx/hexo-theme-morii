@@ -119,7 +119,7 @@
       if (tocDialog?.open && tocDialog.contains(link)) tocDialog.close();
     }));
 
-    const blocks = [...article.querySelectorAll('figure.highlight'), ...article.querySelectorAll('pre')].filter(block => block.matches('figure.highlight') || !block.closest('figure.highlight'));
+    const blocks = [...article.querySelectorAll('figure.highlight'), ...article.querySelectorAll('pre')].filter(block => !block.matches('.morii-diagram-source') && (block.matches('figure.highlight') || !block.closest('figure.highlight')));
     blocks.forEach(block => {
       if (block.dataset.copyReady) return;
       block.dataset.copyReady = 'true';

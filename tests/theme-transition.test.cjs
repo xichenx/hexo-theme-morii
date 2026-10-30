@@ -103,3 +103,15 @@ test('deferred noncritical styles activate when theme behavior starts', () => {
   assert.equal(dom.window.document.querySelector('link[href="/css/style.css"]').media, '');
   dom.window.close();
 });
+
+test('cover frames reserve a loading state and recover to ready or star fallback without replacing image sources', () => {
+  const dom = new JSDOM('<a data-cover-frame><img src="/cover.webp" alt="Cover"></a>', { url: 'https://example.test/', runScripts: 'outside-only' });
+  const w = dom.window, image = w.document.querySelector('img'); let loaded = false;
+  Object.defineProperty(image, 'complete', { get: () => loaded }); Object.defineProperty(image, 'naturalWidth', { get: () => loaded ? 480 : 0 });
+  w.matchMedia = () => ({ matches: false, addEventListener() {} });
+  w.eval(fs.readFileSync(path.join(__dirname, '../source/js/theme.js'), 'utf8'));
+  assert.equal(image.parentElement.dataset.imageState, 'loading');
+  loaded = true; image.dispatchEvent(new w.Event('load')); assert.equal(image.parentElement.dataset.imageState, 'ready');
+  image.dispatchEvent(new w.Event('error')); assert.equal(image.parentElement.dataset.imageState, 'error'); assert.equal(image.getAttribute('src'), '/cover.webp');
+  dom.window.close();
+});

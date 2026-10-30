@@ -12,7 +12,10 @@ const PAGES = [
   'album/index.html',
   'album/morii/index.html',
   'music/index.html',
-  'cinema/index.html'
+  'cinema/index.html',
+  'series/index.html',
+  'series/morii-guide/index.html',
+  'posts/reading/index.html'
 ];
 const KIB = 1024;
 const BUDGET = {

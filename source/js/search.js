@@ -20,6 +20,73 @@
     protected: item.dataset.protected === 'true'
   }));
   let shards = [];
+  let inverted;
+  let indexVersion = 1;
+  let renderTicket = 0;
+  let entriesRevision = 0;
+  let workerEntriesRevision = -1;
+  let workerEntriesSync;
+  let restartBodies = false;
+  const bucketCache = new Map();
+  let corePromise;
+  let worker;
+  let workerReady;
+  let workerFailed = false;
+  let requestId = 0;
+  const requests = new Map();
+  const stopWorker = () => {
+    worker?.terminate(); worker = null; workerReady = null; workerFailed = true;
+    for (const request of requests.values()) { clearTimeout(request.timer); request.reject(new Error('Worker unavailable')); } requests.clear();
+  };
+  window.addEventListener('pagehide', stopWorker);
+  window.addEventListener('pageshow', event => { if (event.persisted) workerFailed = false; });
+  const core = () => {
+    if (window.MoriiSearchEngine) return Promise.resolve(window.MoriiSearchEngine);
+    if (corePromise) return corePromise;
+    corePromise = new Promise((resolve, reject) => {
+      if (!dialog.dataset.searchEngine) { reject(new Error('No search engine')); return; }
+      const script = document.createElement('script'); script.src = dialog.dataset.searchEngine;
+      const timer = setTimeout(() => { script.remove(); reject(new Error('Search engine timeout')); }, 8000);
+      script.onload = () => { clearTimeout(timer); window.MoriiSearchEngine ? resolve(window.MoriiSearchEngine) : reject(new Error('Missing search engine')); };
+      script.onerror = () => { clearTimeout(timer); script.remove(); reject(new Error('Search engine unavailable')); };
+      document.head.append(script);
+    }).catch(error => { corePromise = null; throw error; });
+    return corePromise;
+  };
+  const send = (method, payload) => new Promise((resolve, reject) => {
+    const id = ++requestId;
+    const timer = setTimeout(() => { requests.delete(id); reject(new Error('Search worker timeout')); }, 5000);
+    requests.set(id, { resolve, reject, timer });
+    try { worker.postMessage({ id, method, payload }); } catch (error) { clearTimeout(timer); requests.delete(id); reject(error); }
+  });
+  const compute = async (method, payload) => {
+    const originalPayload = payload;
+    const engine = await core();
+    if (method === 'rank' && payload.ticket !== renderTicket) return [];
+    if (!workerFailed && dialog.dataset.searchWorker && typeof Worker === 'function') {
+      try {
+        if (!worker) {
+          worker = new Worker(dialog.dataset.searchWorker); workerEntriesRevision = -1;
+          worker.onmessage = event => {
+            const request = requests.get(event.data?.id); if (!request) return;
+            clearTimeout(request.timer); requests.delete(event.data.id);
+            if (event.data.error) request.reject(new Error(event.data.error)); else request.resolve(event.data.result);
+          };
+          worker.onerror = stopWorker;
+          workerReady = send('init', { engine: new URL(dialog.dataset.searchEngine, location.href).href });
+        }
+        await workerReady;
+        if (method === 'rank') {
+          if (payload.ticket !== renderTicket) return [];
+          if (workerEntriesRevision !== payload.revision) { workerEntriesRevision = payload.revision; workerEntriesSync = send('entries', { entries: payload.entries }); }
+          await workerEntriesSync;
+          const { entries, ...query } = payload; payload = query;
+        }
+        const result = await send(method, payload); dialog.dataset.searchMode = 'worker'; return result;
+      } catch { stopWorker(); }
+    }
+    dialog.dataset.searchMode = 'main'; return engine[method](originalPayload);
+  };
   let bodyLoading;
   const loadedShards = new Set();
   const category = document.getElementById('search-category');
@@ -58,13 +125,22 @@
       position = start + length;
     }
   };
-  const render = () => {
-    const keywords = words();
-    const matches = entries.map((entry, index) => {
+  const legacyMatches = keywords => {
+    return entries.map((entry, index) => {
       const title = entry.title.toLowerCase();
       const haystack = scope === 'title' ? title : scope === 'topics' ? entry.topics.toLowerCase() : `${title} ${entry.content.toLowerCase()} ${entry.topics.toLowerCase()}`;
       return { entry, index, match: (!category?.value || entry.categories?.includes(category.value)) && keywords.every(word => haystack.includes(word)), score: (input.value.trim() && title === input.value.trim().toLowerCase() ? 20 : input.value.trim() && title.includes(input.value.trim().toLowerCase()) ? 10 : 0) + keywords.reduce((sum, word) => sum + (title.includes(word) ? 3 : entry.topics.toLowerCase().includes(word) ? 1 : 0), 0) };
     }).filter(item => item.match).sort((a, b) => b.score - a.score || a.index - b.index);
+  };
+  const render = () => {
+    const keywords = words(), ticket = ++renderTicket;
+    if (indexVersion !== 3) { draw(legacyMatches(keywords), keywords); return; }
+    const snapshot = entries;
+    compute('rank', { entries: snapshot, revision: entriesRevision, ticket, words: keywords, query: input.value, scope, category: category?.value || '' }).then(matches => {
+      if (ticket === renderTicket) draw(matches.map(match => ({ ...match, entry: snapshot[match.index] })), keywords);
+    }).catch(() => { if (ticket === renderTicket) draw(legacyMatches(keywords), keywords); });
+  };
+  const draw = (matches, keywords) => {
     const focused = document.activeElement?.closest?.('#search-results a');
     const focusedUrl = focused?.href;
     results.replaceChildren(...matches.slice(0, visible).map(({ entry }) => {
@@ -79,11 +155,12 @@
       summary.className = 'search-result-summary';
       if (entry.protected) summary.textContent = t("加密文章 · 输入密码后阅读全文");
       else {
-        const lower = entry.content.toLowerCase();
+        const content = entry.content || entry.summary || '';
+        const lower = content.toLowerCase();
         const offsets = keywords.map(word => lower.indexOf(word)).filter(index => index >= 0);
         const start = offsets.length ? Math.max(0, Math.min(...offsets) - 32) : 0;
-        const text = entry.content.slice(start, start + 150);
-        highlight(summary, `${start ? '…' : ''}${text}${start + 150 < entry.content.length ? '…' : ''}`, keywords);
+        const text = content.slice(start, start + 150);
+        highlight(summary, `${start ? '…' : ''}${text}${start + 150 < content.length ? '…' : ''}`, keywords);
       }
       const meta = document.createElement('small');
       meta.textContent = [entry.date, entry.protected ? t("加密文章") : entry.topics].filter(Boolean).join(' · ');
@@ -108,6 +185,7 @@
       entry.content = entry.protected ? '' : String(entry.content || '');
       entry.topics = entry.protected ? '' : String(entry.topics || '');
       entry.categories = entry.protected ? [] : Array.isArray(entry.categories) ? entry.categories.filter(name => typeof name === 'string') : [];
+      entry.summary = entry.protected ? '' : String(entry.summary || '');
       entry.date = String(entry.date || ''); return true;
     } catch { return false; }
   });
@@ -117,18 +195,44 @@
     finally { clearTimeout(timer); }
   };
   const ensureBodies = () => {
-    if (bodyLoading || !shards.length || scope !== 'all' || !words().length) return bodyLoading;
-    const pending = shards.filter(url => !loadedShards.has(url));
-    if (!pending.length) return;
+    if (!shards.length || scope !== 'all' || !words().length) return bodyLoading;
+    if (bodyLoading) { restartBodies = true; return bodyLoading; }
+    const query = input.value;
+    const keywords = words();
+    restartBodies = false;
     if (service) service.textContent = t("正在加载正文搜索…");
     bodyLoading = (async () => {
+      let selected = shards;
+      if (indexVersion === 3) {
+        try {
+          const engine = await core(), terms = engine.queryTerms(keywords), postings = Object.create(null);
+          const urls = [...new Set(terms.map(term => inverted.buckets[engine.bucketFor(term, inverted.count)]))];
+          // Only the term buckets for this query are fetched, not the complete inverted index.
+          const buckets = await Promise.all(urls.map(url => {
+            if (!bucketCache.has(url)) bucketCache.set(url, json(url).catch(error => { bucketCache.delete(url); throw error; }));
+            return bucketCache.get(url);
+          }));
+          if (buckets.some(bucket => !bucket || typeof bucket !== 'object' || Array.isArray(bucket))) throw new Error('Invalid keyword bucket');
+          for (const bucket of buckets) for (const term of terms) if (Object.hasOwn(bucket, term)) postings[term] = bucket[term];
+          const ids = new Set(await compute('candidates', { terms, postings }));
+          const needed = new Set(entries.filter(entry => ids.has(entry.id) && !entry.protected).map(entry => entry.shard));
+          selected = shards.filter((url, index) => needed.has(index));
+        } catch { if (service) service.textContent = t("索引分片暂不可用，已回退为完整正文搜索。"); }
+      }
+      if (input.value !== query || scope !== 'all') { restartBodies = true; return; }
+      const pending = selected.filter(url => !loadedShards.has(url));
       let cursor = 0;
       const worker = async () => {
         while (cursor < pending.length) {
-          const url = pending[cursor++]; const data = await json(url);
+          if (input.value !== query || scope !== 'all') { restartBodies = true; break; }
+          const url = pending[cursor++], data = await json(url);
           if (!Array.isArray(data)) throw new Error('Invalid shard');
           const byURL = new Map(normalize(data).map(entry => [entry.url, entry]));
-          entries = entries.map(entry => byURL.get(entry.url) || entry); loadedShards.add(url); render();
+          entries = entries.map(entry => {
+            const incoming = byURL.get(entry.url);
+            return incoming ? { ...entry, ...incoming, ...(entry.protected ? { protected: true, content: '', summary: '', topics: '', categories: [] } : {}) } : entry;
+          });
+          entriesRevision++; loadedShards.add(url); render();
         }
       };
       const workers = await Promise.allSettled([worker(), worker()]);
@@ -139,7 +243,8 @@
         if (service) service.textContent = t("全文索引已就绪 · 空格分隔多个关键词");
         if (retry) retry.hidden = true;
       }
-    })().finally(() => { bodyLoading = null; });
+      render();
+    })().finally(() => { bodyLoading = null; if (restartBodies) ensureBodies(); });
     return bodyLoading;
   };
   const load = () => {
@@ -151,12 +256,20 @@
       try {
         const data = await json(dialog.dataset.searchIndex);
         if (Array.isArray(data)) entries = normalize(data);
-        else if (data?.version === 2 && Array.isArray(data.entries) && Array.isArray(data.shards)) {
+        else if ([2, 3].includes(data?.version) && Array.isArray(data.entries) && Array.isArray(data.shards)) {
           entries = normalize(data.entries);
           shards = data.shards.map(value => new URL(value, location.href)).filter(url => url.origin === location.origin && /^https?:$/.test(url.protocol)).map(url => url.href);
           if (shards.length !== data.shards.length || shards.length > 1000) throw new Error('Invalid manifest');
+          indexVersion = data.version;
+          if (indexVersion === 3) {
+            const info = data.inverted;
+            if (!info || !Number.isInteger(info.count) || info.count < 1 || info.count > 256 || !Array.isArray(info.buckets) || info.buckets.length !== info.count || !entries.every(entry => Number.isInteger(entry.id) && entry.id >= 0 && Number.isInteger(entry.shard) && entry.shard >= 0 && entry.shard < shards.length)) throw new Error('Invalid inverted index');
+            const buckets = info.buckets.map(value => new URL(value, location.href));
+            if (buckets.some(url => url.origin !== location.origin || !/^https?:$/.test(url.protocol))) throw new Error('Invalid inverted bucket');
+            inverted = { count: info.count, buckets: buckets.map(url => url.href) };
+          }
         } else throw new Error('Invalid index');
-        updateCategories();
+        entriesRevision++; updateCategories();
         loaded = true;
         dialog.dataset.searchReady = 'true';
         if (service) service.textContent = t("全文索引已就绪 · 空格分隔多个关键词");

@@ -1,4 +1,6 @@
 ---
+series: morii-guide
+series_order: 1
 title: 把主题变成自己的样子
 date: 2026-10-11 12:00:00
 categories:

@@ -1,0 +1,12 @@
+- var articleSeries = morii_series(page)
+if articleSeries
+  details.article-series(open)
+    summary
+      span #{morii_t('系列目录')}
+      strong= articleSeries.title
+      small #{morii_t('第 {0} / {1} 篇', articleSeries.index + 1, articleSeries.posts.length)}
+    ol
+      each item in articleSeries.posts
+        li
+          a(href=url_for(item.path) aria-current=item.path === page.path ? 'page' : null)= item.title
+    a.text-link(href=url_for(articleSeries.path)) #{morii_t('查看专题 →')}

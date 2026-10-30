@@ -1,4 +1,4 @@
-dialog.search-dialog#search-dialog(aria-labelledby='search-heading' data-search-script=morii_asset('/js/search.js') data-search-index=url_for(morii_search_index()) data-page-size=(theme.search && theme.search.page_size) || 10)
+dialog.search-dialog#search-dialog(aria-labelledby='search-heading' data-search-engine=morii_asset('/js/search-engine.js') data-search-worker=(!theme.search || theme.search.worker !== false) ? morii_asset('/js/search-worker.js') : null data-search-script=morii_asset('/js/search.js') data-search-index=url_for(morii_search_index()) data-page-size=(theme.search && theme.search.page_size) || 10)
   .search-header
     .search-dialog__top
       div

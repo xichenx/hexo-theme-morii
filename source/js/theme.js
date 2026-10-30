@@ -21,6 +21,13 @@
   };
   brandLogo?.addEventListener('error', restoreBrandMark, { once: true });
   if (brandLogo?.complete && brandLogo.naturalWidth === 0) restoreBrandMark();
+  document.querySelectorAll('[data-cover-frame] > img').forEach(image => {
+    const frame = image.parentElement;
+    const ready = () => { frame.dataset.imageState = image.naturalWidth > 0 ? 'ready' : 'error'; };
+    image.addEventListener('load', ready);
+    image.addEventListener('error', () => { frame.dataset.imageState = 'error'; });
+    if (image.complete) ready(); else frame.dataset.imageState = 'loading';
+  });
   const reducedThemeMotion = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
   let themeTransition;
   const applyTheme = next => {

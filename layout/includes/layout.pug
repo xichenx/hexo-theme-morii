@@ -8,6 +8,8 @@ html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || them
     meta(name='theme-color' content=theme.accent)
     - var documentTitle = morii_page_title(page)
     - var documentDescription = is_post() ? morii_excerpt(page, 160) : page.description || config.description
+    if page.type === 'series_detail'
+      - documentDescription = morii_series(page.series_key).description || config.description
     - var canonicalUrl = full_url_for((page.path || '').replace(/index\.html$/, ''))
     meta(name='description' content=documentDescription)
     title= is_home() && (!page.current || page.current === 1) ? config.title : documentTitle + ' · ' + config.title
@@ -53,6 +55,8 @@ html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || them
       link(rel='stylesheet' href=morii_asset('/css/music.css') media='print' data-deferred-style)
     if page.type === 'cinema'
       link(rel='stylesheet' href=morii_asset('/css/cinema.css'))
+    if page.type === 'series_index' || page.type === 'series_detail'
+      link(rel='stylesheet' href=morii_asset('/css/series.css'))
     if is_post()
       link(rel='stylesheet' href=morii_asset('/css/reading.css'))
     if is_post() && (!theme.article || !theme.article.print || theme.article.print.enable !== false)

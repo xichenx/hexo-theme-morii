@@ -1,9 +1,10 @@
 mixin postCard(post, featured, eager)
   - var postUrl = url_for(post.path)
   article.post-card(class=featured ? 'post-card--featured' : '')
-    a.post-card__media(href=postUrl aria-label=post.title)
+    a.post-card__media(href=postUrl aria-label=post.title data-cover-frame=post.cover ? '' : null)
       if post.cover
-        img(src=url_for(post.cover) alt=post.title loading=eager ? 'eager' : 'lazy' fetchpriority=eager ? 'high' : 'low' decoding='async')
+        - var cover = morii_cover(post.cover, post)
+        img(src=cover.src srcset=cover.srcset sizes=cover.sizes width=cover.width height=cover.height alt=post.title loading=eager ? 'eager' : 'lazy' fetchpriority=eager ? 'high' : 'low' decoding='async')
       else
         span.post-card__placeholder ✦
     .post-card__body

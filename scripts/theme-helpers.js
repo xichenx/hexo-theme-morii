@@ -5,6 +5,8 @@ const { tocObj, unescapeHTML, stripHTML } = require('hexo-util');
 
 hexo.extend.helper.register('morii_page_title', function (page) {
   const t = (...args) => forPage(hexo, this).t(...args);
+  if (page.type === 'series_index') return t('专题与系列');
+  if (page.type === 'series_detail') return this.morii_series(page.series_key)?.title || t('专题与系列');
   if (this.is_home()) return page.current > 1 ? t("文章 · 第 {0} 页", page.current) : hexo.config.title;
   if (this.is_category()) return t("分类 · {0}", page.category);
   if (this.is_tag()) return t("标签 · {0}", page.tag);

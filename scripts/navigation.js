@@ -23,6 +23,7 @@ hexo.extend.helper.register('morii_navigation', function () {
   const config = hexo.theme.config;
   const items = [...(Array.isArray(config.menu) ? config.menu : []), { name: t("标签"), path: '/tags/' }, ...(Array.isArray(config.explore) ? config.explore : [])];
   if (config.reading_list?.enable !== false) items.push({ name: t("稍后阅读"), path: '/reading-list/' });
+  if (this.morii_series_catalog?.().length) items.push({ name: t('专题与系列'), path: '/series/', icon: 'book', description: t('沿着一条线索，系统地读下去。') });
   const seen = new Set();
   return items.flatMap(item => {
     if (item) item = { ...item, name: this.morii_nav_label ? this.morii_nav_label(item.name) : forPage(hexo, this).localized(item.name), description: forPage(hexo, this).localized(item.description) };

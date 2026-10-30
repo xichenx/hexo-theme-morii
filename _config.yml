@@ -74,6 +74,8 @@ home:
 about:
   show_interests: true
 search:
+  inverted: true  # 大站点使用倒排索引，仅下载命中文章所在正文分片
+  worker: true    # 浏览器允许时将筛选计算放入 Web Worker
   shard_size: 100 # 超过此篇数使用分片；标题/分类搜索无需下载全文分片
   content: true
   page_size: 10
@@ -213,3 +215,12 @@ seo:
   structured_data: true
   # 全站分享图；单篇文章 share_image 优先于 cover，建议填写站内路径或 HTTPS 地址。
   default_image: ''
+
+series:
+  enable: true # 根据文章 series / series_order 自动生成 /series/ 专题页
+
+images:
+  responsive: true  # 使用可选 sharp 为本地封面生成 WebP 候选
+  widths: [480, 800, 1200]
+  quality: 78
+  cover_tone: true  # 封面取色只用于文章头部，保持正文主题色

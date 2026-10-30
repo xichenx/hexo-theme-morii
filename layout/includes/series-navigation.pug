@@ -1,0 +1,11 @@
+- var seriesNavigation = morii_series(page)
+if seriesNavigation && (seriesNavigation.previous || seriesNavigation.next)
+  nav.series-article-nav(aria-label=morii_t('系列文章导航'))
+    if seriesNavigation.previous
+      a(href=url_for(seriesNavigation.previous.path))
+        small #{morii_t('系列上一篇')}
+        strong= seriesNavigation.previous.title
+    if seriesNavigation.next
+      a(href=url_for(seriesNavigation.next.path))
+        small #{morii_t('系列下一篇')}
+        strong= seriesNavigation.next.title

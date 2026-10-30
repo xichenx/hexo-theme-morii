@@ -1,0 +1,54 @@
+extends includes/layout.pug
+
+block content
+  - var collection = page.type === 'series_detail' ? morii_series(page.series_key) : null
+  .wrap.series-page
+    nav.article-breadcrumb(aria-label=morii_t('面包屑导航'))
+      a(href=url_for('/')) #{morii_t('首页')}
+      span(aria-hidden='true') /
+      if collection
+        a(href=url_for('/series/')) #{morii_t('专题与系列')}
+        span(aria-hidden='true') /
+        span(aria-current='page')= collection.title
+      else
+        span(aria-current='page') #{morii_t('专题与系列')}
+    header.series-intro
+      span.section-kicker= collection ? 'READ IN ORDER' : 'COLLECTIONS'
+      h1= collection ? collection.title : morii_t('专题与系列')
+      p= collection ? collection.description || morii_t('沿着一条线索，系统地读下去。') : morii_t('把零散的笔记，连接成持续探索的路线。')
+    if collection
+      .series-directory.panel
+        .series-directory-heading
+          strong #{morii_t('系列目录')}
+          span #{morii_t('共 {0} 篇文章', collection.posts.length)}
+        ol
+          each post, index in collection.posts
+            li
+              a(href=url_for(post.path))
+                span.series-number= String(index + 1).padStart(2, '0')
+                div
+                  strong= post.title
+                  p= morii_excerpt(post, 110)
+                time(datetime=date_xml(post.date))= date(post.date, 'YYYY.MM.DD')
+    else
+      - var collections = morii_series_catalog()
+      if collections.length
+        .series-grid
+          each item in collections
+            article.series-card.panel
+              if item.cover
+                - var collectionCover = morii_cover(item.cover, item)
+                a.series-card-cover(href=url_for(item.path) data-cover-frame)
+                  img(src=collectionCover.src srcset=collectionCover.srcset sizes=collectionCover.sizes width=collectionCover.width height=collectionCover.height alt='' loading='lazy' decoding='async')
+              span.series-card-kicker #{morii_t('共 {0} 篇文章', item.posts.length)}
+              h2
+                a(href=url_for(item.path))= item.title
+              if item.description
+                p= item.description
+              ol
+                each post in item.posts.slice(0, 3)
+                  li
+                    a(href=url_for(post.path))= post.title
+              a.text-link(href=url_for(item.path)) #{morii_t('阅读整个系列 →')}
+      else
+        p.empty-state #{morii_t('还没有系列文章，新的探索即将开始。')}

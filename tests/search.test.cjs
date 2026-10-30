@@ -106,8 +106,79 @@ test('generated search manifests use hashed shards and omit protected bodies and
   const posts = Array.from({ length: 21 }, (_, index) => ({ title: `Post ${index}`, path: `post-${index}/`, content: 'needle', categories: [{ name: '技术' }] }));
   posts[0].password = true; posts[0].content = 'secret';
   const routes = generate({ posts }); const index = JSON.parse(routes.find(route => route.path === 'morii-search.json').data);
-  assert.equal(index.version, 2); assert.equal(index.shards.length, 2); assert.equal(index.entries[0].categories.length, 0);
+  assert.equal(index.version, 3); assert.equal(index.shards.length, 2); assert.equal(index.entries[0].categories.length, 0);
   assert.ok(index.entries.every(entry => !Object.hasOwn(entry, 'content')));
   assert.ok(!JSON.stringify(routes).includes('secret'));
+  assert.equal(index.inverted.count, 64);
   assert.match(index.shards[0], /^\/blog\/search\/part-0\.[a-f0-9]{12}\.json$/);
+});
+
+test('inverted search uses a Worker and downloads only the matching body shard', async () => {
+  const vm = require('node:vm'), engine = require('../source/js/search-engine.js'); let generate;
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../scripts/search-index.js'), 'utf8'), { require, hexo: { config: { root: '/' }, theme: { config: { search: { shard_size: 20 } } }, extend: { helper: { register() {} }, generator: { register(name, fn) { generate = fn; } } } } });
+  const posts = Array.from({ length: 60 }, (_, i) => ({ title: `Post ${i}`, path: `post-${i}/`, content: i === 5 ? 'onlyneedle' : 'ordinary body', date: i }));
+  const routes = generate({ posts }), byPath = new Map(routes.map(route => ['/' + route.path, route.data]));
+  const manifest = JSON.parse(byPath.get('/morii-search.json')); const requested = [], operations = [];
+  const f = fixture(); f.w.MoriiSearchEngine = engine;
+  const dialog = f.d.querySelector('dialog'); dialog.dataset.searchEngine = '/js/search-engine.hash.js'; dialog.dataset.searchWorker = '/js/search-worker.hash.js';
+  let workerEntries = [];
+  f.w.Worker = class {
+    postMessage({ id, method, payload }) { operations.push(method); if (method === 'entries') workerEntries = payload.entries; queueMicrotask(() => this.onmessage?.({ data: { id, result: ['init', 'entries'].includes(method) ? true : engine[method]({ ...payload, ...(method === 'rank' ? { entries: workerEntries } : {}) }) } })); }
+    terminate() {}
+  };
+  f.w.fetch = async value => {
+    const url = new URL(value, f.w.location.href).pathname; requested.push(url);
+    if (!byPath.has(url)) throw new Error(`Unexpected resource ${url}`);
+    return { ok: true, json: async () => JSON.parse(byPath.get(url)) };
+  };
+  await f.open(); assert.equal(requested.length, 1);
+  f.query('onlyneedle'); for (let i = 0; i < 8; i++) await settle();
+  assert.equal(f.links().length, 1); assert.match(f.links()[0].href, /post-5/);
+  const bodies = requested.filter(url => url.includes('/part-')); assert.equal(bodies.length, 1);
+  assert.equal(bodies[0], manifest.shards[manifest.entries.find(entry => entry.title === 'Post 5').shard]);
+  assert.ok(operations.includes('candidates')); assert.ok(operations.includes('rank')); assert.equal(dialog.dataset.searchMode, 'worker');
+  f.query('missingunique'); for (let i = 0; i < 8; i++) await settle();
+  assert.equal(f.links().length, 0); assert.equal(requested.filter(url => url.includes('/part-')).length, 1);
+  f.dom.window.close();
+});
+
+function versionThreeFixture({ blockedWorker = false, brokenTerms = false, holdOld = false } = {}) {
+  const engine = require('../source/js/search-engine.js');
+  const rows = [{ id: 0, shard: 0, title: 'Old post', url: '/old/', content: 'oldneedle' }, { id: 1, shard: 1, title: 'New post', url: '/new/', content: 'newneedle' }];
+  const terms = Object.create(null); rows.forEach(row => engine.grams(`${row.title} ${row.content}`).forEach(term => (terms[term] || (terms[term] = [])).push(row.id)));
+  const manifest = { version: 3, entries: rows.map(({ content, ...entry }) => entry), shards: ['/body-0.json', '/body-1.json'], inverted: { count: 1, buckets: ['/terms.json'] } };
+  const f = fixture(); f.w.MoriiSearchEngine = engine; const requests = [], delayed = [];
+  const dialog = f.d.querySelector('dialog'); dialog.dataset.searchEngine = '/engine.js'; dialog.dataset.searchWorker = '/worker.js';
+  let workerRows = [];
+  f.w.Worker = class {
+    constructor() { if (blockedWorker) throw Error('Blocked by policy'); }
+    postMessage({ id, method, payload }) {
+      if (method === 'entries') workerRows = payload.entries;
+      const reply = () => this.onmessage?.({ data: { id, result: ['init', 'entries'].includes(method) ? true : engine[method]({ ...payload, ...(method === 'rank' ? { entries: workerRows } : {}) }) } });
+      if (holdOld && method === 'rank' && payload.query === 'oldneedle') delayed.push(reply); else queueMicrotask(reply);
+    }
+    terminate() {}
+  };
+  f.w.fetch = async value => {
+    const url = new URL(value, f.w.location.href).pathname; requests.push(url);
+    if (url === '/terms.json' && brokenTerms) throw Error('offline');
+    return { ok: true, json: async () => url === '/morii-search.json' ? manifest : url === '/terms.json' ? terms : [rows[url.includes('body-0') ? 0 : 1]] };
+  };
+  return { ...f, requests, delayed };
+}
+
+test('blocked Workers and unavailable keyword buckets fall back to complete body search', async () => {
+  const f = versionThreeFixture({ blockedWorker: true, brokenTerms: true });
+  await f.open(); f.query('newneedle'); for (let i = 0; i < 10; i++) await settle();
+  assert.equal(f.links().length, 1); assert.match(f.links()[0].href, /\/new\//); assert.equal(f.d.querySelector('dialog').dataset.searchMode, 'main');
+  assert.equal(f.requests.filter(url => url.includes('/body-')).length, 2); f.dom.window.close();
+});
+
+test('late Worker responses cannot replace results for a newer search query', async () => {
+  const f = versionThreeFixture({ holdOld: true }); await f.open();
+  f.query('oldneedle'); for (let i = 0; i < 8; i++) await settle();
+  f.query('newneedle'); for (let i = 0; i < 8; i++) await settle();
+  assert.equal(f.links().length, 1); assert.match(f.links()[0].href, /\/new\//);
+  f.delayed.forEach(reply => reply()); await settle();
+  assert.equal(f.links().length, 1); assert.match(f.links()[0].href, /\/new\//); f.dom.window.close();
 });

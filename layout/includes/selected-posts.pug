@@ -9,9 +9,10 @@ if selectedPosts.length
     .selected-grid
       each post, index in selectedPosts
         a.selected-card(href=url_for(post.path))
-          .selected-card__media
+          .selected-card__media(data-cover-frame=post.cover ? '' : null)
             if post.cover
-              img(src=url_for(post.cover) alt='' loading='lazy')
+              - var selectedCover = morii_cover(post.cover, post)
+              img(src=selectedCover.src srcset=selectedCover.srcset sizes=selectedCover.sizes width=selectedCover.width height=selectedCover.height alt='' loading='lazy' decoding='async')
             else
               span(aria-hidden='true') ✦
           .selected-card__body

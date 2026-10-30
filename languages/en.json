@@ -628,5 +628,18 @@
   "最新评论": "Recent comments",
   "访客": "Visitor",
   "暂时还没有评论。": "No comments yet.",
-  "搜索加载失败，请重试。": "Search could not be loaded. Please retry."
+  "搜索加载失败，请重试。": "Search could not be loaded. Please retry.",
+  "面包屑导航": "Breadcrumbs",
+  "专题与系列": "Collections & series",
+  "沿着一条线索，系统地读下去。": "Follow a thread and read the whole story.",
+  "把零散的笔记，连接成持续探索的路线。": "Turn individual notes into a path of discovery.",
+  "系列目录": "In this series",
+  "阅读整个系列 →": "Read the series →",
+  "还没有系列文章，新的探索即将开始。": "No series yet. A new journey is on its way.",
+  "第 {0} / {1} 篇": "Part {0} of {1}",
+  "查看专题 →": "View collection →",
+  "系列文章导航": "Series navigation",
+  "系列上一篇": "Previous in series",
+  "系列下一篇": "Next in series",
+  "索引分片暂不可用，已回退为完整正文搜索。": "The keyword index is unavailable. Falling back to full-text scanning."
 }

@@ -229,3 +229,30 @@ test('optional enhancements and Waline produce configured assets and safe sharin
   assert.ok(about.window.document.querySelector('script[src*="/js/services."]'));
   dom.window.close(); about.window.close();
 });
+
+test('series pages, article order and responsive covers work in English under a deployment subdirectory', async () => {
+  const original = name => fs.readFileSync(path.join(__dirname, '../demo/source/_posts', name + '.md'), 'utf8');
+  const output = await buildDemo({ root: '/theme/', language: 'en', sourceOverrides: {
+    '_data/series.yml': 'guide:\n  title:\n    en: Morii guide\n    zh-CN: 主题指南\n  description: A reading path\n',
+    '_posts/welcome.md': original('welcome').replace('title:', 'series: guide\nseries_order: 2\ntitle:'),
+    '_posts/cards.md': original('cards').replace('title:', 'series: guide\nseries_order: 1\ntitle:')
+  } });
+  const read = file => new JSDOM(fs.readFileSync(path.join(output, file), 'utf8'));
+  const index = read('series/index.html'), detail = read('series/guide/index.html'), article = read('posts/welcome/index.html');
+  assert.equal(index.window.document.querySelector('h2 a').textContent, 'Morii guide');
+  const links = [...detail.window.document.querySelectorAll('.series-directory li a')];
+  assert.match(links[0].getAttribute('href'), /^\/theme\/posts\/cards\//); assert.match(links[1].getAttribute('href'), /\/posts\/welcome\//);
+  const doc = article.window.document;
+  assert.equal(doc.querySelector('.article-series [aria-current="page"]').getAttribute('href'), '/theme/posts/welcome/');
+  assert.match(doc.querySelector('.series-article-nav a').getAttribute('href'), /\/posts\/cards\//); assert.equal(doc.querySelectorAll('.series-article-nav a').length, 1);
+  assert.equal(doc.querySelector('.article-breadcrumb [aria-current]').textContent, '欢迎使用 Morii');
+  let nativeImages = false; try { nativeImages = !!require('sharp'); } catch {}
+  if (nativeImages) {
+    assert.match(doc.querySelector('.article-cover').getAttribute('srcset'), /^\/theme\/images\/morii\/.+480w/);
+    assert.equal(Number(doc.querySelector('.article-cover').width), 1440);
+    for (const candidate of doc.querySelector('.article-cover').getAttribute('srcset').split(', ')) {
+      const file = candidate.split(' ')[0].replace('/theme/', ''); assert.ok(fs.existsSync(path.join(output, file)));
+    }
+  } else assert.equal(doc.querySelector('.article-cover').getAttribute('srcset'), null);
+  for (const dom of [index, detail, article]) dom.window.close();
+});
