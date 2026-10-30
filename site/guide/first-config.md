@@ -54,7 +54,19 @@ menu:
 
 ## 2. 按需添加主题配置
 
-现在不需要复制整份主题默认配置。顶部站名、首页两行标题与介绍会直接使用刚才填写的 `title`、`subtitle` 和 `description`；头像使用内置图片，未填写的外部服务保持关闭。
+顶部站名、首页两行标题与介绍会直接使用刚才填写的 `title`、`subtitle` 和 `description`；头像使用内置图片，未填写的外部服务保持关闭。可以手动复制配置，也可以用可选的快捷向导，按自己的习惯选择。
+
+### 手动复制配置
+
+新建 `my-blog/_config.morii.yml`，复制下面的最小配置即可：
+
+<<< @/public/examples/minimal/_config.morii.yml{yaml} [_config.morii.yml：可选]
+
+<a href="/examples/minimal/_config.morii.yml" download="_config.morii.yml">下载最小配置</a>。也可以整份复制安装目录里的主题 `_config.yml`，保存为博客根目录的 `_config.morii.yml` 后自行修改。已有个人配置请保留原文件，按需合并字段。
+
+页面和菜单按[第 4 步](/guide/complete-site)手动创建，整个过程无需运行 `morii:init`。
+
+### 快捷创建页面（可选）
 
 想自动创建关于、分类和标签页，在博客根目录执行：
 
@@ -62,13 +74,7 @@ menu:
 npx hexo morii:init --yes
 ```
 
-更多选择和已有站点的处理方式见[初始化向导](/guide/initialization)。暂时只写文章也可以跳过这一步，保留“首页、文章”两个默认菜单。
-
-如果需要个别覆盖，可以新建 `my-blog/_config.morii.yml`。它也可以只是下面这份文件：
-
-<<< @/public/examples/minimal/_config.morii.yml{yaml} [_config.morii.yml：可选]
-
-<a href="/examples/minimal/_config.morii.yml" download="_config.morii.yml">下载最小配置</a>。已有个人配置请保留原文件，按需合并字段。
+安装了全局 `hexo-cli` 也可以直接运行 `hexo morii:init --yes`。更多选择和已有站点的处理方式见[配置方式说明](/guide/initialization)。暂时只写文章也可以跳过主题配置与向导，保留“首页、文章”两个默认菜单。
 
 例如 `avatar: /images/avatar.png` 用于自定义头像，`intro` 用于单独修改首页介绍。内置导航名称自动翻译，个人内容只需写一种语言；语言映射仅在需要独立译文时使用。
 

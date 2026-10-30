@@ -122,7 +122,9 @@ theme: morii
 
 主题使用 Pug 模板与原生 CSS / JavaScript，无额外前端打包步骤。当前开发环境为 Hexo 8.1.2。npm 安装会使用 `node_modules/hexo-theme-morii`；建议通过站点根目录的 `_config.morii.yml` 覆盖主题配置，避免修改安装包。站名、首页标题和介绍默认继承博客 `_config.yml`；账号与外部服务按需开启，不预填作者资料。
 
-在博客根目录运行 `npx hexo morii:init`，可交互创建页面、菜单与空数据文件。使用 `--yes` 选择默认页面，或 `--pages about,categories,tags,music --dry-run` 查看计划。已有文件保留原文，配置冲突时另存建议文件。参阅[初始化向导](site/guide/initialization.md)与[迁移说明](site/guide/updating.md)。
+配置方式自由选择：可以手动复制主题 `_config.yml` 到博客根目录并重命名为 `_config.morii.yml`，或从[最小配置](site/public/examples/minimal/_config.morii.yml)开始，按需创建页面和数据文件。已有配置只需合并需要的字段。
+
+也可以在博客根目录运行可选快捷命令 `hexo morii:init`（或 `npx hexo morii:init`），交互创建页面、菜单与空数据文件。使用 `--yes` 选择默认页面，或 `--pages about,categories,tags,music --dry-run` 查看计划。已有文件保留原文，配置冲突时另存建议文件。手动配置可直接生成站点，无需运行此命令。参阅[两种配置方式](site/guide/initialization.md)与[迁移说明](site/guide/updating.md)。
 
 ```bash
 hexo generate

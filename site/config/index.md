@@ -47,7 +47,7 @@ my-blog/
 
 ## 2. 没有配置文件时，从模板开始
 
-第一次安装可直接运行[初始化向导](/guide/initialization)，或使用[第 2 步的最小配置](/guide/first-config)。完成接入后，想查阅更多常用开关，可以下载 [详细配置模板](/examples/_config.morii.yml)，按需合并到博客根目录的 `_config.morii.yml`。
+第一次安装可手动复制[第 2 步的最小配置](/guide/first-config)，或整份复制安装目录的主题 `_config.yml` 到博客根目录并重命名为 `_config.morii.yml`。也可使用可选的[初始化向导](/guide/initialization)快速创建页面和菜单；手动配置不需要运行 `morii:init`。完成接入后，想查阅更多常用开关，可以下载 [详细配置模板](/examples/_config.morii.yml)，按需合并到博客根目录的 `_config.morii.yml`。
 
 详细模板关闭未填写的外部服务，保留常用阅读功能；它与入门最小配置的用途不同，不需要在做完入门后再整体覆盖一次。已经配好的菜单应继续保留。模板不会替你创建页面、注册服务或上传图片。
 

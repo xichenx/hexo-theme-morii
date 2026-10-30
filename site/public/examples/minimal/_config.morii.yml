@@ -1,5 +1,5 @@
 # 可选文件：博客根目录 _config.morii.yml
 # 站名、作者、副标题、简介、语言直接使用博客 _config.yml。
 # 外部服务默认关闭；只添加你需要覆盖的字段。
-# 也可运行 npx hexo morii:init 创建页面和菜单。
+# 可直接复制使用；hexo morii:init 只是可选的建页与菜单快捷工具。
 {}
