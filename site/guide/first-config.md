@@ -27,6 +27,23 @@ timezone: Asia/Shanghai
 theme: morii
 ```
 
+### 选择界面语言
+
+`language` 支持 `en`（英文）、`zh-CN`（简体中文）和 `zh-TW`（繁体中文）。修改后执行 `npx hexo clean && npx hexo generate`。导航、搜索、播放器提示及主题按钮会使用对应语言，文章和个人资料保留原文。默认使用简体中文；语言数组只取第一项，不会自动创建多语言文章副本。
+
+单篇页面可以通过 Front Matter 的 `lang: en` 或 `lang: zh-TW` 覆盖站点语言。自定义导航名称还可在 `_config.morii.yml` 中使用语言映射：
+
+```yaml
+menu:
+  - name:
+      zh-CN: 我的笔记
+      zh-TW: 我的筆記
+      en: My notes
+    path: /archives/
+```
+
+内置导航名称会自动翻译；其他字符串保持原样。外部评论服务及嵌入式播放器的内部语言由对应服务控制。
+
 | 修改的字段 | 去哪里看结果 |
 | --- | --- |
 | `title` | 浏览器标签里的站名 |

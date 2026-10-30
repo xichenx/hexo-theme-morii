@@ -8,6 +8,31 @@
 
 主题品牌为 **Morii**，组织署名为 **Morainet**，项目仓库为 [xichenx/hexo-theme-morii](https://github.com/xichenx/hexo-theme-morii)。博客名称与主题品牌分别配置，当前博客名称继续使用“心灵涂鸦”。
 
+## 界面语言
+
+在**博客根目录** `_config.yml` 设置（不是主题配置文件）：
+
+```yaml
+language: zh-CN # en / zh-CN / zh-TW
+```
+
+修改后运行 `npx hexo clean && npx hexo generate`。默认简体中文；未知语言回退到 `zh-CN`。如果配置的是语言数组，主题使用第一项，不会自动生成三个语言版本的网站。
+
+导航、按钮、搜索、播放器、收藏和图片预览等主题文字会切换；文章标题、正文、分类名称及个人介绍不自动翻译。单篇页面可在 Front Matter 中设置 `lang: en` 或 `lang: zh-TW` 覆盖站点语言。翻译文件位于 `languages/`，英文和繁体浏览器语言包按当前语言加载并缓存。
+
+默认导航名称（如「首页」「文章」）会自动翻译。自定义名称可保持字符串，或在 `_config.morii.yml` 的 `menu` / `explore` 中按语言填写：
+
+```yaml
+menu:
+  - name:
+      zh-CN: 我的笔记
+      zh-TW: 我的筆記
+      en: My notes
+    path: /archives/
+```
+
+多语言名称优先使用当前语言，缺项时依次回退到简体中文、英文、繁体中文。第三方评论服务及外部播放器的内部界面由服务自身控制。
+
 ## 演示视频
 
 [![Morii 功能演示：点击查看完整视频](docs/media/morii-demo-preview.gif)](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)
@@ -26,6 +51,8 @@
 | 00:36 | 移动端首页与分类 |
 
 ## 已实现
+
+- 支持 `en`、`zh-CN`、`zh-TW` 三种主题界面语言，跟随博客 `language` 或页面 `lang`，文章保持原文。
 
 - 可配置极光背景、星尘连线与鼠标避让、毛玻璃、卡片跟随光晕及按钮扫光；深色模式同步配色，手机减少粒子数量。
 - 响应式首页、文章、归档、分类、标签、404 页面

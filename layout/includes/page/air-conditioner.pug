@@ -1,8 +1,8 @@
-section.ac-page(data-powered='off' data-mode='cool' data-swing='off' aria-label='网页小空调')
+section.ac-page(data-powered='off' data-mode='cool' data-swing='off' aria-label=morii_t("网页小空调"))
   .ac-scene.panel
     span.section-kicker A LITTLE COMFORT
-    h2 给日常一点舒适
-    p.ac-intro 这一刻，把心情调到喜欢的温度。
+    h2 #{morii_t("给日常一点舒适")}
+    p.ac-intro #{morii_t("这一刻，把心情调到喜欢的温度。")}
     .ac-device(aria-hidden='true')
       .ac-device__top
         span= theme.brand || config.title
@@ -18,22 +18,22 @@ section.ac-page(data-powered='off' data-mode='cool' data-swing='off' aria-label=
       span
       span
       span
-    span.ac-simulation 网页小玩具 · 舒适由你设定
+    span.ac-simulation #{morii_t("网页小玩具 · 舒适由你设定")}
   .ac-remote.panel
     .side-card__heading
-      h2 遥控器
+      h2 #{morii_t("遥控器")}
       span ◌
-    p#ac-status(role='status' aria-live='polite') 空调已关闭
-    button.button.service-button#ac-power(type='button' aria-pressed='false') 开启空调
+    p#ac-status(role='status' aria-live='polite') #{morii_t("空调已关闭")}
+    button.button.service-button#ac-power(type='button' aria-pressed='false') #{morii_t("开启空调")}
     .ac-temperature-control
-      button.icon-button#ac-decrease(type='button' aria-label='降低温度' disabled) −
+      button.icon-button#ac-decrease(type='button' aria-label=morii_t("降低温度") disabled) −
       .ac-temperature-output
-        output#ac-temperature(aria-label='设定温度') 26
+        output#ac-temperature(aria-label=morii_t("设定温度")) 26
         span °C
-      button.icon-button#ac-increase(type='button' aria-label='升高温度' disabled) +
+      button.icon-button#ac-increase(type='button' aria-label=morii_t("升高温度") disabled) +
     fieldset.ac-modes
-      legend 运行模式
-      button.button.service-button(type='button' data-ac-mode='cool' aria-pressed='true' disabled) ❄ 制冷
-      button.button.service-button(type='button' data-ac-mode='heat' aria-pressed='false' disabled) ☀ 制热
-    button.button.service-button#ac-swing(type='button' aria-pressed='false' disabled) 开启摆风
-    p.ac-hint 可调温度 16–30°C
+      legend #{morii_t("运行模式")}
+      button.button.service-button(type='button' data-ac-mode='cool' aria-pressed='true' disabled) #{morii_t("❄ 制冷")}
+      button.button.service-button(type='button' data-ac-mode='heat' aria-pressed='false' disabled) #{morii_t("☀ 制热")}
+    button.button.service-button#ac-swing(type='button' aria-pressed='false' disabled) #{morii_t("开启摆风")}
+    p.ac-hint #{morii_t("可调温度 16–30°C")}

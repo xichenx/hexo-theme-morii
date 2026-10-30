@@ -3,15 +3,15 @@
  .friend-directory
   if friendGroups.length
     .directory-toolbar.panel
-      label(for='friend-search') 找一位朋友
+      label(for='friend-search') #{morii_t("找一位朋友")}
       .friend-search-row
-        input#friend-search(type='search' placeholder='搜索站名、简介、标签或域名…' autocomplete='off')
-        button#friend-clear(type='button' hidden) 清空
-      .directory-filters(aria-label='友链分组')
-        button(type='button' data-friend-group='all' aria-pressed='true') 全部 #[span=friendGroups.reduce(function(total, group) { return total + group.friends.length }, 0)]
+        input#friend-search(type='search' placeholder=morii_t("搜索站名、简介、标签或域名…") autocomplete='off')
+        button#friend-clear(type='button' hidden) #{morii_t("清空")}
+      .directory-filters(aria-label=morii_t("友链分组"))
+        button(type='button' data-friend-group='all' aria-pressed='true') #{morii_t("全部")} #[span=friendGroups.reduce(function(total, group) { return total + group.friends.length }, 0)]
         each group in friendGroups
           button(type='button' data-friend-group=group.id aria-pressed='false') #{group.title} #[span=group.friends.length]
-      p#friend-search-status(role='status' aria-live='polite') 共 #{friendGroups.reduce(function(total, group) { return total + group.friends.length }, 0)} 个链接
+      p#friend-search-status(role='status' aria-live='polite') #{morii_t("共 {0} 个链接", friendGroups.reduce(function(total, group) { return total + group.friends.length }, 0))}
     each group in friendGroups
       section.data-section.friend-group(id=group.id data-friend-section=group.id)
         .section-heading
@@ -29,7 +29,7 @@
                   img(src=url_for(friend.screenshot) alt='' loading='lazy')
                 .friend-card-badges
                   if friend.recommend
-                    span 常逛的小站
+                    span #{morii_t("常逛的小站")}
                   if friend.tag
                     span= friend.tag
               .friend-card-main
@@ -39,37 +39,37 @@
                     img(src=url_for(friend.avatar) alt='' loading='lazy')
                 .friend-card__text
                   strong= friend.name
-                  small= friend.description || '去看看他们的博客'
+                  small= friend.description || morii_t("去看看他们的博客")
               .friend-card-bottom
                 span= friend.domain
-                span 去串门 ↗
+                span #{morii_t("去串门 ↗")}
     .empty-panel.panel#friend-empty(hidden)
-      h2 没找到这位朋友
-      p 试试其他关键词，或切换到全部分组。
-      button.button.service-button#friend-reset(type='button') 查看全部友链
+      h2 #{morii_t("没找到这位朋友")}
+      p #{morii_t("试试其他关键词，或切换到全部分组。")}
+      button.button.service-button#friend-reset(type='button') #{morii_t("查看全部友链")}
   else
     .empty-panel.panel
-      h2 友人帐正在整理中
-      p 期待在这里遇见更多有趣的朋友。
- aside.friends-connect#friend-connect(aria-label='交换友链')
+      h2 #{morii_t("友人帐正在整理中")}
+      p #{morii_t("期待在这里遇见更多有趣的朋友。")}
+ aside.friends-connect#friend-connect(aria-label=morii_t("交换友链"))
   section.site-card.panel
     span.section-kicker MY LITTLE CORNER
-    h2 带走本站名片
+    h2 #{morii_t("带走本站名片")}
     .friend-site-preview
       img(src=url_for(theme.avatar) alt='' loading='lazy')
       strong= config.title
       p= config.description
-    button.button.button--primary#copy-site-card(type='button') 复制本站信息
+    button.button.button--primary#copy-site-card(type='button') #{morii_t("复制本站信息")}
     details.site-card__data
-      summary 查看名片数据
-      label.sr-only(for='site-link-data') 本站友链信息
+      summary #{morii_t("查看名片数据")}
+      label.sr-only(for='site-link-data') #{morii_t("本站友链信息")}
       textarea#site-link-data(readonly rows='7' spellcheck='false')= morii_site_card()
     p#site-card-status(role='status' aria-live='polite')
   section.friend-invitation.panel
     span.section-kicker SAY HELLO
-    h2 很高兴认识你
-    p 如果你也喜欢记录和分享，欢迎交换友链。
+    h2 #{morii_t("很高兴认识你")}
+    p #{morii_t("如果你也喜欢记录和分享，欢迎交换友链。")}
     ol
-      li 复制本站名片，添加到你的小站。
-      li 留下站名、链接、简介和头像地址。
-    a.text-link(href=url_for('/comments/')) 去留言板打个招呼 →
+      li #{morii_t("复制本站名片，添加到你的小站。")}
+      li #{morii_t("留下站名、链接、简介和头像地址。")}
+    a.text-link(href=url_for('/comments/')) #{morii_t("去留言板打个招呼 →")}

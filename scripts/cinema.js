@@ -1,8 +1,10 @@
 'use strict';
 
+const { forPage } = require('../scripts/lib/i18n.cjs');
+const t = (...args) => forPage(hexo).t(...args);
 const { URL } = require('node:url');
 
-const types = { movie: '电影', series: '电视剧', anime: '动漫' };
+const types = { movie: t("电影"), series: t("电视剧"), anime: t("动漫") };
 const clean = value => typeof value === 'string' ? value.trim() : '';
 
 function mediaUrl(value) {
@@ -25,17 +27,17 @@ function embedUrl(value) {
   return allowed ? url.href : '';
 }
 
-function normalize(items) {
+function normalize(items, translate = t) {
   if (!Array.isArray(items)) return [];
   return items.flatMap((item, index) => {
     if (!item || !clean(item.title)) return [];
-    const rawEpisodes = Array.isArray(item.episodes) ? item.episodes : [{ title: '播放', url: item.url, embed: item.embed }];
+    const rawEpisodes = Array.isArray(item.episodes) ? item.episodes : [{ title: translate("播放"), url: item.url, embed: item.embed }];
     const episodes = rawEpisodes.flatMap((episode, episodeIndex) => {
       if (!episode || typeof episode !== 'object') return [];
       const embed = embedUrl(episode.embed);
       const url = mediaUrl(episode.url);
       if (!embed && !url) return [];
-      return [{ title: clean(episode.title) || `第 ${episodeIndex + 1} 集`, url: embed || url, kind: embed ? 'embed' : 'video' }];
+      return [{ title: clean(episode.title) || translate("第 {0} 集", episodeIndex + 1), url: embed || url, kind: embed ? 'embed' : 'video' }];
     });
     return [{ id: `cinema-${index}`, title: clean(item.title), type: types[item.type] ? item.type : 'movie', year: clean(String(item.year || '')), description: clean(item.description), cover: mediaUrl(item.cover), episodes }];
   });
@@ -43,12 +45,16 @@ function normalize(items) {
 
 hexo.extend.helper.register('morii_cinema_catalog', function () {
   const data = this.site?.data?.cinema;
-  return normalize(Array.isArray(data) ? data : hexo.theme.config.cinema?.items);
+  return normalize(Array.isArray(data) ? data : hexo.theme.config.cinema?.items, t);
 });
 
 hexo.extend.generator.register('morii-cinema', () => {
   if (hexo.theme.config.cinema?.enable === false) return [];
-  return { path: 'cinema/index.html', layout: 'page', data: { title: hexo.theme.config.cinema?.title || '电影院', description: hexo.theme.config.cinema?.description || '挑一部喜欢的作品，慢慢看。', type: 'cinema', comments: false } };
+  const label = (value, fallback) => {
+    const resolved = forPage(hexo).localized(value);
+    return !resolved || resolved === fallback ? t(fallback) : resolved;
+  };
+  return { path: 'cinema/index.html', layout: 'page', data: { title: label(hexo.theme.config.cinema?.title, '电影院'), description: label(hexo.theme.config.cinema?.description, '挑一部喜欢的作品，慢慢看。'), type: 'cinema', comments: false } };
 });
 
 module.exports = { mediaUrl, embedUrl, normalize };

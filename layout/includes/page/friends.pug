@@ -2,20 +2,20 @@ section.feed-section(data-feed-endpoint=morii_safe_url(theme.friends_feed && the
   .section-heading
     div
       span.section-kicker FRIENDS JOURNAL
-      h2 朋友们的最新文章
-    a.text-link(href=url_for('/link/')) 友人帐 →
-  p.feed-status(role='status' aria-live='polite') 正在寻找朋友们的新鲜事…
+      h2 #{morii_t("朋友们的最新文章")}
+    a.text-link(href=url_for('/link/')) #{morii_t("友人帐 →")}
+  p.feed-status(role='status' aria-live='polite') #{morii_t("正在寻找朋友们的新鲜事…")}
   .feed-grid(aria-busy='true')
   .feed-actions
-    button.button.service-button#feed-more(type='button' hidden) 加载更多
-    button.button.service-button#feed-retry(type='button' hidden) 重新加载
+    button.button.service-button#feed-more(type='button' hidden) #{morii_t("加载更多")}
+    button.button.service-button#feed-retry(type='button' hidden) #{morii_t("重新加载")}
   noscript
-    p 开启 JavaScript 后可以查看最新文章，或直接浏览下方友链。
+    p #{morii_t("开启 JavaScript 后可以查看最新文章，或直接浏览下方友链。")}
 section.data-section
   .section-heading
     div
       span.section-kicker ALWAYS CONNECTED
-      h2 去朋友家坐坐
+      h2 #{morii_t("去朋友家坐坐")}
   .friend-grid
     - var seenFriends = new Set()
     each group in site.data.link || []
@@ -28,5 +28,5 @@ section.data-section
               img(src=friend.avatar alt='' loading='lazy')
             .friend-card__text
               strong= friend.name
-              small= friend.descr || '去看看他们的博客'
+              small= friend.descr || morii_t("去看看他们的博客")
             span ↗

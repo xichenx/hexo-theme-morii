@@ -1,5 +1,6 @@
 'use strict';
 
+const { forPage } = require('../scripts/lib/i18n.cjs');
 const list = collection => Array.isArray(collection) ? [...collection] : collection?.toArray?.() || [];
 const timestamp = value => Number(value) || 0;
 
@@ -44,7 +45,8 @@ hexo.extend.helper.register('morii_archive_groups', posts => {
   return [...groups].map(([year, entries]) => ({ year, entries }));
 });
 
-hexo.extend.helper.register('morii_pagination', page => {
+hexo.extend.helper.register('morii_pagination', function (page) {
+  const t = (...args) => forPage(hexo, this).t(...args);
   const total = Math.max(1, Math.floor(Number(page.total) || 1));
   const current = Math.max(1, Math.min(total, Math.floor(Number(page.current) || 1)));
   if (total < 2) return [];
@@ -53,13 +55,13 @@ hexo.extend.helper.register('morii_pagination', page => {
   const pathFor = number => number === 1 ? base : `${base}${directory}/${number}/`;
   const numbers = total <= 7 ? Array.from({ length: total }, (_, index) => index + 1) : [...new Set([1, current - 1, current, current + 1, total])].filter(number => number >= 1 && number <= total).sort((a, b) => a - b);
   const items = [];
-  if (current > 1) items.push({ label: '←', path: page.prev_link ?? pathFor(current - 1), rel: 'prev', aria: '上一页' });
+  if (current > 1) items.push({ label: '←', path: page.prev_link ?? pathFor(current - 1), rel: 'prev', aria: t("上一页") });
   numbers.forEach((number, index) => {
     const gap = number - numbers[index - 1];
-    if (index && gap === 2) items.push({ label: number - 1, path: pathFor(number - 1), aria: `第 ${number - 1} 页` });
+    if (index && gap === 2) items.push({ label: number - 1, path: pathFor(number - 1), aria: t("第 {0} 页", number - 1) });
     else if (index && gap > 2) items.push({ gap: true });
-    items.push({ label: number, path: pathFor(number), current: number === current, aria: `第 ${number} 页` });
+    items.push({ label: number, path: pathFor(number), current: number === current, aria: t("第 {0} 页", number) });
   });
-  if (current < total) items.push({ label: '→', path: page.next_link || pathFor(current + 1), rel: 'next', aria: '下一页' });
+  if (current < total) items.push({ label: '→', path: page.next_link || pathFor(current + 1), rel: 'next', aria: t("下一页") });
   return items;
 });

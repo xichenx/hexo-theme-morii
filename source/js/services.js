@@ -1,4 +1,5 @@
 (() => {
+  const t = (...args) => window.MoriiI18n ? window.MoriiI18n.t(...args) : args[0].replace(/\{(\d+)\}/g, (_, i) => String(args[Number(i) + 1] ?? ''));
   const safeUrl = value => {
     try {
       const url = new URL(String(value || ''));
@@ -36,7 +37,7 @@
         meta.append(image);
       }
       const author = document.createElement('span');
-      author.textContent = entry.author || entry.name || '朋友的博客';
+      author.textContent = entry.author || entry.name || t("朋友的博客");
       meta.append(author);
       const title = document.createElement('h3');
       const link = document.createElement('a');
@@ -50,7 +51,7 @@
       const parsed = new Date(rawDate);
       if (!Number.isNaN(parsed.getTime())) {
         time.dateTime = parsed.toISOString();
-        time.textContent = parsed.toLocaleDateString('zh-CN');
+        time.textContent = parsed.toLocaleDateString((window.MoriiI18n?.locale || 'zh-CN'));
       }
       card.append(meta, title, time);
       grid.append(card);
@@ -62,7 +63,7 @@
       more.disabled = true;
       retry.hidden = true;
       grid.setAttribute('aria-busy', 'true');
-      status.textContent = offset ? '正在加载更多文章…' : '正在寻找朋友们的新鲜事…';
+      status.textContent = offset ? t("正在加载更多文章…") : t("正在寻找朋友们的新鲜事…");
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
       try {
@@ -80,9 +81,9 @@
         offset += entries.length;
         const hasMore = entries.length >= pageSize && seen.size > previousCount;
         more.hidden = !hasMore;
-        status.textContent = seen.size ? `已收集 ${seen.size} 篇朋友的文章${hasMore ? '' : ' · 已经到底了'}` : '朋友们还没有新的文章，先去他们的博客坐坐吧。';
+        status.textContent = seen.size ? t("已收集 {0} 篇朋友的文章{1}", seen.size, hasMore ? '' : t(" · 已经到底了")) : t("朋友们还没有新的文章，先去他们的博客坐坐吧。");
       } catch {
-        status.textContent = seen.size ? '更多文章暂时加载失败，已加载的内容仍可阅读。' : '暂时连不上朋友圈，稍后重试，或从下方友链继续逛逛。';
+        status.textContent = seen.size ? t("更多文章暂时加载失败，已加载的内容仍可阅读。") : t("暂时连不上朋友圈，稍后重试，或从下方友链继续逛逛。");
         retry.hidden = false;
         more.hidden = true;
       } finally {
@@ -97,7 +98,7 @@
     if (endpoint) loadFeed();
     else {
       grid.setAttribute('aria-busy', 'false');
-      status.textContent = '先去朋友们的博客坐坐，动态会在接入后显示在这里。';
+      status.textContent = t("先去朋友们的博客坐坐，动态会在接入后显示在这里。");
     }
   }
 
@@ -127,7 +128,7 @@
     loading = true;
     button.disabled = true;
     service.setAttribute('aria-busy', 'true');
-    status.textContent = '正在加载评论…';
+    status.textContent = t("正在加载评论…");
     try {
       await loadScript();
       if (typeof window.twikoo?.init !== 'function' || !service.dataset.env) throw new Error('Comment configuration unavailable');
@@ -143,9 +144,9 @@
       status.hidden = true;
     } catch (error) {
       status.hidden = false;
-      status.textContent = '评论服务暂时不可用，可以稍后重新加载。';
+      status.textContent = t("评论服务暂时不可用，可以稍后重新加载。");
       console.warn('[Morii comments]', error);
-      button.textContent = '重新加载评论';
+      button.textContent = t("重新加载评论");
     } finally {
       loading = false;
       button.disabled = false;

@@ -1,4 +1,5 @@
 (() => {
+  const t = (...args) => window.MoriiI18n ? window.MoriiI18n.t(...args) : args[0].replace(/\{(\d+)\}/g, (_, i) => String(args[Number(i) + 1] ?? ''));
   const key = 'morii-reading-list';
   const button = document.querySelector('[data-save-post]');
   const page = document.querySelector('[data-reading-list]');
@@ -30,7 +31,7 @@
       storageError = '';
       return [...new Set(data.map(pathFor).filter(Boolean))].slice(0, 100);
     } catch {
-      storageError = '无法读取本机收藏。请检查浏览器存储设置。';
+      storageError = t("无法读取本机收藏。请检查浏览器存储设置。");
       return [];
     }
   };
@@ -44,7 +45,7 @@
       render();
       return true;
     } catch {
-      const text = '无法保存收藏，请检查浏览器是否允许网站存储。';
+      const text = t("无法保存收藏，请检查浏览器是否允许网站存储。");
       if (message) message.textContent = text;
       if (status) status.textContent = text;
       return false;
@@ -56,7 +57,7 @@
       const active = saved.includes(pathFor(button.dataset.savePost));
       button.hidden = false;
       button.setAttribute('aria-pressed', String(active));
-      button.textContent = active ? '已加入稍后阅读 ★' : '加入稍后阅读 ☆';
+      button.textContent = active ? t("已加入稍后阅读 ★") : t("加入稍后阅读 ☆");
       if (storageError && message) message.textContent = storageError;
     }
     if (!page || !grid) return;
@@ -80,28 +81,28 @@
         link.href = path;
         link.textContent = entry.title;
         heading.append(link);
-      } else heading.textContent = metadata ? '暂未找到这篇文章' : '正在等待文章信息';
+      } else heading.textContent = metadata ? t("暂未找到这篇文章") : t("正在等待文章信息");
       const description = document.createElement('p');
-      description.textContent = entry ? `${entry.protected ? '加密文章 · ' : ''}${entry.date || '打开文章继续阅读'}` : path;
+      description.textContent = entry ? `${entry.protected ? t("加密文章 · ") : ''}${entry.date || t("打开文章继续阅读")}` : path;
       const actions = document.createElement('div');
       actions.className = 'saved-card__actions';
       if (entry) {
         const link = document.createElement('a');
         link.className = 'text-link';
         link.href = path;
-        link.textContent = '继续阅读 →';
+        link.textContent = t("继续阅读 →");
         actions.append(link);
       }
       const remove = document.createElement('button');
       remove.type = 'button';
-      remove.textContent = '移除';
-      remove.setAttribute('aria-label', `从稍后阅读移除${entry?.title || '此文章'}`);
+      remove.textContent = t("移除");
+      remove.setAttribute('aria-label', t("从稍后阅读移除{0}", entry?.title || t("此文章")));
       remove.addEventListener('click', () => { change(current => current.filter(item => item !== path)); });
       actions.append(remove);
       card.append(heading, description, actions);
       return card;
     }));
-    if (status) status.textContent = storageError || loadError || `${terms.length ? `找到 ${filtered.length} / ${saved.length} 篇收藏` : `收藏了 ${saved.length} 篇文章`}${metadata && missing ? `，其中 ${missing} 篇暂未找到，记录仍保留。` : '。'}`;
+    if (status) status.textContent = storageError || loadError || `${terms.length ? t("找到 {0} / {1} 篇收藏", filtered.length, saved.length) : t("收藏了 {0} 篇文章", saved.length)}${metadata && missing ? t("，其中 {0} 篇暂未找到，记录仍保留。", missing) : '。'}`;
   };
   const load = () => {
     if (!page || pending || !read().length) return pending;
@@ -118,7 +119,7 @@
         if (!Array.isArray(data)) throw new Error('Invalid index');
         metadata = new Map(data.filter(entry => entry && pathFor(entry.url) && typeof entry.title === 'string').map(entry => [pathFor(entry.url), entry]));
       } catch {
-        loadError = '文章信息暂时无法加载，收藏记录仍保留，可稍后重试。';
+        loadError = t("文章信息暂时无法加载，收藏记录仍保留，可稍后重试。");
         if (retry) retry.hidden = false;
       } finally {
         clearTimeout(timeout);
@@ -136,12 +137,12 @@
     const changed = change(current => {
       added = !current.includes(path);
       if (added && current.length >= 100) {
-        if (message) message.textContent = '收藏已达 100 篇，请先在稍后阅读中移除一些文章。';
+        if (message) message.textContent = t("收藏已达 100 篇，请先在稍后阅读中移除一些文章。");
         return null;
       }
       return added ? [path, ...current] : current.filter(item => item !== path);
     });
-    if (changed && message) message.textContent = added ? '已收藏，可以在稍后阅读中找到。' : '已从稍后阅读移除。';
+    if (changed && message) message.textContent = added ? t("已收藏，可以在稍后阅读中找到。") : t("已从稍后阅读移除。");
   });
   retry?.addEventListener('click', load);
   search?.addEventListener('input', render);
@@ -161,9 +162,9 @@
       document.body.append(link);
       link.click();
       link.remove();
-      if (transferStatus) transferStatus.textContent = `已导出 ${items.length} 篇收藏。备份包含文章路径，不包含正文或阅读进度。`;
+      if (transferStatus) transferStatus.textContent = t("已导出 {0} 篇收藏。备份包含文章路径，不包含正文或阅读进度。", items.length);
     } catch {
-      if (transferStatus) transferStatus.textContent = '无法导出收藏，请检查浏览器是否允许下载文件。';
+      if (transferStatus) transferStatus.textContent = t("无法导出收藏，请检查浏览器是否允许下载文件。");
     } finally {
       if (url) setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
@@ -174,15 +175,15 @@
     if (!file) return;
     if (importButton) importButton.disabled = true;
     try {
-      if (file.size > 256 * 1024) throw new Error('文件过大，请选择 256 KB 以内的 Morii 收藏备份。');
+      if (file.size > 256 * 1024) throw new Error(t("文件过大，请选择 256 KB 以内的 Morii 收藏备份。"));
       let data;
       try { data = JSON.parse(await file.text()); }
-      catch { throw new Error('无法读取备份，请选择有效的 JSON 文件。'); }
-      if (data?.format !== 'morii-reading-list' || data.version !== 1 || !Array.isArray(data.items) || data.items.length > 1000) throw new Error('这不是支持的 Morii 收藏备份，现有收藏未更改。');
+      catch { throw new Error(t("无法读取备份，请选择有效的 JSON 文件。")); }
+      if (data?.format !== 'morii-reading-list' || data.version !== 1 || !Array.isArray(data.items) || data.items.length > 1000) throw new Error(t("这不是支持的 Morii 收藏备份，现有收藏未更改。"));
       const sourceRoot = data.root;
-      if (typeof sourceRoot !== 'string' || !sourceRoot.startsWith('/') || sourceRoot.startsWith('//') || !sourceRoot.endsWith('/') || sourceRoot.length > 256 || /[?#\\\u0000-\u001f]/.test(sourceRoot) || new URL(sourceRoot, location.href).pathname !== sourceRoot) throw new Error('备份中的站点路径无效，现有收藏未更改。');
+      if (typeof sourceRoot !== 'string' || !sourceRoot.startsWith('/') || sourceRoot.startsWith('//') || !sourceRoot.endsWith('/') || sourceRoot.length > 256 || /[?#\\\u0000-\u001f]/.test(sourceRoot) || new URL(sourceRoot, location.href).pathname !== sourceRoot) throw new Error(t("备份中的站点路径无效，现有收藏未更改。"));
       const current = read();
-      if (storageError) throw new Error('无法读取现有收藏，未进行导入，请检查浏览器存储设置。');
+      if (storageError) throw new Error(t("无法读取现有收藏，未进行导入，请检查浏览器存储设置。"));
       const merged = [...current];
       let added = 0; let duplicates = 0; let invalid = 0; let overflow = 0;
       for (const item of data.items) {
@@ -194,11 +195,11 @@
         if (merged.length >= 100) { overflow++; continue; }
         merged.push(path); added++;
       }
-      if (!change(() => merged)) throw new Error('无法保存导入结果，请检查浏览器存储设置。');
-      if (transferStatus) transferStatus.textContent = `已新增 ${added} 篇收藏${duplicates ? `，跳过 ${duplicates} 个重复项` : ''}${invalid ? `，忽略 ${invalid} 个无效路径` : ''}${overflow ? `，${overflow} 篇因达到 100 篇上限未导入` : ''}。`;
+      if (!change(() => merged)) throw new Error(t("无法保存导入结果，请检查浏览器存储设置。"));
+      if (transferStatus) transferStatus.textContent = t("已新增 {0} 篇收藏{1}{2}{3}。", added, duplicates ? t("，跳过 {0} 个重复项", duplicates) : '', invalid ? t("，忽略 {0} 个无效路径", invalid) : '', overflow ? t("，{0} 篇因达到 100 篇上限未导入", overflow) : '');
       if (!metadata) load();
     } catch (error) {
-      if (transferStatus) transferStatus.textContent = error.message || '导入失败，现有收藏未更改。';
+      if (transferStatus) transferStatus.textContent = error.message || t("导入失败，现有收藏未更改。");
     } finally {
       importFile.value = '';
       if (importButton) importButton.disabled = false;

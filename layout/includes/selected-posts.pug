@@ -4,8 +4,8 @@ if selectedPosts.length
     .section-heading
       div
         span.section-kicker START READING
-        h2#selected-heading 值得一读
-      p 从实践中挑出的几篇笔记。
+        h2#selected-heading #{morii_t("值得一读")}
+      p #{morii_t("从实践中挑出的几篇笔记。")}
     .selected-grid
       each post, index in selectedPosts
         a.selected-card(href=url_for(post.path))
@@ -17,4 +17,4 @@ if selectedPosts.length
           .selected-card__body
             span.selected-card__number= '0' + (index + 1)
             strong= post.title
-            small 阅读笔记 →
+            small #{morii_t("阅读笔记 →")}

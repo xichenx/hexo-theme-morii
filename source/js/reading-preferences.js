@@ -1,4 +1,5 @@
 (() => {
+  const t = (...args) => window.MoriiI18n ? window.MoriiI18n.t(...args) : args[0].replace(/\{(\d+)\}/g, (_, i) => String(args[Number(i) + 1] ?? ''));
   const article = document.querySelector('.article-body');
   const settings = document.querySelector('.reading-settings');
   if (!article || !settings) return;
@@ -27,17 +28,17 @@
     try {
       localStorage.setItem(key, JSON.stringify(state));
       status.textContent = message;
-    } catch { status.textContent = `${message} 当前浏览器无法保存，下次进入将恢复默认。`; }
+    } catch { status.textContent = t("{0} 当前浏览器无法保存，下次进入将恢复默认。", message); }
   };
-  smaller.addEventListener('click', () => { state.font = Math.max(15, state.font - 2); persist(`字号已调整为 ${state.font} px。`); });
-  larger.addEventListener('click', () => { state.font = Math.min(21, state.font + 2); persist(`字号已调整为 ${state.font} px。`); });
-  focus.addEventListener('click', () => { state.focus = !state.focus; persist(state.focus ? '已开启专注阅读，目录仍可展开查看。' : '已退出专注阅读。'); });
+  smaller.addEventListener('click', () => { state.font = Math.max(15, state.font - 2); persist(t("字号已调整为 {0} px。", state.font)); });
+  larger.addEventListener('click', () => { state.font = Math.min(21, state.font + 2); persist(t("字号已调整为 {0} px。", state.font)); });
+  focus.addEventListener('click', () => { state.focus = !state.focus; persist(state.focus ? t("已开启专注阅读，目录仍可展开查看。") : t("已退出专注阅读。")); });
   document.getElementById('reading-settings-reset').addEventListener('click', () => {
     state.font = 17;
     state.focus = false;
     render();
     try { localStorage.removeItem(key); } catch { /* Preferences still reset for this page. */ }
-    status.textContent = '已恢复默认字号与阅读布局。';
+    status.textContent = t("已恢复默认字号与阅读布局。");
   });
   document.addEventListener('click', event => {
     if (settings.open && !settings.contains(event.target)) settings.open = false;

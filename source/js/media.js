@@ -1,4 +1,5 @@
 (() => {
+  const t = (...args) => window.MoriiI18n ? window.MoriiI18n.t(...args) : args[0].replace(/\{(\d+)\}/g, (_, i) => String(args[Number(i) + 1] ?? ''));
   const dialog = document.getElementById('image-dialog');
   const preview = document.getElementById('image-preview');
   const caption = document.getElementById('image-caption');
@@ -60,8 +61,8 @@
     preview.hidden = state === 'error' || (state === 'loading' && !preview.getAttribute('src'));
     if (feedback) feedback.hidden = state !== 'error';
     if (retry) retry.hidden = state !== 'error';
-    if (stateTitle) stateTitle.textContent = state === 'error' ? '这张图片暂时无法显示' : '正在加载图片';
-    if (status) status.textContent = state === 'error' ? '原图暂时无法访问，请重试或切换其他照片。' : state === 'loading' ? '稍等片刻，美好正在抵达。' : '';
+    if (stateTitle) stateTitle.textContent = state === 'error' ? t("这张图片暂时无法显示") : t("正在加载图片");
+    if (status) status.textContent = state === 'error' ? t("原图暂时无法访问，请重试或切换其他照片。") : state === 'loading' ? t("稍等片刻，美好正在抵达。") : '';
     applyZoom();
   };
   const sourceFor = image => {
@@ -91,7 +92,7 @@
       clearTimeout(loadingTimer);
       clearTimeout(feedbackTimer);
       preview.src = source;
-      preview.alt = image.alt || '图片预览';
+      preview.alt = image.alt || t("图片预览");
       setImageState('ready');
       resetZoom();
     };
@@ -218,7 +219,7 @@
       if (image.closest('a')) return;
       image.tabIndex = 0;
       image.setAttribute('role', 'button');
-      image.setAttribute('aria-label', `预览图片${image.alt ? `：${image.alt}` : ''}`);
+      image.setAttribute('aria-label', t("预览图片{0}", image.alt ? `：${image.alt}` : ''));
     });
   };
   enhanceImages();

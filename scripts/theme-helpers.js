@@ -1,14 +1,16 @@
 'use strict';
 
+const { forPage } = require('../scripts/lib/i18n.cjs');
 const { tocObj, unescapeHTML, stripHTML } = require('hexo-util');
 
 hexo.extend.helper.register('morii_page_title', function (page) {
-  if (this.is_home()) return page.current > 1 ? `文章 · 第 ${page.current} 页` : hexo.config.title;
-  if (this.is_category()) return `分类 · ${page.category}`;
-  if (this.is_tag()) return `标签 · ${page.tag}`;
-  if (this.is_archive()) return page.year ? `${page.year}${page.month ? ` 年 ${page.month} 月` : ' 年'}归档` : '文章归档';
-  const labels = { tags: '标签', album: '相册', categories: '分类', music: '音乐馆' };
-  const paths = { game: '游戏厅', 'air-conditioner': '小空调', comments: '留言板', bangumis: '追番列表' };
+  const t = (...args) => forPage(hexo, this).t(...args);
+  if (this.is_home()) return page.current > 1 ? t("文章 · 第 {0} 页", page.current) : hexo.config.title;
+  if (this.is_category()) return t("分类 · {0}", page.category);
+  if (this.is_tag()) return t("标签 · {0}", page.tag);
+  if (this.is_archive()) return page.year ? t("{0}{1}归档", page.year, page.month ? t(" 年 {0} 月", page.month) : t(" 年")) : t("文章归档");
+  const labels = { tags: t("标签"), album: t("相册"), categories: t("分类"), music: t("音乐馆") };
+  const paths = { game: t("游戏厅"), 'air-conditioner': t("小空调"), comments: t("留言板"), bangumis: t("追番列表") };
   return labels[page.type] || paths[String(page.path || '').split('/')[0]] || page.title || hexo.config.title;
 });
 
@@ -29,10 +31,11 @@ hexo.extend.helper.register('morii_toc', content => tocObj(content || '', { min_
   .filter(item => item.id)
   .map(item => ({ ...item, text: unescapeHTML(item.text) })));
 
-hexo.extend.helper.register('morii_reading_time', page => {
+hexo.extend.helper.register('morii_reading_time', function (page) {
+  const t = (...args) => forPage(hexo, this).t(...args);
   if (page.password) return '';
   const text = stripHTML(page.content || '');
   const chinese = (text.match(/[\u3400-\u9fff]/g) || []).length;
   const words = (text.replace(/[\u3400-\u9fff]/g, '').match(/[\p{L}\p{N}]+/gu) || []).length;
-  return `约 ${Math.max(1, Math.ceil(chinese / 350 + words / 200))} 分钟阅读`;
+  return t("约 {0} 分钟阅读", Math.max(1, Math.ceil(chinese / 350 + words / 200)));
 });

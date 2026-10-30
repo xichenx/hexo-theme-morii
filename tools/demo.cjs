@@ -6,7 +6,7 @@ const yaml = require('js-yaml');
 const repository = path.resolve(__dirname, '..');
 const manifest = require('../package.json');
 
-async function buildDemo({ root = process.env.MORII_DEMO_ROOT || '/', url = process.env.MORII_DEMO_URL || 'https://example.test', themeOverrides = {} } = {}) {
+async function buildDemo({ root = process.env.MORII_DEMO_ROOT || '/', url = process.env.MORII_DEMO_URL || 'https://example.test', themeOverrides = {}, language } = {}) {
   if (!root.startsWith('/') || root.startsWith('//') || !root.endsWith('/') || /[?#\\]|\.\./.test(root)) throw new Error('Demo root must be an absolute directory path ending in /.');
   const base = new URL(url);
   if (!/^https?:$/.test(base.protocol) || base.username || base.password) throw new Error('Demo URL must use HTTP(S) without credentials.');
@@ -19,9 +19,9 @@ async function buildDemo({ root = process.env.MORII_DEMO_ROOT || '/', url = proc
   fs.writeFileSync(path.join(site, 'package.json'), JSON.stringify({ name: 'morii-demo', private: true, hexo: { version: manifest.devDependencies.hexo }, dependencies: plugins }));
   const theme = path.join(site, 'themes', 'morii');
   fs.mkdirSync(theme);
-  for (const name of ['layout', 'scripts', 'source', '_config.yml', 'package.json']) fs.cpSync(path.join(repository, name), path.join(theme, name), { recursive: true });
+  for (const name of ['layout', 'scripts', 'source', 'languages', '_config.yml', 'package.json']) fs.cpSync(path.join(repository, name), path.join(theme, name), { recursive: true });
   const config = yaml.load(fs.readFileSync(path.join(repository, 'demo/site.yml'), 'utf8'));
-  fs.writeFileSync(path.join(site, '_config.yml'), yaml.dump({ ...config, root, url: new URL(root, base).href.replace(/\/$/, '') }));
+  fs.writeFileSync(path.join(site, '_config.yml'), yaml.dump({ ...config, ...(language ? { language } : {}), root, url: new URL(root, base).href.replace(/\/$/, '') }));
   const demoTheme = yaml.load(fs.readFileSync(path.join(repository, 'demo/theme.yml'), 'utf8'));
   fs.writeFileSync(path.join(site, '_config.morii.yml'), yaml.dump({ ...demoTheme, ...themeOverrides }));
   const hexo = new Hexo(site, { silent: true });

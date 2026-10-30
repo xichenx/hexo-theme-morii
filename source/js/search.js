@@ -1,4 +1,5 @@
 (() => {
+  const t = (...args) => window.MoriiI18n ? window.MoriiI18n.t(...args) : args[0].replace(/\{(\d+)\}/g, (_, i) => String(args[Number(i) + 1] ?? ''));
   const dialog = document.getElementById('search-dialog');
   const input = document.getElementById('search-input');
   const results = document.getElementById('search-results');
@@ -62,7 +63,7 @@
       highlight(title, entry.title, keywords);
       const summary = document.createElement('p');
       summary.className = 'search-result-summary';
-      if (entry.protected) summary.textContent = '加密文章 · 输入密码后阅读全文';
+      if (entry.protected) summary.textContent = t("加密文章 · 输入密码后阅读全文");
       else {
         const lower = entry.content.toLowerCase();
         const offsets = keywords.map(word => lower.indexOf(word)).filter(index => index >= 0);
@@ -71,7 +72,7 @@
         highlight(summary, `${start ? '…' : ''}${text}${start + 150 < entry.content.length ? '…' : ''}`, keywords);
       }
       const meta = document.createElement('small');
-      meta.textContent = [entry.date, entry.protected ? '加密文章' : entry.topics].filter(Boolean).join(' · ');
+      meta.textContent = [entry.date, entry.protected ? t("加密文章") : entry.topics].filter(Boolean).join(' · ');
       const arrow = document.createElement('span'); arrow.className = 'search-result-arrow'; arrow.textContent = '↗'; arrow.setAttribute('aria-hidden', 'true');
       body.append(title, summary, meta); link.append(icon, body, arrow);
       item.append(link);
@@ -79,14 +80,14 @@
     }));
     if (focusedUrl) ([...results.querySelectorAll('a')].find(link => link.href === focusedUrl) || input).focus({ preventScroll: true });
     if (clear) clear.hidden = input.value.length === 0;
-    if (heading) heading.textContent = keywords.length ? '搜索结果' : '最近文章';
-    if (status) status.textContent = `${keywords.length ? '找到' : '共'} ${matches.length} 篇文章 · 已展示 ${Math.min(visible, matches.length)} 篇`;
+    if (heading) heading.textContent = keywords.length ? t("搜索结果") : t("最近文章");
+    if (status) status.textContent = t("{0} {1} 篇文章 · 已展示 {2} 篇", keywords.length ? t("找到") : t("共"), matches.length, Math.min(visible, matches.length));
     if (empty) empty.hidden = matches.length > 0;
     if (more) more.hidden = matches.length <= visible;
   };
   const load = () => {
     if (loaded || loading || !dialog.dataset.searchIndex) return loading;
-    if (service) service.textContent = '正在加载正文搜索…';
+    if (service) service.textContent = t("正在加载正文搜索…");
     if (retry) retry.hidden = true;
     results.setAttribute('aria-busy', 'true');
     loading = (async () => {
@@ -113,10 +114,10 @@
         });
         loaded = true;
         dialog.dataset.searchReady = 'true';
-        if (service) service.textContent = '全文索引已就绪 · 空格分隔多个关键词';
+        if (service) service.textContent = t("全文索引已就绪 · 空格分隔多个关键词");
         render();
       } catch {
-        if (service) service.textContent = '全文索引暂不可用，正在使用页面内标题、摘要和标签搜索';
+        if (service) service.textContent = t("全文索引暂不可用，正在使用页面内标题、摘要和标签搜索");
         if (retry) retry.hidden = false;
       } finally {
         clearTimeout(timeout);

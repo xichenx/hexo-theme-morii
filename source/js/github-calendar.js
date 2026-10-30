@@ -1,4 +1,5 @@
 (() => {
+  const t = (...args) => window.MoriiI18n ? window.MoriiI18n.t(...args) : args[0].replace(/\{(\d+)\}/g, (_, i) => String(args[Number(i) + 1] ?? ''));
   const card = document.querySelector('[data-github-calendar]');
   if (!card) return;
   const grid = card.querySelector('.github-calendar-days');
@@ -40,26 +41,26 @@
       total += day.count;
       const button = document.createElement('button');
       button.type = 'button'; button.className = 'github-calendar-day'; button.dataset.level = String(day.level);
-      button.title = `${day.date} · ${day.count} 次贡献`;
+      button.title = t("{0} · {1} 次贡献", day.date, day.count);
       button.setAttribute('aria-label', button.title);
       button.tabIndex = i === count - 1 ? 0 : -1;
       grid.append(button);
       if (date.slice(0, 7) !== month) {
         month = date.slice(0, 7);
-        const label = document.createElement('span'); label.textContent = `${Number(date.slice(5, 7))}月`;
+        const label = document.createElement('span'); label.textContent = t("{0}月", Number(date.slice(5, 7)));
         label.style.gridColumn = String(Math.floor((offset + i) / 7) + 1);
         if (months.lastElementChild?.style.gridColumn === label.style.gridColumn) months.lastElementChild.remove();
         months.append(label);
       }
     }
-    status.textContent = `${total.toLocaleString()} 次贡献 · 数据截至 ${days.at(-1).date}${cached ? ' · 缓存' : ''}`;
-    detail.textContent = '悬停或点选日期查看详情；可用方向键切换。';
+    status.textContent = t("{0} 次贡献 · 数据截至 {1}{2}", total.toLocaleString(window.MoriiI18n?.locale || 'zh-CN'), days.at(-1).date, cached ? t(" · 缓存") : '');
+    detail.textContent = t("悬停或点选日期查看详情；可用方向键切换。");
     scroller.scrollLeft = scroller.scrollWidth;
   };
   const load = async () => {
     if (pending) return;
     pending = true; retry.hidden = true; card.setAttribute('aria-busy', 'true');
-    status.textContent = '正在加载 GitHub 贡献记录…';
+    status.textContent = t("正在加载 GitHub 贡献记录…");
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 10000);
     try {
@@ -69,7 +70,7 @@
       render(days);
       try { sessionStorage.setItem(key, JSON.stringify({ at: Date.now(), contributions: days })); } catch { /* Cache is optional. */ }
     } catch {
-      status.textContent = '贡献数据暂时无法加载，可重试或点击账号前往 GitHub。';
+      status.textContent = t("贡献数据暂时无法加载，可重试或点击账号前往 GitHub。");
       retry.hidden = false;
     } finally { clearTimeout(timer); pending = false; card.setAttribute('aria-busy', 'false'); }
   };

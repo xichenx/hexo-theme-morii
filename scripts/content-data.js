@@ -1,5 +1,7 @@
 'use strict';
 
+const { forPage } = require('../scripts/lib/i18n.cjs');
+const t = (...args) => forPage(hexo).t(...args);
 const { URL } = require('node:url');
 const array = value => Array.isArray(value) ? value : [];
 const text = value => typeof value === 'string' || typeof value === 'number' ? String(value).trim() : '';
@@ -31,19 +33,19 @@ const dateLabel = value => {
   return match ? `${match[1]}.${match[2].padStart(2, '0')}.${match[3].padStart(2, '0')}` : '';
 };
 
-const albums = data => array(data).filter(item => item && albumPath(item.path_name)).map(item => {
+const albums = (data, translate = t) => array(data).filter(item => item && albumPath(item.path_name)).map(item => {
   const photos = array(item.album_list).filter(Boolean).flatMap(entry => {
     const images = typeof entry.image === 'string' ? [entry.image] : array(entry.image);
     return images.map(resource).filter(Boolean).map(src => ({
       src, caption: text(entry.content), address: text(entry.address), author: text(entry.from), date: dateLabel(entry.date)
     }));
   });
-  return { path: albumPath(item.path_name), title: text(item.class_name) || '相册', description: text(item.description), cover: resource(item.cover) || photos[0]?.src || '', photos };
+  return { path: albumPath(item.path_name), title: text(item.class_name) || translate("相册"), description: text(item.description), cover: resource(item.cover) || photos[0]?.src || '', photos };
 });
-hexo.extend.helper.register('morii_albums', albums);
+hexo.extend.helper.register('morii_albums', function (data) { return albums(data, forPage(hexo, this).t); });
 hexo.extend.helper.register('morii_album', (data, path) => {
   const requested = albumPath(path);
-  return requested ? albums(data).find(album => album.path === requested) : undefined;
+  return requested ? albums(data, forPage(hexo, this).t).find(album => album.path === requested) : undefined;
 });
 
 hexo.extend.helper.register('morii_about', data => {
@@ -57,13 +59,16 @@ hexo.extend.helper.register('morii_about', data => {
   };
 });
 
-hexo.extend.helper.register('morii_friend_groups', data => array(data).filter(Boolean).map((group, index) => ({
-  id: `friend-group-${index + 1}`, title: text(group.class_name) || '友情链接', description: text(group.class_desc),
+hexo.extend.helper.register('morii_friend_groups', function (data) {
+  const t = (...args) => forPage(hexo, this).t(...args);
+return array(data).filter(Boolean).map((group, index) => ({
+  id: `friend-group-${index + 1}`, title: text(group.class_name) || t("友情链接"), description: text(group.class_desc),
   friends: array(group.link_list).filter(Boolean).map(friend => {
     const url = httpUrl(friend.link);
     return { url, name: text(friend.name) || (url ? new URL(url).hostname : ''), description: text(friend.descr), avatar: resource(friend.avatar), domain: url ? new URL(url).hostname : '', screenshot: resource(friend.siteshot), tag: text(friend.tag), recommend: friend.recommend === true };
   }).filter(friend => friend.url)
-})).filter(group => group.friends.length));
+})).filter(group => group.friends.length);
+});
 
 hexo.extend.helper.register('morii_site_card', () => JSON.stringify({
   name: text(hexo.config.title), link: httpUrl(hexo.config.url), avatar: resource(hexo.theme.config.avatar), descr: text(hexo.config.description)

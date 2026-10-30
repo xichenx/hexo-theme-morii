@@ -1,4 +1,5 @@
 (() => {
+  const t = (...args) => window.MoriiI18n ? window.MoriiI18n.t(...args) : args[0].replace(/\{(\d+)\}/g, (_, i) => String(args[Number(i) + 1] ?? ''));
   const hub = document.getElementById('morii-audio-hub');
   if (!hub) return;
   let inherited;
@@ -28,9 +29,9 @@
     const normalize = data => (Array.isArray(data) ? data : []).filter(item => item && typeof item === 'object').flatMap(item => {
       const url = safeURL(item.url);
       const text = value => typeof value === 'string' ? value.trim() : '';
-      return url ? [{ url, title: text(item.title) || text(item.name) || '未命名曲目', artist: text(item.artist) || text(item.author) || '未知音乐人', cover: safeURL(item.cover || item.pic), lrc: safeURL(item.lrc), lyrics: text(item.lyrics) || (typeof item.lrc === 'string' && item.lrc.includes('[0') ? item.lrc : '') }] : [];
+      return url ? [{ url, title: text(item.title) || text(item.name) || t("未命名曲目"), artist: text(item.artist) || text(item.author) || t("未知音乐人"), cover: safeURL(item.cover || item.pic), lrc: safeURL(item.lrc), lyrics: text(item.lyrics) || (typeof item.lrc === 'string' && item.lrc.includes('[0') ? item.lrc : '') }] : [];
     });
-    const state = { tracks: normalize(config.tracks), current: 0, playing: false, time: 0, duration: 0, volume: config.volume ?? .7, mode: 0, status: '选择一首音乐，开始聆听。', fetchStatus: '', loading: false, failed: false, lyrics: [], lyricIndex: -1, lyricStatus: '播放一首歌，让旋律和文字相遇。', activated: false };
+    const state = { tracks: normalize(config.tracks), current: 0, playing: false, time: 0, duration: 0, volume: config.volume ?? .7, mode: 0, status: t("选择一首音乐，开始聆听。"), fetchStatus: '', loading: false, failed: false, lyrics: [], lyricIndex: -1, lyricStatus: t("播放一首歌，让旋律和文字相遇。"), activated: false };
     const emit = () => listeners.forEach(listener => listener(state));
     let playRequest = 0;
     let lyricRequest = 0;
@@ -49,7 +50,7 @@
     const loadLyrics = async track => {
       const token = ++lyricRequest;
       lyricController?.abort(); lyricController = new AbortController();
-      state.lyrics = []; state.lyricIndex = -1; state.lyricStatus = '正在加载歌词…'; emit();
+      state.lyrics = []; state.lyricIndex = -1; state.lyricStatus = t("正在加载歌词…"); emit();
       try {
         let text = track.lyrics;
         if (!text && track.lrc) {
@@ -58,10 +59,10 @@
         }
         if (token !== lyricRequest) return;
         state.lyrics = parseLyrics(text || '');
-        state.lyricStatus = state.lyrics.length ? '' : '暂无同步歌词，静静听一会儿。';
+        state.lyricStatus = state.lyrics.length ? '' : t("暂无同步歌词，静静听一会儿。");
       } catch {
         if (token !== lyricRequest) return;
-        state.lyricStatus = '歌词暂时无法加载，音乐仍可继续播放。';
+        state.lyricStatus = t("歌词暂时无法加载，音乐仍可继续播放。");
       }
       emit();
     };
@@ -75,11 +76,11 @@
       if (!state.tracks[index]) return;
       const token = ++playRequest;
       if (index !== state.current || !player.getAttribute('src')) prepare(index);
-      state.activated = true; state.status = '正在加载音频…'; emit();
+      state.activated = true; state.status = t("正在加载音频…"); emit();
       try { await player.play(); }
       catch (error) {
         if (token !== playRequest || error?.name === 'AbortError') return;
-        state.playing = false; state.status = '这首歌曲暂时无法播放，可以切换下一首或打开原平台歌单。'; emit();
+        state.playing = false; state.status = t("这首歌曲暂时无法播放，可以切换下一首或打开原平台歌单。"); emit();
       }
     };
     const nextIndex = direction => {
@@ -90,7 +91,7 @@
     const load = () => {
       if (loadingPromise) return loadingPromise;
       if (!config.remote) {
-        loaded = true; state.fetchStatus = state.tracks.length ? `${state.tracks.length} 首本地曲目` : '暂未配置歌单。';
+        loaded = true; state.fetchStatus = state.tracks.length ? t("{0} 首本地曲目", state.tracks.length) : t("暂未配置歌单。");
         if (state.tracks.length && !player.getAttribute('src')) prepare(0);
         emit(); return Promise.resolve();
       }
@@ -101,12 +102,12 @@
           const tracks = cached && Date.now() - cached.at < 1800000 ? normalize(cached.tracks) : [];
           if (tracks.length) {
             state.tracks = tracks; prepare(0); loaded = true;
-            state.fetchStatus = `已获取 ${tracks.length} 首歌曲`;
+            state.fetchStatus = t("已获取 {0} 首歌曲", tracks.length);
             emit(); return Promise.resolve();
           }
         } catch { /* Continue with the network when storage is unavailable. */ }
       }
-      state.loading = true; state.failed = false; state.fetchStatus = '正在获取歌单…'; emit();
+      state.loading = true; state.failed = false; state.fetchStatus = t("正在获取歌单…"); emit();
       loadingPromise = (async () => {
         try {
           const values = { ...config.remote, r: String(Math.random()) };
@@ -114,13 +115,13 @@
           if (!endpoint) throw new Error('invalid endpoint');
           const tracks = normalize(await timedFetch(endpoint, 'json', new AbortController(), 8000));
           if (!tracks.length) throw new Error('empty playlist');
-          if (state.activated) { state.fetchStatus = '当前播放队列已保留。'; return; }
+          if (state.activated) { state.fetchStatus = t("当前播放队列已保留。"); return; }
           state.tracks = tracks; prepare(0); loaded = true;
-          state.fetchStatus = `已获取 ${tracks.length} 首歌曲`;
+          state.fetchStatus = t("已获取 {0} 首歌曲", tracks.length);
           try { sessionStorage.setItem(cacheKey, JSON.stringify({ at: Date.now(), tracks })); } catch { /* Playback does not depend on storage. */ }
         } catch {
           state.failed = true;
-          state.fetchStatus = state.tracks.length ? '在线歌单获取失败，可播放本地曲目。' : '歌单获取失败，请重试或打开原平台歌单。';
+          state.fetchStatus = state.tracks.length ? t("在线歌单获取失败，可播放本地曲目。") : t("歌单获取失败，请重试或打开原平台歌单。");
           if (state.tracks.length && !player.getAttribute('src')) prepare(0);
         } finally { state.loading = false; loadingPromise = null; emit(); }
       })();
@@ -128,9 +129,9 @@
     };
     player.volume = state.volume;
     player.addEventListener('play', () => { state.playing = true; emit(); });
-    player.addEventListener('playing', () => { state.playing = true; state.status = `正在播放：${state.tracks[state.current]?.title || ''}`; emit(); });
-    player.addEventListener('pause', () => { state.playing = false; if (!player.error) state.status = '已暂停，可以随时继续。'; emit(); });
-    player.addEventListener('error', () => { state.playing = false; state.status = '音频暂不可用，请切换歌曲或打开原平台歌单。'; emit(); });
+    player.addEventListener('playing', () => { state.playing = true; state.status = t("正在播放：{0}", state.tracks[state.current]?.title || ''); emit(); });
+    player.addEventListener('pause', () => { state.playing = false; if (!player.error) state.status = t("已暂停，可以随时继续。"); emit(); });
+    player.addEventListener('error', () => { state.playing = false; state.status = t("音频暂不可用，请切换歌曲或打开原平台歌单。"); emit(); });
     player.addEventListener('loadedmetadata', () => { state.duration = Number.isFinite(player.duration) ? player.duration : 0; emit(); });
     player.addEventListener('timeupdate', () => {
       state.time = player.currentTime; state.duration = Number.isFinite(player.duration) ? player.duration : 0;
@@ -141,7 +142,7 @@
     player.addEventListener('ended', () => {
       if (state.mode === 2) { player.currentTime = 0; play(state.current); }
       else if (state.current < state.tracks.length - 1 || state.mode === 1 || state.mode === 3) play(nextIndex(1));
-      else { state.playing = false; state.status = '已听完全部曲目。'; emit(); }
+      else { state.playing = false; state.status = t("已听完全部曲目。"); emit(); }
     });
     api = {
       state, player, parseLyrics,
@@ -183,7 +184,7 @@
       }
       shellActive = true; document.body.classList.add('music-shell-loading');
       if (!frame) {
-        frame = document.createElement('iframe'); frame.id = 'morii-site-frame'; frame.title = '网站内容';
+        frame = document.createElement('iframe'); frame.id = 'morii-site-frame'; frame.title = t("网站内容");
         frame.addEventListener('load', showFrame);
         document.body.append(frame);
       }
@@ -212,7 +213,7 @@
         const frameTheme = content.documentElement.dataset.theme;
         if (frameTheme) document.documentElement.dataset.theme = frameTheme;
         document.title = content.title;
-        frame.title = content.title || '网站内容';
+        frame.title = content.title || t("网站内容");
         bindNavigation(content); updateFloating();
         content.getElementById('main')?.setAttribute('tabindex', '-1');
         content.getElementById('main')?.focus({ preventScroll: true });
@@ -262,15 +263,15 @@
       const track = s.tracks[s.current];
       float.classList.toggle('is-playing', s.playing);
       if (s.playing !== wasPlaying) { expand(s.playing); wasPlaying = s.playing; }
-      ball.setAttribute('aria-label', s.playing ? '暂停音乐' : '播放音乐');
+      ball.setAttribute('aria-label', s.playing ? t("暂停音乐") : t("播放音乐"));
       hub.querySelector('.music-ball-state').textContent = s.playing ? 'Ⅱ' : '▶';
       hub.querySelector('.music-capsule-progress').style.transform = `scaleX(${s.duration ? Math.min(1, s.time / s.duration) : 0})`;
-      trackButton.title = `${track?.title || '音乐馆'} · 点击展开或收起歌词`;
-      hub.querySelectorAll('[data-music-title]').forEach(node => { node.textContent = track?.title || '未选择音乐'; });
+      trackButton.title = t("{0} · 点击展开或收起歌词", track?.title || t("音乐馆"));
+      hub.querySelectorAll('[data-music-title]').forEach(node => { node.textContent = track?.title || t("未选择音乐"); });
       hub.querySelectorAll('[data-music-artist]').forEach(node => { node.textContent = track?.artist || ''; });
-      hub.querySelector('[data-music-mini-lyric]').textContent = s.lyrics[s.lyricIndex]?.text || s.lyricStatus || '让音乐陪你继续探索。';
+      hub.querySelector('[data-music-mini-lyric]').textContent = s.lyrics[s.lyricIndex]?.text || s.lyricStatus || t("让音乐陪你继续探索。");
       hub.querySelector('[data-music-status]').textContent = s.status;
-      ball.title = `${track?.title || '音乐馆'} · ${s.playing ? '正在播放' : '已暂停'}`;
+      ball.title = `${track?.title || t("音乐馆")} · ${s.playing ? t("正在播放") : t("已暂停")}`;
       if (track?.cover !== floatCover) {
         floatCover = track?.cover || '';
         const image = hub.querySelector('.music-ball-cover'); image.hidden = !floatCover;
@@ -282,7 +283,7 @@
     hub.hidden = true;
     window.MoriiMusic = api;
   }
-  const modes = ['顺序播放', '列表循环', '单曲循环', '随机播放'];
+  const modes = [t("顺序播放"), t("列表循环"), t("单曲循环"), t("随机播放")];
   const bindControls = root => {
     root.querySelectorAll('[data-music-action]').forEach(button => button.addEventListener('click', () => {
       const action = button.dataset.musicAction;
@@ -291,7 +292,7 @@
       else if (action === 'mode') api.mode();
     }));
     return api.subscribe(s => {
-      root.querySelectorAll('[data-music-toggle]').forEach(button => { button.disabled = !s.tracks.length; button.textContent = s.playing ? 'Ⅱ' : '▶'; button.setAttribute('aria-label', s.playing ? '暂停' : '播放'); });
+      root.querySelectorAll('[data-music-toggle]').forEach(button => { button.disabled = !s.tracks.length; button.textContent = s.playing ? 'Ⅱ' : '▶'; button.setAttribute('aria-label', s.playing ? t("暂停") : t("播放")); });
       root.querySelectorAll('[data-music-action="previous"]').forEach(button => { button.disabled = !s.tracks.length || s.mode === 0 && s.current === 0; });
       root.querySelectorAll('[data-music-action="next"]').forEach(button => { button.disabled = !s.tracks.length || s.mode === 0 && s.current === s.tracks.length - 1; });
     });
@@ -361,8 +362,8 @@
       });
       if (track !== renderedTrack) {
         renderedTrack = track; following = true; follow.hidden = true;
-        room.querySelector('[data-music-title]').textContent = track?.title || '选择一首音乐';
-        room.querySelector('[data-music-artist]').textContent = track?.artist || '让旋律陪你片刻';
+        room.querySelector('[data-music-title]').textContent = track?.title || t("选择一首音乐");
+        room.querySelector('[data-music-artist]').textContent = track?.artist || t("让旋律陪你片刻");
         cover.hidden = !track?.cover;
         const background = room.querySelector('.music-atmosphere'); background.hidden = !track?.cover;
         if (track?.cover) { cover.src = track.cover; background.src = track.cover; } else { cover.removeAttribute('src'); background.removeAttribute('src'); }
@@ -385,7 +386,7 @@
         [...lyrics.children].forEach((node, index) => { if (index === lyricIndex) node.setAttribute('aria-current', 'true'); else node.removeAttribute('aria-current'); });
         scrollLyric();
       }
-      room.querySelector('.music-track-count').textContent = `${s.tracks.length} 首`;
+      room.querySelector('.music-track-count').textContent = t("{0} 首", s.tracks.length);
       room.querySelector('#music-fetch-status').textContent = s.fetchStatus;
       room.querySelector('#music-retry').hidden = !s.failed;
       room.querySelector('[data-music-status]').textContent = s.status;
@@ -394,7 +395,7 @@
       const seek = room.querySelector('.music-seek'); seek.disabled = !s.duration; seek.value = s.duration ? s.time / s.duration * 100 : 0;
       seek.setAttribute('aria-valuetext', `${formatTime(s.time)} / ${formatTime(s.duration)}`);
       room.querySelector('.music-volume').value = s.volume;
-      const mode = room.querySelector('#music-mode'); mode.textContent = ['顺序', '循环', '单曲', '随机'][s.mode]; mode.setAttribute('aria-label', `播放模式：${modes[s.mode]}`);
+      const mode = room.querySelector('#music-mode'); mode.textContent = [t("顺序"), t("循环"), t("单曲"), t("随机")][s.mode]; mode.setAttribute('aria-label', t("播放模式：{0}", modes[s.mode]));
     }));
     api.ensure();
   }

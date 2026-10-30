@@ -14,20 +14,20 @@ block content
       if page.description
         p= page.description
       else if page.type === 'link'
-        p 以文字相识，在彼此的小站里，发现更大的世界。
+        p #{morii_t("以文字相识，在彼此的小站里，发现更大的世界。")}
       else if page.type === 'categories'
-        p 从一个感兴趣的主题，开始下一次探索。
+        p #{morii_t("从一个感兴趣的主题，开始下一次探索。")}
       if categoryEditorial
         span.category-intro-mark(aria-hidden='true') #
         .category-directory-stats
-          div #[strong=morii_category_directory(site.categories).length] #[span 个主题]
-          div #[strong=site.posts.length] #[span 篇全站文章]
+          div #[strong=morii_category_directory(site.categories).length] #[span #{morii_t("个主题")}]
+          div #[strong=site.posts.length] #[span #{morii_t("篇全站文章")}]
       if page.type === 'link'
         - var introGroups = morii_friend_groups(site.data.link)
         .friends-intro-meta
-          span #{introGroups.reduce(function(total, group) { return total + group.friends.length }, 0)} 条友链
-          span #{introGroups.length} 个分组
-          a(href='#friend-connect') 交换友链 ↗
+          span #{introGroups.reduce(function(total, group) { return total + group.friends.length }, 0)} #{morii_t("条友链")}
+          span #{introGroups.length} #{morii_t("个分组")}
+          a(href='#friend-connect') #{morii_t("交换友链 ↗")}
     case page.type
       when 'about'
         include includes/page/about.pug
@@ -39,15 +39,15 @@ block content
             .essay-grid
               each note, noteIndex in (group.essay_list || []).slice(0, group.limit || 100)
                 article.essay-card.panel(id='moment-' + (groupIndex + 1) + '-' + (noteIndex + 1))
-                  .essay-card__top #[span ✦ 即刻] #[time=note.date]
+                  .essay-card__top #[span #{morii_t("✦ 即刻")}] #[time=note.date]
                   p= note.content
                   if note.image && note.image.length
                     .essay-images
                       each img in note.image.slice(0, 3)
                         a(href=img target='_blank' rel='noopener noreferrer')
-                          img(src=img alt='短文配图' loading='lazy')
+                          img(src=img alt=morii_t("短文配图") loading='lazy')
                   if note.link
-                    a.text-link(href=note.link) 查看链接 →
+                    a.text-link(href=note.link) #{morii_t("查看链接 →")}
                   if note.video && note.video.length
                     .essay-videos
                       each video in note.video
@@ -67,7 +67,7 @@ block content
             each category in morii_category_directory(site.categories)
               a.taxonomy-card(href=url_for(category.path))
                 strong= category.name
-                span #{category.count} 篇文章 →
+                span #{category.count} #{morii_t("篇文章 →")}
         else
           include includes/page/categories.pug
       when 'tags'
@@ -88,7 +88,7 @@ block content
             each game in [{name:'魔方', path:'/game/mf/'}, {name:'扫雷', path:'/game/sl/'}, {name:'2048', path:'/game/2048/'}, {name:'五子棋', path:'/game/wzq/'}, {name:'推箱子', path:'/game/txz/'}]
               a.taxonomy-card(href=url_for(game.path))
                 strong= game.name
-                span 开始游戏 →
+                span #{morii_t("开始游戏 →")}
         else if page.content
           .page-prose.panel!= page.content
     if page.type !== 'music' && page.type !== 'cinema' && page.type !== 'categories' && page.type !== 'tags'

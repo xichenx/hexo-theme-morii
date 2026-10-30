@@ -1,4 +1,5 @@
 (() => {
+  const t = (...args) => window.MoriiI18n ? window.MoriiI18n.t(...args) : args[0].replace(/\{(\d+)\}/g, (_, i) => String(args[Number(i) + 1] ?? ''));
   const root = document.documentElement;
   // Hidden dialogs, motion and the inactive music capsule do not block first paint.
   document.querySelectorAll('link[data-deferred-style]').forEach(link => { link.media = 'all'; });
@@ -7,8 +8,8 @@
     if (!themeButton) return;
     const dark = root.dataset.theme === 'dark';
     themeButton.setAttribute('aria-pressed', String(dark));
-    themeButton.setAttribute('aria-label', dark ? '切换浅色模式' : '切换深色模式');
-    themeButton.title = dark ? '切换浅色模式' : '切换深色模式';
+    themeButton.setAttribute('aria-label', dark ? t("切换浅色模式") : t("切换深色模式"));
+    themeButton.title = dark ? t("切换浅色模式") : t("切换深色模式");
   };
   syncThemeButton();
   const brandLogo = document.querySelector('.brand__mark--image img');
@@ -74,13 +75,13 @@
     const wasOpen = menu?.classList.contains('is-open');
     menu?.classList.remove('is-open');
     menuToggle?.setAttribute('aria-expanded', 'false');
-    menuToggle?.setAttribute('aria-label', '打开菜单');
+    menuToggle?.setAttribute('aria-label', t("打开菜单"));
     if (restoreFocus && wasOpen) menuToggle?.focus();
   };
   menuToggle?.addEventListener('click', () => {
     const open = menu?.classList.toggle('is-open');
     menuToggle.setAttribute('aria-expanded', String(Boolean(open)));
-    menuToggle.setAttribute('aria-label', open ? '关闭菜单' : '打开菜单');
+    menuToggle.setAttribute('aria-label', open ? t("关闭菜单") : t("打开菜单"));
   });
   document.addEventListener('click', event => {
     if (!menu?.contains(event.target) && !menuToggle?.contains(event.target)) closeMenu();

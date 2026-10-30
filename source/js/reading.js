@@ -1,4 +1,5 @@
 (() => {
+  const t = (...args) => window.MoriiI18n ? window.MoriiI18n.t(...args) : args[0].replace(/\{(\d+)\}/g, (_, i) => String(args[Number(i) + 1] ?? ''));
   const article = document.querySelector('.article-body');
   if (!article) return;
   const updateOutdatedNotice = () => {
@@ -79,11 +80,11 @@
     try {
       if (!navigator.clipboard?.writeText) throw new Error('Clipboard is unavailable');
       await navigator.clipboard.writeText(text);
-      button.textContent = '已复制';
-      if (announcement) announcement.textContent = '已复制到剪贴板';
+      button.textContent = t("已复制");
+      if (announcement) announcement.textContent = t("已复制到剪贴板");
     } catch {
-      button.textContent = '请手动选择并复制';
-      if (announcement) announcement.textContent = '无法访问剪贴板，请手动选择并复制';
+      button.textContent = t("请手动选择并复制");
+      if (announcement) announcement.textContent = t("无法访问剪贴板，请手动选择并复制");
     } finally {
       setTimeout(() => { button.textContent = label; button.disabled = false; }, 2200);
     }
@@ -99,7 +100,7 @@
       heading.id = id;
     });
     tocContainers.forEach(toc => {
-      if (!headings.length) { toc.textContent = '这篇文章暂无目录'; return; }
+      if (!headings.length) { toc.textContent = t("这篇文章暂无目录"); return; }
       toc.replaceChildren(...headings.map(heading => {
         const link = document.createElement('a');
         link.href = `#${encodeURIComponent(heading.id)}`;
@@ -134,8 +135,8 @@
       language.textContent = languageClass?.replace('language-', '') || [...block.classList].find(name => !['highlight', 'plaintext'].includes(name)) || 'CODE';
       const button = document.createElement('button');
       button.type = 'button';
-      button.textContent = '复制代码';
-      button.setAttribute('aria-label', '复制代码');
+      button.textContent = t("复制代码");
+      button.setAttribute('aria-label', t("复制代码"));
       button.addEventListener('click', () => {
         copyText(codeText(code), button);
       });
@@ -158,7 +159,7 @@
         const sync = () => {
           const expanded = !shell.classList.contains('is-collapsed');
           toggle.setAttribute('aria-expanded', String(expanded));
-          toggle.textContent = expanded ? '收起代码 ↑' : `展开全部 ${lineCount} 行代码 ↓`;
+          toggle.textContent = expanded ? t("收起代码 ↑") : t("展开全部 {0} 行代码 ↓", lineCount);
         };
         toggle.addEventListener('click', () => {
           shell.classList.toggle('is-collapsed');

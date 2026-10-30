@@ -16,6 +16,7 @@
   },
   "files": [
     "_config.yml",
+    "languages/",
     "layout/",
     "scripts/",
     "source/",

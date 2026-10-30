@@ -1,4 +1,5 @@
 (() => {
+  const t = (...args) => window.MoriiI18n ? window.MoriiI18n.t(...args) : args[0].replace(/\{(\d+)\}/g, (_, i) => String(args[Number(i) + 1] ?? ''));
   const directory = document.querySelector('.friend-directory');
   const input = document.getElementById('friend-search');
   const sections = [...document.querySelectorAll('[data-friend-section]')];
@@ -18,7 +19,7 @@
       section.hidden = sectionCount === 0;
       count += sectionCount;
     });
-    document.getElementById('friend-search-status').textContent = `找到 ${count} 个链接`;
+    document.getElementById('friend-search-status').textContent = t("找到 {0} 个链接", count);
     document.getElementById('friend-empty').hidden = count > 0;
     const clear = document.getElementById('friend-clear');
     if (clear) clear.hidden = !input.value;
@@ -49,13 +50,13 @@
     try {
       if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
       await navigator.clipboard.writeText(field.value);
-      status.textContent = '本站信息已复制，可以粘贴到你的友链中。';
+      status.textContent = t("本站信息已复制，可以粘贴到你的友链中。");
     } catch {
       const details = field.closest('details');
       if (details) details.open = true;
       field.focus();
       field.select();
-      status.textContent = '请复制上方已选中的本站信息。';
+      status.textContent = t("请复制上方已选中的本站信息。");
     } finally { copy.disabled = false; }
   });
 })();

@@ -1,5 +1,7 @@
 'use strict';
 
+const { forPage } = require('../scripts/lib/i18n.cjs');
+const t = (...args) => forPage(hexo).t(...args);
 const { URL } = require('node:url');
 const text = value => typeof value === 'string' ? value.trim() : '';
 const webUrl = value => {
@@ -10,8 +12,9 @@ const qrSource = value => {
   if (webUrl(source)) return webUrl(source);
   return source.startsWith('/') && !source.startsWith('//') && !/[\\\u0000-\u001f]/.test(source) ? source : '';
 };
-const badges = { github: 'GH', csdn: 'C', bilibili: 'B站', wechat: '微', weibo: 'W', zhihu: '知', douyin: '抖', xiaohongshu: '红', telegram: 'TG' };
-hexo.extend.helper.register('morii_social_links', () => {
+const badges = { github: 'GH', csdn: 'C', bilibili: t("B站"), wechat: t("微"), weibo: 'W', zhihu: t("知"), douyin: t("抖"), xiaohongshu: t("红"), telegram: 'TG' };
+hexo.extend.helper.register('morii_social_links', function () {
+  const t = (...args) => forPage(hexo, this).t(...args);
   const items = hexo.theme.config.social;
   if (!Array.isArray(items)) return [];
   const seen = new Set();
@@ -25,6 +28,6 @@ hexo.extend.helper.register('morii_social_links', () => {
     if (seen.has(identity)) return [];
     seen.add(identity);
     const icon = Object.hasOwn(badges, item.icon) ? item.icon : 'custom';
-    return [{ name, url, qrcode, icon, badge: badges[icon] || name.slice(0, 2), account: text(item.account), description: text(item.description) || `在${name}关注我` }];
+    return [{ name, url, qrcode, icon, badge: badges[icon] || name.slice(0, 2), account: text(item.account), description: text(item.description) || t("在{0}关注我", name) }];
   });
 });

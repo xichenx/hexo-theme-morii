@@ -3,24 +3,24 @@
 .wrap.listing-page.category-directory-page
   header.page-intro.category-directory-intro(data-intro-word='TOPICS' data-intro-tone='taxonomy')
     include ../intro-atmosphere.pug
-    a.category-breadcrumb(href=url_for('/categories/')) ← 返回分类目录
+    a.category-breadcrumb(href=url_for('/categories/')) #{morii_t("← 返回分类目录")}
     h1= page.category
-    p 这个主题下的思考、实践与持续记录。
+    p #{morii_t("这个主题下的思考、实践与持续记录。")}
     .category-directory-stats
-      div #[strong=currentTopic ? currentTopic.count : page.posts.length] #[span 篇文章]
-      div #[span 第 #{page.current || 1} / #{page.total || 1} 页]
+      div #[strong=currentTopic ? currentTopic.count : page.posts.length] #[span #{morii_t("篇文章")}]
+      div #[span #{morii_t("第 {0} / {1} 页", page.current || 1, page.total || 1)}]
   .category-directory
     aside.category-index
       .category-index-heading
         span.section-kicker CONTENTS
-        h2 所有主题
-      nav(aria-label='所有分类')
+        h2 #{morii_t("所有主题")}
+      nav(aria-label=morii_t("所有分类"))
         each category in directoryTopics
           a(href=url_for(category.path) aria-current=category.name === page.category ? 'page' : undefined)
             span= category.name
             small= String(category.count).padStart(2, '0')
-      a.category-index-all(href=url_for('/archives/')) 全部文章 ↗
-    section.category-post-list(aria-label=page.category + '分类下的文章')
+      a.category-index-all(href=url_for('/archives/')) #{morii_t("全部文章 ↗")}
+    section.category-post-list(aria-label=page.category + morii_t("分类下的文章"))
       each post, index in page.posts.toArray()
         article.category-post-row
           span.category-topic-number(aria-hidden='true')= String(((page.current || 1) - 1) * (config.category_generator && config.category_generator.per_page || config.per_page || page.posts.length) + index + 1).padStart(2, '0')
@@ -28,9 +28,9 @@
             .category-post-meta
               time(datetime=date_xml(post.date))= date(post.date, 'YYYY.MM.DD')
               if post.password
-                span 加密文章
+                span #{morii_t("加密文章")}
             h2
               a(href=url_for(post.path))= post.title
-            p= post.password ? '这篇文章已加密，解锁后即可阅读。' : morii_excerpt(post, 115)
-            a.category-topic-more(href=url_for(post.path)) 阅读全文 #[span(aria-hidden='true') ↗]
+            p= post.password ? morii_t("这篇文章已加密，解锁后即可阅读。") : morii_excerpt(post, 115)
+            a.category-topic-more(href=url_for(post.path)) #{morii_t("阅读全文")} #[span(aria-hidden='true') ↗]
       include ../pagination.pug

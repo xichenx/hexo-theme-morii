@@ -4,7 +4,7 @@ block content
   .wrap
     .panel.special-page.error-page
       span.special-page__icon 404
-      h1 页面走丢了
-      p 或许可以从首页重新出发。
-      a.button.button--primary(href=url_for('/')) 返回首页 →
-      button.button.service-button(type='button' data-open-search) 搜索文章 ⌕
+      h1 #{morii_t("页面走丢了")}
+      p #{morii_t("或许可以从首页重新出发。")}
+      a.button.button--primary(href=url_for('/')) #{morii_t("返回首页 →")}
+      button.button.service-button(type='button' data-open-search) #{morii_t("搜索文章 ⌕")}

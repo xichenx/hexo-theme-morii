@@ -6,12 +6,12 @@ if albums.length
         if album.cover
           img(src=url_for(album.cover) alt=album.title loading=index < 2 ? 'eager' : 'lazy' fetchpriority=index < 2 ? 'high' : 'low' decoding='async')
         .album-card__caption
-          span #{album.photos.length} 张照片
+          span #{album.photos.length} #{morii_t("张照片")}
           strong= album.title
           small= album.description
 else
   .empty-panel.panel
     span.empty-panel__icon(aria-hidden='true') ◇
-    h2 相册正在慢慢收集
-    p 把值得记住的瞬间，留到这里。
-    a.text-link(href=url_for('/essay/')) 先看看即刻短文 →
+    h2 #{morii_t("相册正在慢慢收集")}
+    p #{morii_t("把值得记住的瞬间，留到这里。")}
+    a.text-link(href=url_for('/essay/')) #{morii_t("先看看即刻短文 →")}

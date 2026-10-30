@@ -1,4 +1,5 @@
 (() => {
+  const t = (...args) => window.MoriiI18n ? window.MoriiI18n.t(...args) : args[0].replace(/\{(\d+)\}/g, (_, i) => String(args[Number(i) + 1] ?? ''));
   const article = document.querySelector('.article-body');
   const banner = document.getElementById('reading-resume');
   if (!article || !banner) return;
@@ -43,7 +44,7 @@
     const label = heading?.cloneNode(true);
     label?.querySelectorAll('.headerlink').forEach(link => link.remove());
     const description = document.getElementById('reading-resume-description');
-    if (description) description.textContent = `上次读到 ${Math.round(saved.ratio * 100)}%${label ? ` · ${label.textContent.trim()}` : ''}。进度仅保存在当前浏览器。`;
+    if (description) description.textContent = t("上次读到 {0}%{1}。进度仅保存在当前浏览器。", Math.round(saved.ratio * 100), label ? ` · ${label.textContent.trim()}` : '');
     banner.hidden = false;
   }
   document.getElementById('reading-resume-continue')?.addEventListener('click', () => {
@@ -68,7 +69,7 @@
     write(read().filter(item => item.path !== path));
     banner.hidden = true;
     const announcement = document.getElementById('theme-announcement');
-    if (announcement) announcement.textContent = '已清除此篇阅读记录，本次访问不再保存。';
+    if (announcement) announcement.textContent = t("已清除此篇阅读记录，本次访问不再保存。");
   });
   const interact = () => { interacted = true; };
   for (const event of ['wheel', 'touchstart', 'pointerdown', 'keydown']) document.addEventListener(event, interact, { passive: true });

@@ -7,53 +7,53 @@
       h2= music.title
     .music-room-links
       if music.playlist
-        a(href=url_for(music.playlist) target='_blank' rel='noopener noreferrer') 原平台歌单 ↗
-      a(href=url_for('/')) 返回博客 ↗
+        a(href=url_for(music.playlist) target='_blank' rel='noopener noreferrer') #{morii_t("原平台歌单 ↗")}
+      a(href=url_for('/')) #{morii_t("返回博客 ↗")}
   .music-stage
-    section.music-now(aria-label='当前曲目')
+    section.music-now(aria-label=morii_t("当前曲目"))
       .music-album
         .music-album-fallback(aria-hidden='true') ♫
-        img(data-music-cover alt='歌曲封面' hidden)
+        img(data-music-cover alt=morii_t("歌曲封面") hidden)
         span.music-album-spindle(aria-hidden='true')
         span.music-album-arm(aria-hidden='true')
       .music-now-info
         span.music-player-kicker NOW PLAYING
-        h3#music-current-title(data-music-title) 选择一首音乐
+        h3#music-current-title(data-music-title) #{morii_t("选择一首音乐")}
         p#music-current-artist(data-music-artist)= music.description
-        a#music-source(data-music-source target='_blank' rel='noopener noreferrer' hidden) 打开音频原链接 ↗
-    .music-mobile-tabs(role='group' aria-label='音乐面板')
-      button(type='button' data-music-tab-button='lyrics' aria-pressed='true') 歌词
-      button(type='button' data-music-tab-button='queue' aria-pressed='false') 歌单
-    section.music-lyrics-panel(aria-label='同步歌词')
-      .music-lyrics#music-lyrics(tabindex='0' aria-label='歌词，可点击歌词跳转播放进度')
-        p.music-lyrics-message 播放一首歌，让旋律和文字相遇。
-      button.music-lyrics-follow(type='button' hidden) 跟随当前歌词 ↓
+        a#music-source(data-music-source target='_blank' rel='noopener noreferrer' hidden) #{morii_t("打开音频原链接 ↗")}
+    .music-mobile-tabs(role='group' aria-label=morii_t("音乐面板"))
+      button(type='button' data-music-tab-button='lyrics' aria-pressed='true') #{morii_t("歌词")}
+      button(type='button' data-music-tab-button='queue' aria-pressed='false') #{morii_t("歌单")}
+    section.music-lyrics-panel(aria-label=morii_t("同步歌词"))
+      .music-lyrics#music-lyrics(tabindex='0' aria-label=morii_t("歌词，可点击歌词跳转播放进度"))
+        p.music-lyrics-message #{morii_t("播放一首歌，让旋律和文字相遇。")}
+      button.music-lyrics-follow(type='button' hidden) #{morii_t("跟随当前歌词 ↓")}
     section.music-queue(aria-labelledby='music-library-heading')
       .music-queue-heading
-        h3#music-library-heading 播放列表
-        span.music-track-count 0 首
-      label.sr-only(for='music-search') 搜索曲目或音乐人
-      input#music-search(type='search' placeholder='搜索歌名、歌手…' autocomplete='off')
+        h3#music-library-heading #{morii_t("播放列表")}
+        span.music-track-count #{morii_t("0 首")}
+      label.sr-only(for='music-search') #{morii_t("搜索曲目或音乐人")}
+      input#music-search(type='search' placeholder=morii_t("搜索歌名、歌手…") autocomplete='off')
       .music-fetch-state
-        p#music-fetch-status(role='status' aria-live='polite') 正在获取歌单…
-        button#music-retry(type='button' hidden) 重试
+        p#music-fetch-status(role='status' aria-live='polite') #{morii_t("正在获取歌单…")}
+        button#music-retry(type='button' hidden) #{morii_t("重试")}
       .music-track-list
-      p#music-search-empty(hidden) 没有找到这首音乐。
-  section.music-control-bar(aria-label='播放控制')
+      p#music-search-empty(hidden) #{morii_t("没有找到这首音乐。")}
+  section.music-control-bar(aria-label=morii_t("播放控制"))
     .music-playback-status
-      p#music-play-status(data-music-status role='status') 选择一首音乐，开始聆听。
+      p#music-play-status(data-music-status role='status') #{morii_t("选择一首音乐，开始聆听。")}
     .music-timeline
       span(data-music-elapsed) 0:00
-      input.music-seek(type='range' min='0' max='100' step='0.1' value='0' aria-label='播放进度' disabled)
+      input.music-seek(type='range' min='0' max='100' step='0.1' value='0' aria-label=morii_t("播放进度") disabled)
       span(data-music-duration) 0:00
     .music-transport
-      button#music-mode(type='button' data-music-action='mode' aria-label='播放模式：顺序播放') 顺序
-      button#music-previous(type='button' data-music-action='previous' aria-label='上一首') ⏮
-      button.music-toggle#music-toggle(type='button' data-music-action='toggle' data-music-toggle aria-label='播放') ▶
-      button#music-next(type='button' data-music-action='next' aria-label='下一首') ⏭
+      button#music-mode(type='button' data-music-action='mode' aria-label=morii_t("播放模式：顺序播放")) #{morii_t("顺序")}
+      button#music-previous(type='button' data-music-action='previous' aria-label=morii_t("上一首")) ⏮
+      button.music-toggle#music-toggle(type='button' data-music-action='toggle' data-music-toggle aria-label=morii_t("播放")) ▶
+      button#music-next(type='button' data-music-action='next' aria-label=morii_t("下一首")) ⏭
       label.music-volume-label
         span(aria-hidden='true') ♪
-        span.sr-only 音量
-        input.music-volume(type='range' min='0' max='1' step='0.01' value=music.volume aria-label='音量')
+        span.sr-only #{morii_t("音量")}
+        input.music-volume(type='range' min='0' max='1' step='0.01' value=music.volume aria-label=morii_t("音量"))
   noscript
-    p 启用 JavaScript 后可在本站播放歌曲和显示歌词；也可打开上方原平台歌单。
+    p #{morii_t("启用 JavaScript 后可在本站播放歌曲和显示歌词；也可打开上方原平台歌单。")}

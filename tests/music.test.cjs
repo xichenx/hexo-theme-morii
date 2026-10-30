@@ -9,7 +9,7 @@ const root = path.resolve(__dirname, '..');
 const script = name => fs.readFileSync(path.join(root, 'source/js', name), 'utf8');
 const tick = () => new Promise(resolve => setImmediate(resolve));
 const musicMarkup = music => {
-  const locals = { morii_music: () => music, theme: {}, config: { author: '作者' }, url_for: value => value };
+  const locals = { morii_t: require('../source/js/i18n.js').create('zh-CN').t, morii_music: () => music, theme: {}, config: { author: '作者' }, url_for: value => value };
   const pug = require('pug');
   return pug.renderFile(path.join(root, 'layout/includes/page/music-room.pug'), locals) + pug.renderFile(path.join(root, 'layout/includes/music-hub.pug'), locals);
 };

@@ -1,6 +1,6 @@
 - var socialLinks = morii_social_links()
 if socialLinks.length
-  nav.social-links(aria-label='关注作者')
+  nav.social-links(aria-label=morii_t("关注作者"))
     each social in socialLinks
       .social-entry
         if social.url
@@ -14,7 +14,7 @@ if socialLinks.length
                 = social.badge
             span= social.name
         if social.qrcode
-          button.social-link(type='button' data-social-qr=url_for(social.qrcode) data-social-name=social.name data-social-account=social.account data-social-description=social.description aria-label='扫码关注' + social.name class='social-link--' + social.icon)
+          button.social-link(type='button' data-social-qr=url_for(social.qrcode) data-social-name=social.name data-social-account=social.account data-social-description=social.description aria-label=morii_t("扫码关注") + social.name class='social-link--' + social.icon)
             if !social.url
               span.social-link__badge(aria-hidden='true')
                 if social.icon === 'csdn'
@@ -23,4 +23,4 @@ if socialLinks.length
                   span.social-brand-icon
                 else
                   = social.badge
-            span= social.url ? '扫码' : social.name
+            span= social.url ? morii_t("扫码") : social.name

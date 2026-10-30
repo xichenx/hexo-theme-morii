@@ -15,4 +15,4 @@ mixin postCard(post, featured, eager)
       h3
         a(href=postUrl)= post.title
       p= morii_excerpt(post, featured ? 108 : 82)
-      a.post-card__read(href=postUrl) 阅读文章 #[span →]
+      a.post-card__read(href=postUrl) #{morii_t("阅读文章")} #[span →]

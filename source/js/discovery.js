@@ -1,4 +1,5 @@
 (() => {
+  const t = (...args) => window.MoriiI18n ? window.MoriiI18n.t(...args) : args[0].replace(/\{(\d+)\}/g, (_, i) => String(args[Number(i) + 1] ?? ''));
   document.querySelectorAll('[data-moments]').forEach(card => {
     const items = [...card.querySelectorAll('.moment-item')];
     const controls = card.querySelector('[data-moment-controls]');
@@ -31,7 +32,7 @@
       link.href = selected.href;
       card.querySelector('[data-random-title]').textContent = selected.title;
       card.querySelector('[data-random-summary]').textContent = selected.summary;
-      card.querySelector('[data-random-status]').textContent = `为你找到：${selected.title}`;
+      card.querySelector('[data-random-status]').textContent = t("为你找到：{0}", selected.title);
     });
   });
 })();

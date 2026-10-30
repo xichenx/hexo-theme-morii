@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- 新增 `en`、`zh-CN`、`zh-TW` 主题界面国际化，支持站点语言、页面覆盖、自定义导航语言映射及按语言缓存的交互提示。文章与用户内容保持原文。
+
 ## [1.0.1]
 
 - 修复评论容器的 DOM 全局名称与 Twikoo 客户端冲突，避免出现 `twikoo.init is not a function`。

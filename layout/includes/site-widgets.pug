@@ -3,8 +3,8 @@ if !theme.sidebar || !theme.sidebar.tags || theme.sidebar.tags.enable !== false
   if popularTags.length
     section.side-card.tag-widget
       .side-card__heading
-        h2 标签漫游
-        a.text-link(href=url_for('/tags/') aria-label='查看所有标签') 全部 →
+        h2 #{morii_t("标签漫游")}
+        a.text-link(href=url_for('/tags/') aria-label=morii_t("查看所有标签")) #{morii_t("全部 →")}
       .widget-tag-cloud
         each tag in popularTags
           a(href=url_for(tag.path))
@@ -14,17 +14,17 @@ if !theme.sidebar || !theme.sidebar.stats || theme.sidebar.stats.enable !== fals
   - var siteStats = morii_site_stats(site.posts)
   section.side-card.stats-widget
     .side-card__heading
-      h2 小站档案
+      h2 #{morii_t("小站档案")}
       span ◷
     dl.widget-stat-list
       div
-        dt 已发表文章
-        dd #{siteStats.posts} 篇
+        dt #{morii_t("已发表文章")}
+        dd #{siteStats.posts} #{morii_t("篇")}
       div
-        dt 公开内容字数
-        dd= siteStats.words.toLocaleString('zh-CN')
+        dt #{morii_t("公开内容字数")}
+        dd= siteStats.words.toLocaleString(morii_locale())
       if siteStats.firstPost
         div
-          dt 记录始于
+          dt #{morii_t("记录始于")}
           dd
             time(datetime=date_xml(siteStats.firstPost))= date(siteStats.firstPost, 'YYYY.MM.DD')

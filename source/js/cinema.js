@@ -1,4 +1,5 @@
 (() => {
+  const t = (...args) => window.MoriiI18n ? window.MoriiI18n.t(...args) : args[0].replace(/\{(\d+)\}/g, (_, i) => String(args[Number(i) + 1] ?? ''));
   'use strict';
   const root = document.querySelector('[data-cinema]');
   if (!root) return;
@@ -56,21 +57,21 @@
       item.querySelector('[data-cinema-select]').setAttribute('aria-pressed', String(selected));
     });
     title.textContent = card.dataset.title;
-    description.textContent = card.dataset.description || '选一集，开始播放。';
-    type.textContent = { movie: '电影', series: '电视剧', anime: '动漫' }[card.dataset.type] || '电影';
+    description.textContent = card.dataset.description || t("选一集，开始播放。");
+    type.textContent = { movie: t("电影"), series: t("电视剧"), anime: t("动漫") }[card.dataset.type] || t("电影");
     episodeList?.remove();
     episodeList = document.createElement('div');
     episodeList.className = 'cinema-episodes';
     episodeList.setAttribute('role', 'group');
-    episodeList.setAttribute('aria-label', `${card.dataset.title} 选集`);
+    episodeList.setAttribute('aria-label', t("{0} 选集", card.dataset.title));
     const episodes = [...card.querySelectorAll('[data-cinema-episode]')];
     const label = document.createElement('span');
     label.className = 'cinema-episodes-title';
-    label.textContent = episodes.length ? '选择片源 / 选集' : '片源状态';
+    label.textContent = episodes.length ? t("选择片源 / 选集") : t("片源状态");
     episodeList.append(label);
     if (!episodes.length) {
       const note = document.createElement('p');
-      note.textContent = '这部作品暂时没有可用片源。';
+      note.textContent = t("这部作品暂时没有可用片源。");
       episodeList.append(note);
     }
     episodes.forEach(episode => {

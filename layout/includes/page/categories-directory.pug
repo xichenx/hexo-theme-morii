@@ -1,12 +1,12 @@
 - var directoryTopics = morii_category_directory(site.categories)
 .category-directory-variant
-  nav.category-directory-index(aria-label='分类目录')
+  nav.category-directory-index(aria-label=morii_t("分类目录"))
     span.section-kicker CONTENTS
     each category, index in directoryTopics
       a(href='#category-topic-' + (index + 1))
         span= category.name
         small= category.count
-    a(href=url_for('/archives/')) 全部文章 ↗
+    a(href=url_for('/archives/')) #{morii_t("全部文章 ↗")}
   .category-directory-sections
     each category, index in directoryTopics
       section.category-directory-row(id='category-topic-' + (index + 1) aria-labelledby='category-title-' + (index + 1))
@@ -14,8 +14,8 @@
           span.category-topic-number(aria-hidden='true')= String(index + 1).padStart(2, '0')
           h2(id='category-title-' + (index + 1))
             a(href=url_for(category.path))= category.name
-          span #{category.count} 篇文章
-          a.category-topic-more(href=url_for(category.path)) 查看全部 ↗
+          span #{category.count} #{morii_t("篇文章")}
+          a.category-topic-more(href=url_for(category.path)) #{morii_t("查看全部 ↗")}
         ol
           each post in category.latest
             li
@@ -23,4 +23,4 @@
                 strong= post.title
                 time(datetime=date_xml(post.date))= date(post.date, 'YYYY.MM.DD')
     if !directoryTopics.length
-      p.empty-state 暂时没有分类，先去文章归档看看吧。
+      p.empty-state #{morii_t("暂时没有分类，先去文章归档看看吧。")}

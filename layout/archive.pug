@@ -7,7 +7,7 @@ block content
       include includes/intro-atmosphere.pug
       span.section-kicker= is_category() ? 'CATEGORY' : is_tag() ? 'TAG' : 'ALL STORIES'
       h1= morii_page_title(page)
-      p= is_category() || is_tag() ? '这个主题下的所有文章。' : '所有思考与实践，都在这里留下时间的刻度。'
+      p= is_category() || is_tag() ? morii_t("这个主题下的所有文章。") : morii_t("所有思考与实践，都在这里留下时间的刻度。")
     .content-grid
       section.posts-column
         include includes/category-nav.pug
@@ -22,7 +22,7 @@ block content
               each post, index in page.posts.toArray()
                 +postCard(post, false, index < 2)
         else
-          p.empty-state 这里还没有文章，去其他分类看看吧。
+          p.empty-state #{morii_t("这里还没有文章，去其他分类看看吧。")}
         include includes/pagination.pug
       if is_archive()
         include includes/archive-sidebar.pug

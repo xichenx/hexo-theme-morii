@@ -5,7 +5,7 @@ const crypto = require('node:crypto');
 const { execFileSync } = require('node:child_process');
 const root = path.resolve(__dirname, '..');
 const manifest = require('../package.json');
-const required = ['README.md', 'LICENSE', '_config.yml', 'package.json', 'layout', 'scripts', 'source'];
+const required = ['README.md', 'LICENSE', '_config.yml', 'package.json', 'layout', 'scripts', 'source', 'languages'];
 const optional = ['CHANGELOG.md'];
 function metadata(tag = `v${manifest.version}`, version = manifest.version) {
   const match = /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/.exec(tag);

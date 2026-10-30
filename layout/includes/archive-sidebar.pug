@@ -1,12 +1,12 @@
-aside.sidebar.archive-sidebar(aria-label='归档导航')
+aside.sidebar.archive-sidebar(aria-label=morii_t("归档导航"))
   include profile-card.pug
   if site.posts.length
     section.side-card
       .side-card__heading
-        h2 时间足迹
+        h2 #{morii_t("时间足迹")}
         span(aria-hidden='true') ◷
       .sidebar-years
         each year in morii_archive_years(site.posts)
           a(href=url_for(year.path) aria-current=page.year && Number(page.year) === Number(year.year) ? 'page' : undefined)
             strong= year.year
-            span #{year.count} 篇 →
+            span #{year.count} #{morii_t("篇 →")}

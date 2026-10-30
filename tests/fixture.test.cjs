@@ -179,3 +179,28 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
     }
   });
 });
+
+test('English and Traditional Chinese build at a subpath with cached locale assets and original articles', async () => {
+  for (const language of ['en', 'zh-TW']) {
+    const output = await buildDemo({ root: '/theme/', language, themeOverrides: { menu: [{ name: '首页', path: '/' }, { name: { en: 'My notes', 'zh-CN': '我的笔记', 'zh-TW': '我的筆記' }, path: '/archives/' }] } });
+    const translations = require(`../languages/${language}.json`);
+    for (const file of pages) {
+      const dom = new JSDOM(fs.readFileSync(path.join(output, file), 'utf8'), { url: `https://example.test/theme/${file}`, runScripts: 'outside-only' });
+      const document = dom.window.document;
+      assert.equal(document.documentElement.lang, language);
+      assert.equal(document.querySelector('#search-open').getAttribute('aria-label'), translations['搜索文章']);
+      assert.equal(document.querySelector('.site-nav a').textContent, translations['首页']);
+      assert.equal(document.querySelectorAll('.site-nav a')[1].textContent, language === 'en' ? 'My notes' : '我的筆記');
+      assert.equal(document.querySelector('.navigation-card strong').textContent, translations['首页']);
+      const localeScript = document.querySelector('script[src*="/js/locales/"]');
+      assert.ok(localeScript, `${file}: locale asset`);
+      const relative = localeScript.getAttribute('src').replace(/^\/theme\//, '');
+      assert.match(relative, new RegExp(`^js/locales/${language}\\.[a-f0-9]+\\.js$`));
+      dom.window.eval(fs.readFileSync(path.join(output, relative), 'utf8'));
+      dom.window.eval(fs.readFileSync(path.join(output, 'js/i18n.js'), 'utf8'));
+      assert.equal(dom.window.MoriiI18n.t('切换浅色模式'), translations['切换浅色模式']);
+      if (file === 'posts/welcome/index.html') assert.match(document.querySelector('.article-body').textContent, /这是一篇用于展示 Morii 的示例文章/);
+      dom.window.close();
+    }
+  }
+});

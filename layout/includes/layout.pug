@@ -1,6 +1,6 @@
 doctype html
 - var visualEffects = morii_effects()
-html(lang=config.language || 'zh-CN' style=morii_accent() data-motion=(!theme.motion || theme.motion.enable !== false) ? 'on' : 'off' data-glass=visualEffects.enabled ? (visualEffects.glass ? 'on' : 'off') : null data-effects=visualEffects.enabled ? 'on' : null data-theme-transition=visualEffects.transition ? 'on' : null)
+html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || theme.motion.enable !== false) ? 'on' : 'off' data-glass=visualEffects.enabled ? (visualEffects.glass ? 'on' : 'off') : null data-effects=visualEffects.enabled ? 'on' : null data-theme-transition=visualEffects.transition ? 'on' : null)
   head
     meta(charset='utf-8')
     meta(name='viewport' content='width=device-width, initial-scale=1')
@@ -48,17 +48,17 @@ html(lang=config.language || 'zh-CN' style=morii_accent() data-motion=(!theme.mo
       link(rel='stylesheet' href=url_for('/css/reading.css'))
     if is_post() && (!theme.article || !theme.article.print || theme.article.print.enable !== false)
       link#article-print-style(rel='stylesheet' href=url_for('/css/print.css') media='print')
-  body(class=page.type === 'music' ? 'is-music' : is_post() ? 'is-reading' : page.path && page.path.startsWith('air-conditioner/') ? 'is-playground' : '')
+  body(data-page-loading=morii_t('正在打开页面…') class=page.type === 'music' ? 'is-music' : is_post() ? 'is-reading' : page.path && page.path.startsWith('air-conditioner/') ? 'is-playground' : '')
     if visualEffects.enabled
       .morii-atmosphere(aria-hidden='true' data-aurora=visualEffects.aurora ? 'on' : null)
         if visualEffects.particles
           canvas#morii-particles(data-density=visualEffects.density)
-    a.skip-link(href='#main') 跳转到正文
+    a.skip-link(href='#main') #{morii_t("跳转到正文")}
     include print-toolbar.pug
     .site-shell
       header.site-header
         .site-header__inner
-          a.brand(href=url_for('/') aria-label='返回首页')
+          a.brand(href=url_for('/') aria-label=morii_t("返回首页"))
             span.brand__mark(class=theme.logo ? 'brand__mark--image' : '' aria-hidden='true')
               if theme.logo
                 img(src=url_for(theme.logo) alt='' width='38' height='38')
@@ -68,36 +68,36 @@ html(lang=config.language || 'zh-CN' style=morii_accent() data-motion=(!theme.mo
               strong.brand__text= theme.brand || config.title
               if theme.tagline
                 small.brand__tagline= theme.tagline
-          nav.site-nav#site-nav(aria-label='主导航')
+          nav.site-nav#site-nav(aria-label=morii_t("主导航"))
             each item in theme.menu
               - var activeMenu = is_current(item.path) || (item.path === '/' && is_home()) || (item.path === '/archives/' && (is_archive() || is_post())) || (item.path === '/album/' && page.type === 'album_detail')
-              a(href=url_for(item.path) class=activeMenu ? 'site-nav__item--active' : '' aria-current=activeMenu ? 'page' : false)= item.name
+              a(href=url_for(item.path) class=activeMenu ? 'site-nav__item--active' : '' aria-current=activeMenu ? 'page' : false)= morii_nav_label(item.name)
           .header-actions
             if !theme.quick_navigation || theme.quick_navigation.enable !== false
-              button.icon-button#navigation-open(type='button' aria-label='全站快捷导航' title='全站快捷导航（?）' aria-haspopup='dialog' aria-controls='navigation-dialog' aria-expanded='false')
+              button.icon-button#navigation-open(type='button' aria-label=morii_t("全站快捷导航") title=morii_t("全站快捷导航（?）") aria-haspopup='dialog' aria-controls='navigation-dialog' aria-expanded='false')
                 svg(viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' aria-hidden='true')
                   rect(x='3' y='3' width='7' height='7' rx='1.5')
                   rect(x='14' y='3' width='7' height='7' rx='1.5')
                   rect(x='3' y='14' width='7' height='7' rx='1.5')
                   rect(x='14' y='14' width='7' height='7' rx='1.5')
-            button.icon-button.header-search#search-open(type='button' aria-label='搜索文章' title='搜索文章（⌘/Ctrl + K）')
+            button.icon-button.header-search#search-open(type='button' aria-label=morii_t("搜索文章") title=morii_t("搜索文章（⌘/Ctrl + K）"))
               svg(viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' aria-hidden='true')
                 circle(cx='10.8' cy='10.8' r='6.8')
                 path(d='m16 16 4.5 4.5')
-              span.header-search__label 搜索
-            button.icon-button#theme-toggle(type='button' aria-label='切换深色模式' title='切换深色模式')
+              span.header-search__label #{morii_t("搜索")}
+            button.icon-button#theme-toggle(type='button' aria-label=morii_t("切换深色模式") title=morii_t("切换深色模式"))
               svg.theme-icon--moon(viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' aria-hidden='true')
                 path(d='M20.4 15.6A8.5 8.5 0 0 1 8.4 3.6 8.5 8.5 0 1 0 20.4 15.6Z')
               svg.theme-icon--sun(viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' aria-hidden='true')
                 circle(cx='12' cy='12' r='4')
                 path(d='M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4')
-            button.icon-button#menu-toggle.mobile-only(type='button' aria-label='打开菜单' aria-controls='site-nav' aria-expanded='false')
+            button.icon-button#menu-toggle.mobile-only(type='button' aria-label=morii_t("打开菜单") aria-controls='site-nav' aria-expanded='false')
               svg.menu-icon--open(viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' aria-hidden='true')
                 path(d='M4 7h16M4 12h16M4 17h16')
               svg.menu-icon--close(viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' aria-hidden='true')
                 path(d='M5 5l14 14M19 5 5 19')
         if is_post()
-          .reading-progress(role='progressbar' aria-label='阅读进度' aria-valuemin='0' aria-valuemax='100' aria-valuenow='0')
+          .reading-progress(role='progressbar' aria-label=morii_t("阅读进度") aria-valuemin='0' aria-valuemax='100' aria-valuenow='0')
             .reading-progress__bar
       main#main
         block content
@@ -106,16 +106,16 @@ html(lang=config.language || 'zh-CN' style=morii_accent() data-motion=(!theme.mo
           div
             strong= theme.brand || config.title
             p= theme.tagline
-          a(href=url_for('/archives/')) 继续探索 #[span →]
+          a(href=url_for('/archives/')) #{morii_t("继续探索")} #[span →]
         .footer-bottom
           span © #{new Date().getFullYear()} #{config.author}
           if theme.explore && theme.explore.length
-            nav.footer-explore(aria-label='更多探索')
+            nav.footer-explore(aria-label=morii_t("更多探索"))
               each item in theme.explore
-                a(href=url_for(item.path))= item.name
+                a(href=url_for(item.path))= morii_nav_label(item.name)
               if !theme.reading_list || theme.reading_list.enable !== false
-                a(href=url_for('/reading-list/')) 稍后阅读
-          span 用 Hexo 与 Morii Theme 构建
+                a(href=url_for('/reading-list/')) #{morii_t("稍后阅读")}
+          span #{morii_t("用 Hexo 与 Morii Theme 构建")}
         - var footerRuntime = morii_runtime()
         if footerRuntime || morii_filings().length
           .footer-meta
@@ -128,22 +128,22 @@ html(lang=config.language || 'zh-CN' style=morii_accent() data-motion=(!theme.mo
     include navigation-panel.pug
     include social-dialog.pug
     if is_post()
-      button.reading-toc-trigger(type='button' data-reading-toc aria-haspopup='dialog' aria-controls='reading-toc-dialog' hidden) 目录 #[span(data-reading-percent aria-hidden='true') 0%]
+      button.reading-toc-trigger(type='button' data-reading-toc aria-haspopup='dialog' aria-controls='reading-toc-dialog' hidden) #{morii_t("目录")} #[span(data-reading-percent aria-hidden='true') 0%]
       dialog.reading-toc-dialog#reading-toc-dialog(aria-labelledby='reading-toc-title')
         .reading-toc-heading
-          h2#reading-toc-title 本文目录
-          button.icon-button#reading-toc-close(type='button' aria-label='关闭文章目录') ×
-        nav(aria-label='文章章节')
+          h2#reading-toc-title #{morii_t("本文目录")}
+          button.icon-button#reading-toc-close(type='button' aria-label=morii_t("关闭文章目录")) ×
+        nav(aria-label=morii_t("文章章节"))
           include toc.pug
     if is_post() && (!theme.article || !theme.article.share || theme.article.share.enable !== false)
       include article-share.pug
     include search-panel.pug
-    dialog.lightbox#image-dialog(aria-label='图片预览')
+    dialog.lightbox#image-dialog(aria-label=morii_t("图片预览"))
       .lightbox-header
-        strong 图片预览
-        button.icon-button#image-close(type='button' aria-label='关闭图片预览') ×
+        strong #{morii_t("图片预览")}
+        button.icon-button#image-close(type='button' aria-label=morii_t("关闭图片预览")) ×
       figure
-        .lightbox-stage#image-stage(tabindex='0' role='group' aria-label='图片查看区域' aria-describedby='image-help')
+        .lightbox-stage#image-stage(tabindex='0' role='group' aria-label=morii_t("图片查看区域") aria-describedby='image-help')
           img#image-preview(alt='' draggable='false')
           .lightbox-feedback#image-feedback(hidden)
             span.lightbox-feedback-icon(aria-hidden='true')
@@ -151,24 +151,27 @@ html(lang=config.language || 'zh-CN' style=morii_accent() data-motion=(!theme.mo
                 rect(x='4' y='5' width='24' height='22' rx='5')
                 circle(cx='12' cy='12' r='2')
                 path(d='m5 23 7-7 5 5 4-4 6 6')
-            strong#image-state-title 正在加载图片
+            strong#image-state-title #{morii_t("正在加载图片")}
             p#image-status(role='status' aria-live='polite')
-            button.button.service-button#image-retry(type='button' hidden) 重新加载图片
+            button.button.service-button#image-retry(type='button' hidden) #{morii_t("重新加载图片")}
         figcaption#image-caption
-      .lightbox-zoom(role='group' aria-label='图片缩放')
-        button.icon-button#image-zoom-out(type='button' aria-label='缩小图片' title='缩小（−）') −
-        output#image-scale(aria-label='当前缩放倍数') 1.0×
-        button.icon-button#image-zoom-in(type='button' aria-label='放大图片' title='放大（+）') +
-        button.button.service-button#image-reset(type='button' title='重置缩放（0）') 适应窗口
-      p.lightbox-help#image-help 滚轮 / 双指缩放 · 放大后拖拽 · 左右滑动切图 · Esc 关闭
+      .lightbox-zoom(role='group' aria-label=morii_t("图片缩放"))
+        button.icon-button#image-zoom-out(type='button' aria-label=morii_t("缩小图片") title=morii_t("缩小（−）")) −
+        output#image-scale(aria-label=morii_t("当前缩放倍数")) 1.0×
+        button.icon-button#image-zoom-in(type='button' aria-label=morii_t("放大图片") title=morii_t("放大（+）")) +
+        button.button.service-button#image-reset(type='button' title=morii_t("重置缩放（0）")) #{morii_t("适应窗口")}
+      p.lightbox-help#image-help #{morii_t("滚轮 / 双指缩放 · 放大后拖拽 · 左右滑动切图 · Esc 关闭")}
       .lightbox-controls
-        button.icon-button#image-previous(type='button' aria-label='上一张图片') ←
+        button.icon-button#image-previous(type='button' aria-label=morii_t("上一张图片")) ←
         span#image-counter(aria-live='polite')
-        button.icon-button#image-next(type='button' aria-label='下一张图片') →
-        a.text-link#image-original(target='_blank' rel='noopener noreferrer') 打开原图 ↗
-    button.icon-button.back-to-top#back-to-top(type='button' aria-label='返回顶部' hidden) ↑
+        button.icon-button#image-next(type='button' aria-label=morii_t("下一张图片")) →
+        a.text-link#image-original(target='_blank' rel='noopener noreferrer') #{morii_t("打开原图 ↗")}
+    button.icon-button.back-to-top#back-to-top(type='button' aria-label=morii_t("返回顶部") hidden) ↑
     .sr-only#theme-announcement(role='status' aria-live='polite')
     include music-hub.pug
+    if morii_locale_asset()
+      script(src=url_for(morii_locale_asset()) defer)
+    script(src=url_for('/js/i18n.js') defer)
     script(src=url_for('/js/theme.js') + '?v=nav-performance-2' defer)
     script(src=url_for('/js/music.js') + '?v=nav-performance-1' defer)
     if page.type === 'cinema'

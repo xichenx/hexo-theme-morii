@@ -8,7 +8,7 @@ block content
         include includes/intro-atmosphere.pug
         span.section-kicker CATEGORY
         h1= morii_page_title(page)
-        p 这个主题下的所有文章。
+        p #{morii_t("这个主题下的所有文章。")}
       .content-grid
         section.posts-column
           include includes/category-nav.pug
@@ -17,7 +17,7 @@ block content
               each post, index in page.posts.toArray()
                 +postCard(post, false, index < 2)
           else
-            p.empty-state 这里还没有文章。
+            p.empty-state #{morii_t("这里还没有文章。")}
           include includes/pagination.pug
         include includes/sidebar.pug
   else

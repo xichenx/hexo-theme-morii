@@ -3,10 +3,10 @@ if !theme.quick_navigation || theme.quick_navigation.enable !== false
     .navigation-dialog__header
       div
         span.section-kicker EXPLORE MORII
-        h2#navigation-heading 去哪里逛逛
-        p 技术笔记、生活片段，还有一点小乐趣。
-      button.icon-button#navigation-close(type='button' aria-label='关闭快捷导航') ×
-    nav.navigation-grid(aria-label='全站快捷导航')
+        h2#navigation-heading #{morii_t("去哪里逛逛")}
+        p #{morii_t("技术笔记、生活片段，还有一点小乐趣。")}
+      button.icon-button#navigation-close(type='button' aria-label=morii_t("关闭快捷导航")) ×
+    nav.navigation-grid(aria-label=morii_t("全站快捷导航"))
       each item in morii_navigation()
         a.navigation-card(href=url_for(item.path))
           - var iconName = morii_icon(item.icon)
@@ -17,5 +17,5 @@ if !theme.quick_navigation || theme.quick_navigation.enable !== false
             strong= item.name
             small= item.description
     .navigation-shortcuts
-      button.navigation-search(type='button' data-open-search) 搜索文章 #[kbd ⌘ / Ctrl + K]
-      p #[kbd ?] 打开快捷导航 · #[kbd Esc] 关闭弹窗
+      button.navigation-search(type='button' data-open-search) #{morii_t("搜索文章")} #[kbd ⌘ / Ctrl + K]
+      p #[kbd ?] #{morii_t("打开快捷导航 ·")} #[kbd Esc] #{morii_t("关闭弹窗")}

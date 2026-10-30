@@ -2,27 +2,27 @@
 .section-heading.album-detail-heading
   div
     span.section-kicker PHOTO JOURNAL
-    h2= album ? album.title : '相册'
+    h2= album ? album.title : morii_t("相册")
     if album && album.description
       p= album.description
-  a.text-link(href=url_for('/album/')) ← 返回相册
+  a.text-link(href=url_for('/album/')) #{morii_t("← 返回相册")}
 if album && album.photos.length
-  p.album-count 共 #{album.photos.length} 张照片 · 点击图片浏览
+  p.album-count #{morii_t("共 {0} 张照片 · 点击图片浏览", album.photos.length)}
   .photo-grid(data-gallery)
     each photo, index in album.photos
-      - var photoCaption = [photo.caption || album.title, photo.address, photo.author ? '来自 ' + photo.author : '', photo.date].filter(Boolean).join(' · ')
+      - var photoCaption = [photo.caption || album.title, photo.address, photo.author ? morii_t("来自 ") + photo.author : '', photo.date].filter(Boolean).join(' · ')
       a.photo-card(href=url_for(photo.src) data-caption=photoCaption data-image-fallback)
         img(src=url_for(photo.src) alt=photo.caption || album.title loading=index < 2 ? 'eager' : 'lazy' fetchpriority=index < 2 ? 'high' : 'low' decoding='async')
-        span.image-placeholder(hidden aria-hidden='true') 照片暂时无法加载
+        span.image-placeholder(hidden aria-hidden='true') #{morii_t("照片暂时无法加载")}
         .photo-card__details
           strong= photo.caption || album.title
           if photo.address || photo.date
             small= [photo.address, photo.date].filter(Boolean).join(' · ')
           if photo.author
-            small= '来自 ' + photo.author
+            small= morii_t("来自 ") + photo.author
 else
   .empty-panel.panel
     span.empty-panel__icon(aria-hidden='true') ◇
-    h2 这里还没有照片
-    p 过些日子，再来看看吧。
-    a.text-link(href=url_for('/album/')) 浏览其他相册 →
+    h2 #{morii_t("这里还没有照片")}
+    p #{morii_t("过些日子，再来看看吧。")}
+    a.text-link(href=url_for('/album/')) #{morii_t("浏览其他相册 →")}

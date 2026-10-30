@@ -1,4 +1,5 @@
 (() => {
+  const t = (...args) => window.MoriiI18n ? window.MoriiI18n.t(...args) : args[0].replace(/\{(\d+)\}/g, (_, i) => String(args[Number(i) + 1] ?? ''));
   const dialog = document.getElementById('navigation-dialog');
   const button = document.getElementById('navigation-open');
   if (!dialog || !button) return;
@@ -9,7 +10,7 @@
     if (document.querySelector('dialog[open]')) return;
     opener = document.activeElement;
     document.getElementById('menu-toggle')?.setAttribute('aria-expanded', 'false');
-    document.getElementById('menu-toggle')?.setAttribute('aria-label', '打开菜单');
+    document.getElementById('menu-toggle')?.setAttribute('aria-label', t("打开菜单"));
     document.querySelector('.site-nav')?.classList.remove('is-open');
     dialog.showModal();
     button.setAttribute('aria-expanded', 'true');

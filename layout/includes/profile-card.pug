@@ -5,5 +5,5 @@ section.side-card.profile-card
   p= config.description
   include social-links.pug
   .profile-card__links
-    a(href=url_for('/about/')) 认识我
-    a(href=url_for('/link/')) 友情链接
+    a(href=url_for('/about/')) #{morii_t("认识我")}
+    a(href=url_for('/link/')) #{morii_t("友情链接")}

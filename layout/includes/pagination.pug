@@ -1,11 +1,11 @@
 - var paginationItems = morii_pagination(page)
 if paginationItems.length
-  nav.pagination.pagination--numbered(aria-label='文章分页' class=[page.current <= 1 ? 'pagination--first' : '', page.current >= page.total ? 'pagination--last' : ''])
+  nav.pagination.pagination--numbered(aria-label=morii_t("文章分页") class=[page.current <= 1 ? 'pagination--first' : '', page.current >= page.total ? 'pagination--last' : ''])
     each item in paginationItems
       if item.rel === 'prev'
         a.pagination__step(href=url_for(item.path) rel=item.rel aria-label=item.aria class='pagination__step--' + item.rel)
           span(aria-hidden='true') ←
-          span 上一页
+          span #{morii_t("上一页")}
     .pagination__items
       each item in paginationItems
         if item.rel
@@ -19,6 +19,6 @@ if paginationItems.length
     each item in paginationItems
       if item.rel === 'next'
         a.pagination__step.pagination__step--next(href=url_for(item.path) rel='next' aria-label=item.aria)
-          span 下一页
+          span #{morii_t("下一页")}
           span(aria-hidden='true') →
-    span.pagination__summary 第 #{page.current} / #{page.total} 页
+    span.pagination__summary #{morii_t("第 {0} / {1} 页", page.current, page.total)}

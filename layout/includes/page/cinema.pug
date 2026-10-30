@@ -1,45 +1,45 @@
 - var films = morii_cinema_catalog()
-- var categories = [{key:'all', name:'全部', count:films.length}, {key:'movie', name:'电影', count:films.filter(function(film) { return film.type === 'movie' }).length}, {key:'series', name:'电视剧', count:films.filter(function(film) { return film.type === 'series' }).length}, {key:'anime', name:'动漫', count:films.filter(function(film) { return film.type === 'anime' }).length}]
+- var categories = [{key:'all', name:morii_t("全部"), count:films.length}, {key:'movie', name:morii_t("电影"), count:films.filter(function(film) { return film.type === 'movie' }).length}, {key:'series', name:morii_t("电视剧"), count:films.filter(function(film) { return film.type === 'series' }).length}, {key:'anime', name:morii_t("动漫"), count:films.filter(function(film) { return film.type === 'anime' }).length}]
 .cinema(data-cinema)
   if films.length
     .cinema-stage(data-cinema-stage hidden)
       .cinema-stage-heading
         div
           span.section-kicker NOW SHOWING
-          h2(data-cinema-title aria-live='polite') 正在放映
-        button.cinema-close(type='button' data-cinema-close) ← 返回片单
+          h2(data-cinema-title aria-live='polite') #{morii_t("正在放映")}
+        button.cinema-close(type='button' data-cinema-close) #{morii_t("← 返回片单")}
       .cinema-stage-body
         .cinema-screen
           video.cinema-video(data-cinema-video controls preload='none' playsinline hidden)
-          iframe.cinema-embed(data-cinema-embed title='电影播放器' allow='autoplay; fullscreen; picture-in-picture' allowfullscreen referrerpolicy='strict-origin-when-cross-origin' sandbox='allow-scripts allow-same-origin allow-presentation' hidden)
+          iframe.cinema-embed(data-cinema-embed title=morii_t("电影播放器") allow='autoplay; fullscreen; picture-in-picture' allowfullscreen referrerpolicy='strict-origin-when-cross-origin' sandbox='allow-scripts allow-same-origin allow-presentation' hidden)
           .cinema-screen-placeholder(data-cinema-placeholder)
             span.cinema-screen-mark(aria-hidden='true') ✦
-            strong 选一集，开始放映
+            strong #{morii_t("选一集，开始放映")}
             span CINEMA · MORII
         .cinema-now
-          span.cinema-now-type(data-cinema-type) 电影
+          span.cinema-now-type(data-cinema-type) #{morii_t("电影")}
           p(data-cinema-description)
           .cinema-episodes-anchor(data-cinema-episodes-anchor)
     .cinema-library
       .cinema-library-heading
         div
           span.section-kicker THE COLLECTION
-          h2 片单 #[small #{films.length} 部作品]
-        p 电影、剧集和动漫，挑一部慢慢看。
+          h2 #{morii_t("片单")} #[small #{films.length} #{morii_t("部作品")}]
+        p #{morii_t("电影、剧集和动漫，挑一部慢慢看。")}
       .cinema-toolbar
-        .cinema-filters(role='group' aria-label='作品分类')
+        .cinema-filters(role='group' aria-label=morii_t("作品分类"))
           each category in categories
             button.cinema-filter(type='button' data-cinema-filter=category.key aria-pressed=category.key === 'all' ? 'true' : 'false') #{category.name} #[span= category.count]
         label.cinema-search
-          span.sr-only 搜索片名
+          span.sr-only #{morii_t("搜索片名")}
           svg(viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' aria-hidden='true')
             circle(cx='10.8' cy='10.8' r='6.8')
             path(d='m16 16 4.5 4.5')
-          input(type='search' data-cinema-search placeholder='搜索作品' autocomplete='off')
+          input(type='search' data-cinema-search placeholder=morii_t("搜索作品") autocomplete='off')
       .cinema-list(data-cinema-grid)
         each film, index in films
           article.cinema-card(data-cinema-card data-type=film.type data-title=film.title data-description=film.description)
-            button.cinema-card-button(type='button' data-cinema-select aria-label='查看 ' + film.title + ' 的片源' aria-pressed='false')
+            button.cinema-card-button(type='button' data-cinema-select aria-label=morii_t("查看 ") + film.title + morii_t(" 的片源") aria-pressed='false')
               .cinema-poster
                 if film.cover
                   img(src=url_for(film.cover) alt='' loading=index < 2 ? 'eager' : 'lazy' fetchpriority=index < 2 ? 'high' : 'low' decoding='async')
@@ -48,20 +48,20 @@
                 span.cinema-poster-index= String(index + 1).padStart(2, '0')
               .cinema-card-copy
                 .cinema-card-top
-                  span.cinema-card-type= film.type === 'series' ? '电视剧' : film.type === 'anime' ? '动漫' : '电影'
+                  span.cinema-card-type= film.type === 'series' ? morii_t("电视剧") : film.type === 'anime' ? morii_t("动漫") : morii_t("电影")
                   if film.year
                     span= film.year
-                  span= film.episodes.length ? film.episodes.length + (film.type === 'movie' ? ' 个片源' : ' 集') : '待上架'
+                  span= film.episodes.length ? film.episodes.length + (film.type === 'movie' ? morii_t(" 个片源") : morii_t(" 集")) : morii_t("待上架")
                 strong.cinema-card-title= film.title
-                p= film.description || '挑一段空闲时间，来这里看一场。'
-                span.cinema-card-action= film.episodes.length ? '查看片源  →' : '查看详情  →'
+                p= film.description || morii_t("挑一段空闲时间，来这里看一场。")
+                span.cinema-card-action= film.episodes.length ? morii_t("查看片源  →") : morii_t("查看详情  →")
               span.cinema-card-arrow(aria-hidden='true') ↗
             .cinema-card-data(hidden)
               each episode in film.episodes
                 span(data-cinema-episode data-kind=episode.kind data-url=url_for(episode.url) data-title=episode.title)
-      p.cinema-empty(data-cinema-no-results hidden) 没有找到符合条件的作品，试试别的关键词。
+      p.cinema-empty(data-cinema-no-results hidden) #{morii_t("没有找到符合条件的作品，试试别的关键词。")}
   else
     .cinema-empty.panel
-      strong 放映表还空着
-      p 在博客的 source/_data/cinema.yml 中添加作品与播放地址，就可以开始放映。
-  p.cinema-note 片源由站点维护者提供。播放效果取决于视频格式、片源服务及浏览器支持。
+      strong #{morii_t("放映表还空着")}
+      p #{morii_t("在博客的 source/_data/cinema.yml 中添加作品与播放地址，就可以开始放映。")}
+  p.cinema-note #{morii_t("片源由站点维护者提供。播放效果取决于视频格式、片源服务及浏览器支持。")}

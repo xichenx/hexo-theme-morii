@@ -1,5 +1,6 @@
 'use strict';
 
+const { forPage } = require('../scripts/lib/i18n.cjs');
 const { URL } = require('node:url');
 
 const uiIcons = new Set([
@@ -9,20 +10,22 @@ const uiIcons = new Set([
 ]);
 hexo.extend.helper.register('morii_icon', name => typeof name === 'string' && uiIcons.has(name) ? name : '');
 
-const defaults = {
-  '/': ['home', '回到首页，发现新的内容'],
-  archives: ['archive', '按时间翻阅所有文章'], categories: ['categories', '按主题寻找技术笔记'], tags: ['tags', '从关键词出发探索'],
-  essay: ['essay', '生活片段与随手记录'], album: ['album', '收藏值得记住的瞬间'], link: ['link', '去朋友们的博客坐坐'],
-  about: ['about', '认识这个小站和作者'], music: ['music', '给日常留一点旋律'], cinema: ['cinema', '挑一部电影、剧集或动漫'], fcircle: ['friends', '看看朋友们的新文章'],
-  comments: ['comments', '留下你的想法与问候'], game: ['game', '玩一会儿，再继续探索'],
-  'air-conditioner': ['snowflake', '一个可以操作的网页小玩具'], 'reading-list': ['bookmark', '接着读你收藏的文章']
-};
-hexo.extend.helper.register('morii_navigation', () => {
+hexo.extend.helper.register('morii_navigation', function () {
+  const t = (...args) => forPage(hexo, this).t(...args);
+  const defaults = {
+    '/': ['home', t("回到首页，发现新的内容")],
+    archives: ['archive', t("按时间翻阅所有文章")], categories: ['categories', t("按主题寻找技术笔记")], tags: ['tags', t("从关键词出发探索")],
+    essay: ['essay', t("生活片段与随手记录")], album: ['album', t("收藏值得记住的瞬间")], link: ['link', t("去朋友们的博客坐坐")],
+    about: ['about', t("认识这个小站和作者")], music: ['music', t("给日常留一点旋律")], cinema: ['cinema', t("挑一部电影、剧集或动漫")], fcircle: ['friends', t("看看朋友们的新文章")],
+    comments: ['comments', t("留下你的想法与问候")], game: ['game', t("玩一会儿，再继续探索")],
+    'air-conditioner': ['snowflake', t("一个可以操作的网页小玩具")], 'reading-list': ['bookmark', t("接着读你收藏的文章")]
+  };
   const config = hexo.theme.config;
-  const items = [...(Array.isArray(config.menu) ? config.menu : []), { name: '标签', path: '/tags/' }, ...(Array.isArray(config.explore) ? config.explore : [])];
-  if (config.reading_list?.enable !== false) items.push({ name: '稍后阅读', path: '/reading-list/' });
+  const items = [...(Array.isArray(config.menu) ? config.menu : []), { name: t("标签"), path: '/tags/' }, ...(Array.isArray(config.explore) ? config.explore : [])];
+  if (config.reading_list?.enable !== false) items.push({ name: t("稍后阅读"), path: '/reading-list/' });
   const seen = new Set();
   return items.flatMap(item => {
+    if (item) item = { ...item, name: this.morii_nav_label ? this.morii_nav_label(item.name) : forPage(hexo, this).localized(item.name), description: forPage(hexo, this).localized(item.description) };
     if (!item || typeof item.path !== 'string' || typeof item.name !== 'string' || !item.name.trim()) return [];
     const path = item.path.trim();
     if (!path || /[\\\u0000-\u001f]/.test(path) || path.startsWith('//')) return [];
@@ -34,7 +37,7 @@ hexo.extend.helper.register('morii_navigation', () => {
     const identity = path.replace(/\/$/, '');
     if (seen.has(identity)) return [];
     seen.add(identity);
-    const [icon, description] = defaults[key] || ['external', '打开这个页面'];
+    const [icon, description] = defaults[key] || ['external', t("打开这个页面")];
     return [{ path, name: item.name.trim(), icon: typeof item.icon === 'string' ? item.icon : icon, description: typeof item.description === 'string' ? item.description : description }];
   });
 });

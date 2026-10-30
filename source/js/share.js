@@ -1,4 +1,5 @@
 (() => {
+  const t = (...args) => window.MoriiI18n ? window.MoriiI18n.t(...args) : args[0].replace(/\{(\d+)\}/g, (_, i) => String(args[Number(i) + 1] ?? ''));
   const dialog = document.getElementById('article-share-dialog');
   if (!dialog || typeof dialog.showModal !== 'function') return;
   const title = document.querySelector('.article-header h1')?.textContent.trim() || document.title;
@@ -12,8 +13,8 @@
   let session = 0;
   document.getElementById('article-share-title').textContent = title;
   const hint = typeof navigator.share === 'function'
-    ? '可复制链接，或通过系统分享选择应用。'
-    : '当前浏览器不支持系统分享，可复制后粘贴到其他应用。';
+    ? t("可复制链接，或通过系统分享选择应用。")
+    : t("当前浏览器不支持系统分享，可复制后粘贴到其他应用。");
   document.querySelectorAll('[data-share-article]').forEach(button => {
     button.hidden = false;
     button.addEventListener('click', () => {
@@ -30,26 +31,26 @@
     content.value = text;
     try {
       await navigator.clipboard.writeText(text);
-      if (dialog.open && currentSession === session) status.textContent = `已复制${label}，可粘贴到其他应用。`;
+      if (dialog.open && currentSession === session) status.textContent = t("已复制{0}，可粘贴到其他应用。", label);
     } catch {
       if (!dialog.open || currentSession !== session) return;
       content.focus();
       content.select();
-      status.textContent = '自动复制不可用，已选中内容，请长按或按 Ctrl/Cmd + C 复制。';
+      status.textContent = t("自动复制不可用，已选中内容，请长按或按 Ctrl/Cmd + C 复制。");
     }
   };
-  document.getElementById('article-share-copy').addEventListener('click', () => copy(url, '文章链接'));
-  document.getElementById('article-share-markdown').addEventListener('click', () => copy(markdown, ' Markdown 链接'));
+  document.getElementById('article-share-copy').addEventListener('click', () => copy(url, t("文章链接")));
+  document.getElementById('article-share-markdown').addEventListener('click', () => copy(markdown, t(" Markdown 链接")));
   nativeButton.hidden = typeof navigator.share !== 'function';
   nativeButton.addEventListener('click', async () => {
     const currentSession = session;
     nativeButton.disabled = true;
     try {
       await navigator.share({ title, url });
-      if (dialog.open && currentSession === session) status.textContent = '系统分享已完成。';
+      if (dialog.open && currentSession === session) status.textContent = t("系统分享已完成。");
     } catch (error) {
       if (dialog.open && currentSession === session) status.textContent = error?.name === 'AbortError'
-        ? '已取消分享，仍可复制链接。' : '系统分享暂不可用，请使用复制链接。';
+        ? t("已取消分享，仍可复制链接。") : t("系统分享暂不可用，请使用复制链接。");
     } finally {
       nativeButton.disabled = false;
     }

@@ -1,4 +1,5 @@
 (() => {
+  const t = (...args) => window.MoriiI18n ? window.MoriiI18n.t(...args) : args[0].replace(/\{(\d+)\}/g, (_, i) => String(args[Number(i) + 1] ?? ''));
   const stylesheet = document.getElementById('article-print-style');
   const toolbar = document.getElementById('article-print-toolbar');
   const article = document.querySelector('.article-body');
@@ -46,7 +47,7 @@
   document.getElementById('exit-print-preview')?.addEventListener('click', close);
   document.getElementById('print-article')?.addEventListener('click', () => {
     try { window.print(); }
-    catch { document.getElementById('print-status').textContent = '当前浏览器无法打开打印窗口，请使用浏览器菜单中的打印功能。'; }
+    catch { document.getElementById('print-status').textContent = t("当前浏览器无法打开打印窗口，请使用浏览器菜单中的打印功能。"); }
   });
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && active) { event.preventDefault(); close(); }
