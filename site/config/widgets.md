@@ -19,9 +19,9 @@ sidebar:
 
 | 字段 | 默认值 | 作用 |
 | --- | --- | --- |
-| `sidebar.announcement.enable` | `true` | 是否显示公告；还需要非空 `content` |
-| `sidebar.announcement.title` | `小站公告` | 公告卡片标题 |
-| `sidebar.announcement.content` | 作者的欢迎语 | 请换成自己的文字，按普通文本显示 |
+| `sidebar.announcement.enable` | `false` | 是否显示公告；还需要非空 `content` |
+| `sidebar.announcement.title` | 空 | 留空时使用内置公告标题 |
+| `sidebar.announcement.content` | 空 | 请换成自己的文字，按普通文本显示 |
 | `sidebar.tags.enable` | `true` | 显示标签漫游，需要文章有标签 |
 | `sidebar.tags.limit` | `12` | 最多展示的标签数，范围 1–40 |
 | `sidebar.stats.enable` | `true` | 显示文章数、公开内容字数、最早文章日期 |
@@ -49,9 +49,9 @@ clock:
 | `longitude` | 天气查询的经度 | 数值，范围 -180 到 180 |
 | `timezone` | 时钟使用的时区 | 如 `Asia/Shanghai`，不要写城市中文名 |
 
-主题按经纬度请求 Open-Meteo 天气接口，不会根据 `city` 文本自动查询坐标。只把“长沙市”改成“北京市”会导致显示名称与天气位置不一致。
+默认关闭且不预填经纬度。只设置 `enable: true` 时显示时钟，时区沿用博客 `_config.yml`。完整填写经纬度后才请求 Open-Meteo，`city` 文本不参与坐标查询。
 
-天气由访客浏览器联网获取。构建成功并不代表天气请求一定成功；天气失败时检查网络和浏览器控制台。无效经纬度或时区可能回退到主题默认值。这个时区与 Hexo `_config.yml` 的 `timezone` 分别控制组件时钟和文章时间。
+天气由访客浏览器联网获取。构建成功并不代表天气请求一定成功；天气失败时检查网络和浏览器控制台。经纬度无效时不请求天气；时区无效时回退 UTC，配置检查会提示。`clock.timezone` 可单独覆盖组件时区。
 
 ## 3. GitHub 贡献日历
 

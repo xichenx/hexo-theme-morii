@@ -18,47 +18,40 @@ appearance:
 motion:
   # 卡片滚动入场、首页氛围和交互动效；遵循系统减少动态效果设置。
   enable: true
-brand: 心灵涂鸦
+# 留空继承博客 _config.yml；原有显式设置继续优先。
+brand: ''
 github_calendar:
-  enable: true
-  user: xichenx
+  enable: null # 未配置时关闭，兼容旧站点 githubcalendar.enable
+  user: ''
   # 支持兼容 GitHub Contributions API v4 的自建服务，{user} 会替换为账号。
   api: 'https://github-contributions-api.jogruber.de/v4/{user}?y=last'
 favicon: /icons/brand/morii-logo-v2.png
 logo: /icons/brand/morii-logo-v2.png
 footer:
   runtime:
-    enable: true
-    # 沿用原站上线时间，显式指定北京时间。
-    start: '2024-03-15T00:00:00+08:00'
-    label: 本站居然运行了
+    enable: false
+    # 启用后填写自己的上线时间和时区。
+    start: ''
+    label: ''
   filing:
-    enable: true
+    enable: false
     icp:
-      # 沿用原主题的备案信息；留空则不显示。
-      number: '湘ICP备-2024053403号'
+      # 填写自己的备案号；留空不显示。
+      number: ''
       url: https://beian.miit.gov.cn/
     police:
       number: ''
       # 填写公安备案查询页面的完整链接。
       url: ''
-tagline: 记录技术，也记录生活。
-intro: 从 Android 到全栈开发，收集一路上的想法、实践和日常。
-avatar: https://pic3.zhimg.com/v2-b1951610711c8d80060d509d9b499c72_r.jpg?source=1940ef5c
-social:
-  - name: GitHub
-    icon: github
-    url: https://github.com/xichenx
-    description: 在 GitHub 关注我
-  - name: CSDN
-    icon: csdn
-    url: https://blog.csdn.net/qq_60642811
-    description: 在 CSDN 关注我
+tagline: '' # 继承博客 subtitle；false 可隐藏
+intro: ''   # 继承博客 description；false 可隐藏
+avatar: ''  # 继承博客 avatar，否则使用内置 Morii 图标
+social: []
 accent: '#5568f6'
 accent_dark: '#8c9aff'
 hero:
-  title: [生活明朗, 万物可爱。]
-  note: 把热爱写进日常，把好奇带向远方。
+  title: [] # 未配置时使用博客 title / subtitle
+  note: ''
 home:
   moments:
     enable: true
@@ -67,10 +60,7 @@ home:
     enable: true
   selected_limit: 3
   # 可填写文章标题或文章路径，顺序即展示顺序。
-  selected_posts:
-    - RecyclerView底层实现原理
-    - Flutter
-    - Ktor 学习与实践文档
+  selected_posts: []
 about:
   show_interests: true
 search:
@@ -84,11 +74,11 @@ reading_list:
 quick_navigation:
   enable: true
 clock:
-  enable: true
-  city: 长沙市
-  latitude: 28.19
-  longitude: 112.98
-  timezone: Asia/Shanghai
+  enable: false
+  city: ''
+  latitude: null
+  longitude: null
+  timezone: '' # 继承博客 timezone；只开时钟无需填写坐标
 article:
   enhancements:
     # 默认不下载渲染库；单篇文章也可用 mermaid: true / math: true 开启。
@@ -117,49 +107,37 @@ article:
     lines: 18
 sidebar:
   announcement:
-    enable: true
-    title: 小站公告
-    content: 欢迎来到心灵涂鸦。技术笔记与生活碎片，都在这里慢慢更新。
+    enable: false
+    title: ''
+    content: ''
   tags:
     enable: true
     limit: 12
   stats:
     enable: true
-explore:
-  - name: 音乐馆
-    path: /music/
-  - name: 电影院
-    path: /cinema/
-  - name: 朋友圈
-    path: /fcircle/
-  - name: 留言板
-    path: /comments/
-  - name: 游戏厅
-    path: /game/
-  - name: 小空调
-    path: /air-conditioner/
+explore: []
 friends_feed:
-  endpoint: https://friends.anheyu.com/all
+  endpoint: ''
   page_size: 12
 music:
   title: 我的音乐收藏
   description: 给日常留一点旋律，边听边逛。
-  playlist_url: https://y.qq.com/n/ryqq/playlist/1451608172
-  playlist_label: 在 QQ 音乐收听
+  playlist_url: ''
+  playlist_label: ''
   volume: 0.7
   # 与 AnZhiYu 相同的 Meting 歌单配置，访问音乐馆时获取歌曲。
   meting:
-    enable: true
+    enable: false
     server: tencent
     type: playlist
-    id: '1451608172'
+    id: ''
     api: 'https://api.injahow.cn/meting/?server=:server&type=:type&id=:id&r=:r'
   # 可选：官方提供的 HTTPS 嵌入播放器。
   embed_url: ''
   # 可选：自有音频资源，格式为 title / artist / url / cover。
   tracks: []
 cinema:
-  enable: true
+  enable: false
   title: 电影院
   description: 挑一部喜欢的作品，慢慢看。
   # 片单优先从博客根目录 source/_data/cinema.yml 读取；也可在此填写 items。
@@ -169,34 +147,9 @@ menu:
     path: /
   - name: 文章
     path: /archives/
-  - name: 分类
-    path: /categories/
-  - name: 即刻
-    path: /essay/
-  - name: 相册
-    path: /album/
-  - name: 友链
-    path: /link/
-  - name: 关于
-    path: /about/
-featured:
-  - title: Android 开发
-    description: 应用开发、底层原理与实践
-    path: /categories/Android/
-    icon: code
-    tone: blue
-  - title: 跨端探索
-    description: Flutter、HarmonyOS 与新技术
-    path: /categories/Flutter/
-    icon: sparkles
-    tone: violet
-  - title: 生活随笔
-    description: 旅途、日常和偶然的灵感
-    path: /essay/
-    icon: sun
-    tone: orange
+featured: []
 comments:
-  enable: true
+  enable: false
   provider: twikoo # twikoo / waline
   server_url: ''  # 使用 Waline 时填写服务端地址
   style_url: ''   # Waline 样式地址，可自托管
@@ -205,7 +158,7 @@ comments:
     limit: 5
   # 可指定同域脚本或 CDN；前端版本应与后端一致。留空沿用默认脚本。
   script_url: ''
-  env_id: https://martinleo-twikoo.hf.space
+  env_id: ''
 
 # 默认关闭；也可在单次访问链接添加 ?morii-debug=1 开启本地加载诊断。
 performance:

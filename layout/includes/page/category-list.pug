@@ -3,7 +3,8 @@
 .wrap.listing-page.category-directory-page
   header.page-intro.category-directory-intro(data-intro-word='TOPICS' data-intro-tone='taxonomy')
     include ../intro-atmosphere.pug
-    a.category-breadcrumb(href=url_for('/categories/')) #{morii_t("← 返回分类目录")}
+    if morii_has_page('/categories/')
+      a.category-breadcrumb(href=url_for('/categories/')) #{morii_t("← 返回分类目录")}
     h1= page.category
     p #{morii_t("这个主题下的思考、实践与持续记录。")}
     .category-directory-stats

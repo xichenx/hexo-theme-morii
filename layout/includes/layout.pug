@@ -1,4 +1,5 @@
 doctype html
+- var siteIdentity = morii_identity()
 - var visualEffects = morii_effects()
 - var articleEnhancements = morii_enhancements(page)
 html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || theme.motion.enable !== false) ? 'on' : 'off' data-glass=visualEffects.enabled ? (visualEffects.glass ? 'on' : 'off') : null data-effects=visualEffects.enabled ? 'on' : null data-theme-transition=visualEffects.transition ? 'on' : null)
@@ -78,9 +79,9 @@ html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || them
               else
                 | ✦
             span.brand__copy
-              strong.brand__text= theme.brand || config.title
-              if theme.tagline
-                small.brand__tagline= theme.tagline
+              strong.brand__text= siteIdentity.brand
+              if siteIdentity.tagline
+                small.brand__tagline= siteIdentity.tagline
           nav.site-nav#site-nav(aria-label=morii_t("主导航"))
             each item in theme.menu
               - var activeMenu = is_current(item.path) || (item.path === '/' && is_home()) || (item.path === '/archives/' && (is_archive() || is_post())) || (item.path === '/album/' && page.type === 'album_detail')
@@ -117,8 +118,8 @@ html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || them
       footer.site-footer
         .footer-top
           div
-            strong= theme.brand || config.title
-            p= theme.tagline
+            strong= siteIdentity.brand
+            p= siteIdentity.tagline
           a(href=url_for('/archives/')) #{morii_t("继续探索")} #[span →]
         .footer-bottom
           span © #{new Date().getFullYear()} #{config.author}

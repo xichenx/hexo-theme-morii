@@ -6,6 +6,7 @@ const onboarding = {
     { text: '先看接入路线', link: '/guide/' },
     { text: '1. 安装并启用主题', link: '/guide/getting-started' },
     { text: '2. 换成自己的资料', link: '/guide/first-config' },
+    { text: '初始化向导', link: '/guide/initialization' },
     { text: '3. 写第一篇文章', link: '/guide/first-post' },
     { text: '4. 补齐页面和菜单', link: '/guide/complete-site' },
     { text: '5. 发布上线', link: '/guide/publishing' }

@@ -13,9 +13,12 @@ aside.sidebar(aria-label=morii_t("站点信息"))
       span ✦
     .quick-links
       a(href=url_for('/archives/')) #[span #{morii_t("文章归档")}] #[b →]
-      a(href=url_for('/categories/')) #[span #{morii_t("所有分类")}] #[b →]
-      a(href=url_for('/tags/')) #[span #{morii_t("标签索引")}] #[b →]
-      a(href=url_for('/essay/')) #[span #{morii_t("即刻短文")}] #[b →]
+      if morii_has_page('/categories/')
+        a(href=url_for('/categories/')) #[span #{morii_t("所有分类")}] #[b →]
+      if morii_has_page('/tags/')
+        a(href=url_for('/tags/')) #[span #{morii_t("标签索引")}] #[b →]
+      if morii_has_page('/essay/')
+        a(href=url_for('/essay/')) #[span #{morii_t("即刻短文")}] #[b →]
       if !theme.reading_list || theme.reading_list.enable !== false
         a(href=url_for('/reading-list/')) #[span #{morii_t("稍后阅读")}] #[b →]
   if site.posts.length

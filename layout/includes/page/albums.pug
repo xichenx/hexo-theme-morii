@@ -14,4 +14,5 @@ else
     span.empty-panel__icon(aria-hidden='true') ◇
     h2 #{morii_t("相册正在慢慢收集")}
     p #{morii_t("把值得记住的瞬间，留到这里。")}
-    a.text-link(href=url_for('/essay/')) #{morii_t("先看看即刻短文 →")}
+    if morii_has_page('/essay/')
+      a.text-link(href=url_for('/essay/')) #{morii_t("先看看即刻短文 →")}

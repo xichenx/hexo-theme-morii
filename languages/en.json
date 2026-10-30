@@ -641,5 +641,7 @@
   "系列文章导航": "Series navigation",
   "系列上一篇": "Previous in series",
   "系列下一篇": "Next in series",
-  "索引分片暂不可用，已回退为完整正文搜索。": "The keyword index is unavailable. Falling back to full-text scanning."
+  "索引分片暂不可用，已回退为完整正文搜索。": "The keyword index is unavailable. Falling back to full-text scanning.",
+  "本地时间": "Local time",
+  "开启 JavaScript 后显示时钟。": "Enable JavaScript to display the clock."
 }

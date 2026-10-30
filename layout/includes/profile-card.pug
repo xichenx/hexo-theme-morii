@@ -1,9 +1,12 @@
 section.side-card.profile-card
   .profile-card__cover
-  img.profile-card__avatar(src=url_for(theme.avatar) alt=config.author loading='lazy')
+  img.profile-card__avatar(src=url_for(morii_identity().avatar) alt=config.author loading='lazy')
   h2= config.author
   p= config.description
   include social-links.pug
-  .profile-card__links
-    a(href=url_for('/about/')) #{morii_t("认识我")}
-    a(href=url_for('/link/')) #{morii_t("友情链接")}
+  if morii_has_page('/about/') || morii_has_page('/link/')
+    .profile-card__links
+      if morii_has_page('/about/')
+        a(href=url_for('/about/')) #{morii_t("认识我")}
+      if morii_has_page('/link/')
+        a(href=url_for('/link/')) #{morii_t("友情链接")}

@@ -47,3 +47,23 @@ explore:
     path: /comments/
 github_calendar:
   enable: false
+
+# 演示站显式开启展示内容；主题默认不提供作者账号与歌单。
+hero:
+  title: [生活明朗, 万物可爱。]
+menu:
+  - { name: 首页, path: / }
+  - { name: 文章, path: /archives/ }
+  - { name: 分类, path: /categories/ }
+  - { name: 即刻, path: /essay/ }
+  - { name: 相册, path: /album/ }
+  - { name: 友链, path: /link/ }
+  - { name: 关于, path: /about/ }
+cinema:
+  enable: true
+music:
+  meting:
+    enable: true
+    server: tencent
+    type: playlist
+    id: '1451608172'

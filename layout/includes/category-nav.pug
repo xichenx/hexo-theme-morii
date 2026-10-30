@@ -4,4 +4,5 @@ nav.category-nav(aria-label=morii_t("按分类浏览"))
     a(href=url_for(category.path) aria-current=(is_category() && page.category === category.name) ? 'page' : false)
       = category.name
       small= category.count
-  a.category-nav__more(href=url_for('/categories/')) #{morii_t("更多分类 ↗")}
+  if morii_has_page('/categories/')
+    a.category-nav__more(href=url_for('/categories/')) #{morii_t("更多分类 ↗")}

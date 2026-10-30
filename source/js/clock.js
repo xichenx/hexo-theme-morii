@@ -75,7 +75,7 @@
       cards.forEach(card => { card.querySelector('[data-weather-refresh]').disabled = false; });
     }
   };
-  cards.forEach(card => card.querySelector('[data-weather-refresh]').addEventListener('click', () => load(true)));
+  cards.forEach(card => card.querySelector('[data-weather-refresh]')?.addEventListener('click', () => load(true)));
   let timer;
   let refreshTimer;
   const start = () => {
@@ -83,7 +83,7 @@
     clearInterval(refreshTimer);
     tick();
     timer = setInterval(() => { if (!document.hidden) tick(); }, 1000);
-    refreshTimer = setInterval(() => { if (!document.hidden) load(); }, 600000);
+    if (url) refreshTimer = setInterval(() => { if (!document.hidden) load(); }, 600000);
   };
   window.addEventListener('pagehide', () => { clearInterval(timer); clearInterval(refreshTimer); });
   window.addEventListener('pageshow', start);

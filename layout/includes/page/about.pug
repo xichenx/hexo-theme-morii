@@ -4,17 +4,17 @@
     .about-introduction
       span.section-kicker HELLO THERE
       h2= profile.name || config.author
-      p= profile.description || theme.intro || config.description
+      p= profile.description || morii_identity().intro || config.description
       a.about-introduction__link(href=url_for('/archives/')) #{morii_t("来看看我的笔记 →")}
       include ../social-links.pug
     .about-avatar(data-image-fallback)
       span(aria-hidden='true')= (profile.name || config.author || morii_t("我")).slice(0, 1)
-      if profile.avatar || theme.avatar
-        img(src=url_for(profile.avatar || theme.avatar) alt=profile.name || config.author)
+      if profile.avatar || morii_identity().avatar
+        img(src=url_for(profile.avatar || morii_identity().avatar) alt=profile.name || config.author)
   .about-motto.panel
     span.section-kicker MY MOTTO
-    h2= profile.motto || theme.tagline
-    p= profile.subtitle || theme.intro
+    h2= profile.motto || morii_identity().tagline
+    p= profile.subtitle || morii_identity().intro
   .about-stats.panel
     span.section-kicker A LITTLE JOURNAL
     h2 #{morii_t("每一篇，都是记录")}
@@ -22,10 +22,10 @@
       a(href=url_for('/archives/'))
         strong= site.posts.length
         span #{morii_t("篇文章")}
-      a(href=url_for('/categories/'))
+      a(href=morii_has_page('/categories/') ? url_for('/categories/') : null)
         strong= site.categories.length
         span #{morii_t("个主题")}
-      a(href=url_for('/album/'))
+      a(href=morii_has_page('/album/') ? url_for('/album/') : null)
         strong= morii_albums(site.data.album).length
         span #{morii_t("本相册")}
   .about-topics.panel
@@ -56,7 +56,7 @@
       span.section-kicker BEYOND THE SCREEN
       h2 #{morii_t("屏幕之外")}
       if profile.music
-        a.about-interest(href=url_for('/music/'))
+        a.about-interest(href=morii_has_page('/music/') ? url_for('/music/') : null)
           span(aria-hidden='true') ♫
           div
             strong #{morii_t("听点音乐")}

@@ -17,7 +17,7 @@ const assets = Object.entries(catalogs).filter(([locale]) => locale !== 'zh-CN')
 });
 hexo.extend.generator.register('morii-locales', () => assets.map(({ path, data }) => ({ path, data })));
 hexo.extend.helper.register('morii_locale_asset', function () { return assets.find(asset => asset.locale === forPage(hexo, this).locale)?.path; });
-const navigationLabels = new Set(['首页', '文章', '分类', '即刻', '相册', '友链', '关于', '音乐馆', '电影院', '朋友圈', '留言板', '游戏厅', '小空调', '标签', '稍后阅读']);
+const navigationLabels = new Set(['专题与系列', '首页', '文章', '分类', '即刻', '相册', '友链', '关于', '音乐馆', '电影院', '朋友圈', '留言板', '游戏厅', '小空调', '标签', '稍后阅读']);
 hexo.extend.helper.register('morii_nav_label', function (value) {
   const locale = forPage(hexo, this);
   return typeof value === 'string' && navigationLabels.has(value) ? locale.t(value) : locale.localized(value);

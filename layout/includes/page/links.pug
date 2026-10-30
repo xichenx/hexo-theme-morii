@@ -56,7 +56,7 @@
     span.section-kicker MY LITTLE CORNER
     h2 #{morii_t("带走本站名片")}
     .friend-site-preview
-      img(src=url_for(theme.avatar) alt='' loading='lazy')
+      img(src=url_for(morii_identity().avatar) alt='' loading='lazy')
       strong= config.title
       p= config.description
     button.button.button--primary#copy-site-card(type='button') #{morii_t("复制本站信息")}

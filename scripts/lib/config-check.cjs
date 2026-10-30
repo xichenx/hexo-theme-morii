@@ -23,12 +23,18 @@ function inspect(config, site = {}, knownKeys) {
   for (const field of ['friends_feed.endpoint', 'music.meting.api', 'github_calendar.api']) if (get(field) && !https(get(field))) add('error', field, '必须为完整 HTTP(S) 地址。');
   for (const field of ['accent', 'accent_dark']) if (get(field) != null && !/^#[\da-f]{6}$/i.test(get(field))) add('error', field, '使用六位十六进制颜色，如 #5568f6。');
   for (const field of ['search.page_size', 'search.shard_size']) if (get(field) != null && (!Number.isInteger(get(field)) || get(field) < 1)) add('error', field, '必须为正整数。');
-  for (const field of ['menu', 'explore']) if (config[field] != null) {
+  for (const field of ['menu', 'explore']) if (config[field] != null && config[field] !== false) {
     if (!Array.isArray(config[field])) add('error', field, '必须为导航列表。');
     else config[field].forEach((item, index) => { if (!item || typeof item.path !== 'string' || !item.path.trim() || /^(?:javascript:|data:|\/\/)/i.test(item.path) || /[\\\u0000-\u001f]/.test(item.path)) add('error', `${field}[${index}].path`, '填写站内路径或 HTTP(S) 链接。'); });
   }
   if (config.images?.widths != null && (!Array.isArray(config.images.widths) || !config.images.widths.every(value => Number.isInteger(value) && value >= 160 && value <= 2400))) add('error', 'images.widths', '使用 160–2400 范围内的整数宽度列表。');
   if (config.images?.quality != null && (!Number.isInteger(config.images.quality) || config.images.quality < 40 || config.images.quality > 95)) add('error', 'images.quality', '图片质量必须为 40–95 范围内的整数。');
+  if (config.clock?.enable === true) {
+    const has = key => get('clock.' + key) != null && get('clock.' + key) !== '';
+    for (const [field, limit] of [['latitude', 90], ['longitude', 180]]) if (has(field) && (typeof config.clock[field] === 'boolean' || !Number.isFinite(Number(config.clock[field])) || Math.abs(Number(config.clock[field])) > limit)) add('error', 'clock.' + field, '填写有效的经纬度数值。');
+    if (has('latitude') !== has('longitude')) add('warning', 'clock', '天气需要同时填写经纬度；未填写时仅显示时钟。');
+    if (config.clock.timezone) try { new Intl.DateTimeFormat('en', { timeZone: config.clock.timezone }); } catch { add('error', 'clock.timezone', '填写有效时区，如 Asia/Shanghai。'); }
+  }
   const start = config.footer?.runtime?.start;
   if (config.footer?.runtime?.enable && (!start || !Number.isFinite(Date.parse(start)) || !/(?:Z|[+-]\d{2}:\d{2})$/i.test(start))) add('error', 'footer.runtime.start', '填写包含时区的时间，如 2026-01-01T00:00:00+08:00。');
   for (const [field, value] of [['brand', '心灵涂鸦'], ['footer.filing.icp.number', '湘ICP备-2024053403号'], ['comments.env_id', 'https://martinleo-twikoo.hf.space'], ['music.meting.id', '1451608172']]) if (get(field) === value) add('warning', field, '仍使用主题作者的示例资料，请确认是否需要替换。');

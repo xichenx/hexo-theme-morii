@@ -8,40 +8,47 @@ block content
       .hero__main
         .eyebrow #[span.eyebrow__dot] #{morii_t("个人博客 · 技术与生活")}
         h1
-          = theme.hero && theme.hero.title ? theme.hero.title[0] : morii_t("生活明朗")
-          br
-          em= theme.hero && theme.hero.title ? theme.hero.title[1] : morii_t("万物可爱。")
-        p= theme.intro
+          = siteIdentity.title[0]
+          if siteIdentity.title[1]
+            br
+            em= siteIdentity.title[1]
+        if siteIdentity.intro
+          p= siteIdentity.intro
         .hero__actions
           a.button.button--primary(href='#latest') #{morii_t("浏览文章")} #[span →]
-          a.button.button--ghost(href=url_for('/about/')) #{morii_t("关于我")}
-        .hero__signature= theme.brand || config.title
+          if morii_has_page('/about/')
+            a.button.button--ghost(href=url_for('/about/')) #{morii_t("关于我")}
+        .hero__signature= siteIdentity.brand
       .hero__side
         .hero-mini.hero-mini--quote
           span.mini-label #{morii_t("✦ 随手记")}
           strong= theme.hero && theme.hero.note || morii_t("把热爱写进日常，把好奇带向远方。")
-          a(href=url_for('/essay/')) #{morii_t("看看即刻")} #[span →]
+          if morii_has_page('/essay/')
+            a(href=url_for('/essay/')) #{morii_t("看看即刻")} #[span →]
+          else
+            a(href=url_for('/archives/')) #{morii_t("继续探索")} #[span →]
         .hero-mini.hero-mini--stats
           span.mini-label #{morii_t("◉ 博客手账")}
           .stats-grid
             div #[strong=site.posts.length] #[span #{morii_t("篇文章")}]
             div #[strong=site.categories.length] #[span #{morii_t("个分类")}]
-    section.wrap.section-block
-      .section-heading
-        div
-          span.section-kicker EXPLORE
-          h2 #{morii_t("从这里开始")}
-        p #{morii_t("选择感兴趣的方向，慢慢逛。")}
-      .feature-grid
-        each item in theme.featured
-          a.feature-card(href=url_for(item.path) class='feature-card--' + item.tone)
-            - var iconName = morii_icon(item.icon)
-            span.feature-card__icon(class=iconName ? 'ui-icon ui-icon--' + iconName : '' aria-hidden='true')
-              if !iconName
-                = item.icon
-            span.feature-card__arrow ↗
-            strong= item.title
-            small= item.description
+    if theme.featured && theme.featured.length
+      section.wrap.section-block
+        .section-heading
+          div
+            span.section-kicker EXPLORE
+            h2 #{morii_t("从这里开始")}
+          p #{morii_t("选择感兴趣的方向，慢慢逛。")}
+        .feature-grid
+          each item in theme.featured
+            a.feature-card(href=url_for(item.path) class='feature-card--' + item.tone)
+              - var iconName = morii_icon(item.icon)
+              span.feature-card__icon(class=iconName ? 'ui-icon ui-icon--' + iconName : '' aria-hidden='true')
+                if !iconName
+                  = item.icon
+              span.feature-card__arrow ↗
+              strong= item.title
+              small= item.description
     include includes/selected-posts.pug
     include includes/home-discovery.pug
     include includes/github-calendar.pug

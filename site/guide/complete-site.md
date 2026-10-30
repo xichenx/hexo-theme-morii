@@ -13,6 +13,8 @@ next:
 
 这一步先建页面，再填写数据，最后打开菜单。相册、音乐馆等内容以后再按[功能指南](/features/)添加。
 
+也可以先运行 `npx hexo morii:init --pages categories,tags,essay,link,about` 自动补齐页面和空数据；已有主题配置会生成单独的菜单合并建议。详细行为见[初始化向导](/guide/initialization)。下文是手动创建方式，已存在的页面跳过即可。
+
 ## 1. 创建 5 个页面文件
 
 在博客根目录执行：

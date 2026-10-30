@@ -5,7 +5,7 @@ section.ac-page(data-powered='off' data-mode='cool' data-swing='off' aria-label=
     p.ac-intro #{morii_t("这一刻，把心情调到喜欢的温度。")}
     .ac-device(aria-hidden='true')
       .ac-device__top
-        span= theme.brand || config.title
+        span= morii_identity().brand
         span.ac-device__indicator
       .ac-device__screen
         span#ac-device-mode ❄

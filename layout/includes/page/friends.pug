@@ -3,7 +3,8 @@ section.feed-section(data-feed-endpoint=morii_safe_url(theme.friends_feed && the
     div
       span.section-kicker FRIENDS JOURNAL
       h2 #{morii_t("朋友们的最新文章")}
-    a.text-link(href=url_for('/link/')) #{morii_t("友人帐 →")}
+    if morii_has_page('/link/')
+      a.text-link(href=url_for('/link/')) #{morii_t("友人帐 →")}
   p.feed-status(role='status' aria-live='polite') #{morii_t("正在寻找朋友们的新鲜事…")}
   .feed-grid(aria-busy='true')
   .feed-actions

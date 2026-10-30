@@ -120,7 +120,9 @@ npm install hexo-renderer-pug
 theme: morii
 ```
 
-主题使用 Pug 模板与原生 CSS / JavaScript，无额外前端打包步骤。当前开发环境为 Hexo 8.1.2。npm 安装会使用 `node_modules/hexo-theme-morii`；建议通过站点根目录的 `_config.morii.yml` 覆盖主题配置，避免修改安装包。首次安装请按自己的信息修改头像、社交账号、备案号、建站时间和音乐歌单；这些配置目前保留作者站点的示例值。
+主题使用 Pug 模板与原生 CSS / JavaScript，无额外前端打包步骤。当前开发环境为 Hexo 8.1.2。npm 安装会使用 `node_modules/hexo-theme-morii`；建议通过站点根目录的 `_config.morii.yml` 覆盖主题配置，避免修改安装包。站名、首页标题和介绍默认继承博客 `_config.yml`；账号与外部服务按需开启，不预填作者资料。
+
+在博客根目录运行 `npx hexo morii:init`，可交互创建页面、菜单与空数据文件。使用 `--yes` 选择默认页面，或 `--pages about,categories,tags,music --dry-run` 查看计划。已有文件保留原文，配置冲突时另存建议文件。参阅[初始化向导](site/guide/initialization.md)与[迁移说明](site/guide/updating.md)。
 
 ```bash
 hexo generate
@@ -140,7 +142,7 @@ logo: /icons/brand/morii-logo-v2.png
 favicon: /icons/brand/morii-logo-v2.png
 ```
 
-本地图片放在主题的 `source/` 目录下，配置中省略 `source`。`logo` 留空时显示默认星形标记，图片加载失败时也会回退为星形。
+个人图片放在博客的 `source/` 目录下，配置中省略 `source`。`logo` 留空时显示默认星形标记，图片加载失败时也会回退为星形。
 
 首页 `featured[].icon` 可使用主题内置线性图标名称，例如 `book`、`code`、`sparkles`、`sun`；快捷导航会按页面路径自动选择同风格图标。自定义单个字符图标仍可使用，找不到对应图标名称时会按原文字显示。
 
@@ -158,9 +160,9 @@ footer:
     label: 本站居然运行了
 ```
 
-上线时间沿用原站配置，请填写带时区的 ISO 日期。浏览器按秒更新天、小时、分钟和秒；标签页隐藏时暂停更新，返回后重新计算。关闭 JavaScript 时显示构建时的时长；`enable: false` 隐藏，格式无效时不展示。运行时长与备案信息共享紧凑一行，小屏自动换行。
+运行时长默认关闭；启用时请填写自己的、带时区的 ISO 日期。浏览器按秒更新天、小时、分钟和秒；标签页隐藏时暂停更新，返回后重新计算。关闭 JavaScript 时显示构建时的时长；`enable: false` 隐藏，格式无效时不展示。运行时长与备案信息共享紧凑一行，小屏自动换行。
 
-在主题配置中设置 `footer.filing`，支持 ICP 与公安备案号，未填写的条目自动隐藏。`enable: false` 隐藏整个区域。已沿用原主题的 ICP 备案文本；请按自己的实际备案信息填写，主题不会自动校验备案状态。`url` 为点击后打开的查询链接，公安备案未配置链接时显示为纯文本。
+在主题配置中设置 `footer.filing`，支持 ICP 与公安备案号，未填写的条目自动隐藏。`enable: false` 隐藏整个区域。默认关闭且不预填号码；请按自己的实际备案信息填写，主题不会自动校验备案状态。`url` 为点击后打开的查询链接，公安备案未配置链接时显示为纯文本。
 
 ```yaml
 footer:
@@ -193,7 +195,7 @@ home:
 
 ## 时钟与天气
 
-`clock.enable` 控制首页、归档和文章侧栏中的数字时钟天气卡片。默认城市为长沙市，坐标 `latitude: 28.19`、`longitude: 112.98`，时区 `timezone: Asia/Shanghai`；更换城市时请同时修改名称、经纬度和时区。时钟每秒更新，与天气请求独立，不依赖远程字体。
+`clock.enable` 控制首页、归档和文章侧栏中的数字时钟天气卡片。默认关闭，不预填城市或经纬度。只设置 `enable: true` 时显示本站时区的时钟；提供完整经纬度后才启用天气，可用 `timezone` 单独覆盖组件时区。时钟每秒更新，与天气请求独立，不依赖远程字体。
 
 天气使用 [Open-Meteo Forecast API](https://open-meteo.com/en/docs) 的当前天气数据，显示天气状况、温度、湿度、风向和数据更新时间。每 10 分钟刷新，最多使用 1 小时内缓存，失败可手动重试；无法连接时继续显示时钟与城市。页面不会获取访客 IP 或定位权限，默认显示配置城市。免费接口适用于非商业使用，商业站点请根据提供方条款选择服务。
 
@@ -225,7 +227,7 @@ home:
 
 ### 社交关注入口
 
-主题配置 `social` 为列表，资料卡和关于页使用同一份配置。当前沿用旧站的两个账号：GitHub `xichenx` 与 CSDN `qq_60642811`。主页链接在新标签页打开；手机是否唤起对应 App 取决于平台与系统的链接处理，主题不强制调用应用。
+主题配置 `social` 为列表，资料卡和关于页使用同一份配置。默认没有社交账号，请添加自己的链接。主页链接在新标签页打开；手机是否唤起对应 App 取决于平台与系统的链接处理，主题不强制调用应用。
 
 ```yaml
 social:
@@ -315,7 +317,7 @@ article:
 
 `friends_feed.endpoint` 是返回 JSON 的完整接口地址。前端使用 `start`、`end` 参数分页，支持数组，以及 `article_data` 数组或以键组织的对象。文章字段为 `title`、`link`（或 `url`）、`author`、`avatar`、`created`（或 `date` / `updated`）。跨域接口需要允许博客域名的 CORS 请求。
 
-默认沿用旧站配置的 `https://friends.anheyu.com/all`。2026-10-15 本地验证时该服务连接超时，尚未核实在线响应格式；已用代表性 JSON 数据验证渲染、去重、分页、失败重试与异常链接处理。真实接口不可用时页面仍显示友链，替换为你自己的服务地址后即可再次验证。
+接口默认留空；只有填写自己的 `friends_feed.endpoint` 后才请求文章数据。未配置或接口不可用时页面仍显示已有友链。
 
 ## 音乐馆
 
@@ -325,18 +327,18 @@ article:
 
 这是同一标签页内的连续播放；手动刷新或关闭标签页会重新加载播放器，不会自动播放。未播放前不会在普通页面额外请求歌单。
 
-音乐馆支持与 AnZhiYu 相同的 Meting 配置，访问页面后自动获取平台歌单，在本站选曲播放。当前沿用原站 QQ 歌单，修改主题 `_config.yml`：
+音乐馆支持与 AnZhiYu 相同的 Meting 配置，访问页面后自动获取平台歌单，在本站选曲播放。默认关闭在线歌单，在博客 `_config.morii.yml` 填写自己的歌单：
 
 ```yaml
 music:
-  playlist_url: https://y.qq.com/n/ryqq/playlist/1451608172
+  playlist_url: https://y.qq.com/n/ryqq/playlist/YOUR_PLAYLIST_ID
   playlist_label: 在 QQ 音乐收听
   volume: 0.7
   meting:
     enable: true
     server: tencent  # QQ 音乐；网易云使用 netease
     type: playlist
-    id: '1451608172'
+    id: 'YOUR_PLAYLIST_ID'
     api: 'https://api.injahow.cn/meting/?server=:server&type=:type&id=:id&r=:r'
   tracks: []
 ```

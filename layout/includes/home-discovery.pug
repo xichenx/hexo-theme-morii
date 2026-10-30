@@ -1,4 +1,4 @@
-- var moments = theme.home && theme.home.moments && theme.home.moments.enable === false ? [] : morii_home_moments(site.data.essay)
+- var moments = !morii_has_page('/essay/') || theme.home && theme.home.moments && theme.home.moments.enable === false ? [] : morii_home_moments(site.data.essay)
 - var discoveryPosts = theme.home && theme.home.random && theme.home.random.enable === false ? [] : morii_discovery_posts(site.posts)
 if moments.length || discoveryPosts.length
   section.wrap.home-discovery(aria-label=morii_t("发现更多内容"))

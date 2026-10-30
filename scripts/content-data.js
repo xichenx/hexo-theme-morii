@@ -2,6 +2,7 @@
 
 const { forPage } = require('../scripts/lib/i18n.cjs');
 const t = (...args) => forPage(hexo).t(...args);
+const { identity } = require('../scripts/lib/identity.cjs');
 const { URL } = require('node:url');
 const array = value => Array.isArray(value) ? value : [];
 const text = value => typeof value === 'string' || typeof value === 'number' ? String(value).trim() : '';
@@ -71,5 +72,5 @@ return array(data).filter(Boolean).map((group, index) => ({
 });
 
 hexo.extend.helper.register('morii_site_card', () => JSON.stringify({
-  name: text(hexo.config.title), link: httpUrl(hexo.config.url), avatar: resource(hexo.theme.config.avatar), descr: text(hexo.config.description)
+  name: text(hexo.config.title), link: httpUrl(hexo.config.url), avatar: resource(identity(hexo.config, hexo.theme.config).avatar), descr: text(hexo.config.description)
 }, null, 2));

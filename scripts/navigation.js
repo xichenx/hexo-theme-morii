@@ -21,7 +21,7 @@ hexo.extend.helper.register('morii_navigation', function () {
     'air-conditioner': ['snowflake', t("一个可以操作的网页小玩具")], 'reading-list': ['bookmark', t("接着读你收藏的文章")]
   };
   const config = hexo.theme.config;
-  const items = [...(Array.isArray(config.menu) ? config.menu : []), { name: t("标签"), path: '/tags/' }, ...(Array.isArray(config.explore) ? config.explore : [])];
+  const items = [...(Array.isArray(config.menu) ? config.menu : []), ...(this.morii_has_page?.('/tags/') ? [{ name: t("标签"), path: '/tags/' }] : []), ...(Array.isArray(config.explore) ? config.explore : [])];
   if (config.reading_list?.enable !== false) items.push({ name: t("稍后阅读"), path: '/reading-list/' });
   if (this.morii_series_catalog?.().length) items.push({ name: t('专题与系列'), path: '/series/', icon: 'book', description: t('沿着一条线索，系统地读下去。') });
   const seen = new Set();

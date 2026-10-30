@@ -14,6 +14,7 @@
       .music-float-actions
         button(type='button' data-music-action='previous' aria-label=morii_t("上一首")) ⏮
         button(type='button' data-music-action='next' aria-label=morii_t("下一首")) ⏭
-        a(href=url_for('/music/') aria-label=morii_t("打开音乐馆") title=morii_t("打开完整音乐馆")) ♫
+        if morii_has_page('/music/')
+          a(href=url_for('/music/') aria-label=morii_t("打开音乐馆") title=morii_t("打开完整音乐馆")) ♫
       button.music-float-resume(type='button' data-music-action='toggle') #{morii_t("播放音乐")}
     p.sr-only(data-music-status role='status')
