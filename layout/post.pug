@@ -55,7 +55,8 @@ block content
       details.mobile-toc
         summary #{morii_t("本文目录")}
         include includes/toc.pug
-      .article-body(data-code-collapse=(!theme.article || !theme.article.code || theme.article.code.collapse !== false) ? 'true' : 'false' data-code-lines=(theme.article && theme.article.code && theme.article.code.lines) || 18)!= page.content
+      - var codeStyle = morii_code_style(page)
+      .article-body(data-code-style=codeStyle.style data-code-theme=codeStyle.theme data-code-collapse=(!theme.article || !theme.article.code || theme.article.code.collapse !== false) ? 'true' : 'false' data-code-lines=(theme.article && theme.article.code && theme.article.code.lines) || 18)!= page.content
       if page.tags && page.tags.length
         .article-tags
           each tag in page.tags.toArray()

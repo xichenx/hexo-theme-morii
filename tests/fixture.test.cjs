@@ -14,6 +14,12 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       assert.ok(fs.existsSync(path.join(output, file)), `Generated ${file}`);
       const dom = new JSDOM(fs.readFileSync(path.join(output, file), 'utf8'), { url: `https://example.test${prefix}${file}` });
       const document = dom.window.document;
+      const codeStyle = document.querySelector('link[href*="/css/code."]');
+      assert.equal(!!codeStyle, file.startsWith('posts/'), `${file}: code styles load only on article pages`);
+      if (file === 'posts/welcome/index.html') {
+        assert.equal(document.querySelector('.article-body').dataset.codeStyle, 'classic');
+        assert.equal(document.querySelector('.article-body').dataset.codeTheme, 'dark');
+      }
       assert.equal(document.querySelectorAll('main h1').length, 1, `${file}: one page heading`);
       const introTones = {
         'page/2/index.html': 'archive',

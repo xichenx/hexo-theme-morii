@@ -307,6 +307,8 @@ article:
     enable: true
     limit: 3
   code:
+    style: classic # classic / mac / minimal
+    theme: dark    # dark / light / auto
     collapse: true
     lines: 18
 ```

@@ -65,6 +65,8 @@ article:
     enable: true
     limit: 3
   code:
+    style: classic
+    theme: dark
     collapse: true
     lines: 18
 ```
@@ -81,6 +83,8 @@ article:
 | `article.related.enable` | `true` | 显示相关文章 |
 | `article.related.limit` | `3` | 相关文章数量，范围 1–6 |
 | `article.code.collapse` | `true` | 较长的代码块默认折叠 |
+| `article.code.style` | `classic` | 外观：`classic`、`mac`、`minimal` |
+| `article.code.theme` | `dark` | 配色：`dark`、`light`、`auto`；`auto` 跟随站点深浅模式 |
 | `article.code.lines` | `18` | 代码折叠行数阈值，范围 5–100，建议从默认值开始 |
 
 例如只想关闭打印功能，修改 `article.print.enable` 即可，不需要关闭全部阅读工具。`reading_settings` 和 `navigation` 直接接受布尔值，**不要在它们下面再套一层 `enable`**。
@@ -117,6 +121,49 @@ reading_list:
 过时提示不出现时，先看文章的 `updated` 和 `outdated`，不要只看全局开关。
 
 ## 技术写作增强
+
+### 代码块外观与配色
+
+在博客 `_config.morii.yml` 中选择默认外观，原有 Markdown 围栏代码块无需修改：
+
+```yaml
+article:
+  code:
+    style: mac
+    theme: auto
+    collapse: true
+    lines: 18
+```
+
+| 外观 | 效果 |
+| --- | --- |
+| `classic` | 经典工具栏，保留语言和复制按钮 |
+| `mac` | 带三色装饰圆点的窗口标题栏与轻阴影 |
+| `minimal` | 简洁边框和透明工具栏背景 |
+
+默认仍是 `classic` + `dark`。需要跟随站点的浅色 / 深色切换时，使用 `theme: auto`；固定 `light` 或 `dark` 则保持对应配色。文件名、行号、行高亮、复制和长代码折叠在三种样式中均可使用。
+
+单篇文章可在原有 Front Matter 中覆盖：
+
+```yaml
+code_style: minimal
+code_theme: auto
+```
+
+单个代码块可使用 `codefile` 的第 4、5 个参数：
+
+```text
+{% codefile app.js, javascript, 2, mac, auto %}
+const theme = 'Morii';
+console.log(theme);
+{% endcodefile %}
+```
+
+前三个参数依次是文件名、代码语言、高亮行；不需要行高亮时保留空位，例如 `app.js, javascript, , mac, auto`。第 4、5 个参数可省略，继承文章或全站设置。
+
+优先级为：单个代码块 > 单篇文章 > 全站配置。非法文章设置会提示并继承全站设置，非法全站字段回退对应默认值；代码块中的非法值忽略并继承文章设置。样式只接受表格中的名称，不执行自定义 CSS 或外部脚本。
+
+代码样式使用本地 CSS，只在文章页加载。无 JavaScript 时保留代码与配色；复制和折叠按钮需要 JavaScript。打印时隐藏工具栏并展开全部代码。
 
 提示块、代码文件名与行高亮、Mermaid 及数学公式的用法见[技术文章增强](/config/iteration#技术文章)。
 

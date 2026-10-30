@@ -31,7 +31,7 @@ body.is-reading .article-body img { max-width: 100%; max-height: 240mm; object-f
 body.is-reading .article-body :is(video, audio, iframe) { display: none; }
 body.is-reading .code-shell, body.is-reading .article-body figure.highlight,
 body.is-reading .article-body pre, body.is-reading .article-body code { color: #111 !important; background: #f5f5f5 !important; border-radius: 0; }
-body.is-reading .code-shell { overflow: visible; border: 1px solid #ccc; }
+body.is-reading .code-shell { overflow: visible; border: 1px solid #ccc; box-shadow: none; }
 body.is-reading .code-shell > figure, body.is-reading .code-shell > pre { max-height: none !important; overflow: visible !important; }
 body.is-reading .article-body pre { white-space: pre-wrap !important; overflow-wrap: anywhere; min-width: 0 !important; font-size: 9pt; line-height: 1.6; }
 body.is-reading .article-body pre * { white-space: inherit !important; color: #111 !important; }

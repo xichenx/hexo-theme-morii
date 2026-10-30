@@ -127,13 +127,17 @@
       if (!code) return;
       const shell = document.createElement('div');
       shell.className = 'code-shell';
+      const file = block.closest('.code-file');
+      const choice = (name, allowed, fallback) => allowed.includes(file?.dataset[name]) ? file.dataset[name] : allowed.includes(article.dataset[name]) ? article.dataset[name] : fallback;
+      shell.dataset.codeStyle = choice('codeStyle', ['classic', 'mac', 'minimal'], 'classic');
+      shell.dataset.codeTheme = choice('codeTheme', ['auto', 'light', 'dark'], 'dark');
       block.before(shell);
       const tools = document.createElement('div');
       tools.className = 'code-tools';
       const language = document.createElement('span');
       const languageClass = [...(code.querySelector('code')?.classList || [])].find(name => name.startsWith('language-'));
       language.textContent = languageClass?.replace('language-', '') || [...block.classList].find(name => !['highlight', 'plaintext'].includes(name)) || 'CODE';
-      const filename = block.closest('.code-file')?.dataset.filename;
+      const filename = file?.dataset.filename;
       if (filename) { const label = document.createElement('strong'); label.className = 'code-filename'; label.textContent = filename; tools.append(label); }
       const button = document.createElement('button');
       button.type = 'button';

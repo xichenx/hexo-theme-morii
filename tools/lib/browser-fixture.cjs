@@ -3,6 +3,8 @@ const yaml = require('js-yaml');
 const prefix = '/layout/';
 const title = '长标题布局验证：AndroidInternalsAndRenderingPipelineWithoutWordBreaks'.repeat(3);
 const category = 'Android底层原理与渲染实践';
+const sampleCode = Array.from({ length: 24 }, (_, index) => `const value${index} = 'Morii sample ${index}';`).join('\n');
+const codeArticle = '---\ntitle: 代码块样式预览\ndate: 2026-10-29 09:00:00\npermalink: posts/code-styles/\ncode_style: minimal\ncode_theme: auto\ncomments: false\n---\n\n## 继承文章设置\n\n```javascript\nconst inherited = true;\n```\n\n' + ['classic', 'mac', 'minimal'].flatMap(style => ['auto', 'light', 'dark'].map(theme => `## ${style} / ${theme}\n\n{% codefile src/components/code-block/${style}-${theme}-example-file-with-a-long-name.js, javascript, 2-3, ${style}, ${theme} %}\n${sampleCode}\n{% endcodefile %}\n\n`)).join('');
 const longArticle = `---\n${yaml.dump({ title, date: '2026-10-30 09:00:00', permalink: 'posts/layout-stress/', categories: [category], tags: ['布局回归'], comments: false })}---\n\n` +
   Array.from({ length: 36 }, (_, index) => `## ${index + 1}. 学习路线与实践记录\n\n${'阅读侧栏保持目录可滚动，时钟与天气信息完整可见。'.repeat(14)}\n\n`).join('') +
   '\n## 代码与表格允许在自身区域横向滚动\n\n```text\n' + 'a_long_code_line_'.repeat(30) + '\n```\n\n| 字段 | 说明 |\n| --- | --- |\n| sample | 正文表格的内容 |\n';
@@ -13,6 +15,6 @@ const options = {
     music: { meting: { enable: false }, tracks: [] },
     github_calendar: { enable: false }, comments: { enable: false }, friends_feed: { endpoint: '' }
   },
-  sourceOverrides: { '_posts/layout-stress.md': longArticle }
+  sourceOverrides: { '_posts/layout-stress.md': longArticle, '_posts/code-styles.md': codeArticle }
 };
-module.exports = { prefix, title, options };
+module.exports = { prefix, title, options, sampleCode };

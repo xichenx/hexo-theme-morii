@@ -16,6 +16,10 @@ test('article enhancements escape source, render code filenames and honor per-pa
   assert.match(tags.math([], 'x < y'), /x &lt; y/);
   const code = tags.codefile(['app.js,', 'javascript,', '2'], 'const a = 1;\nconst b = 2;');
   assert.match(code, /data-filename="app.js"/); assert.match(code, /line marked/);
+  const styled = tags.codefile(['app.js, javascript, 2, mac, auto'], 'const value = 1;');
+  assert.match(styled, /data-code-style="mac"/); assert.match(styled, /data-code-theme="auto"/);
+  const invalid = tags.codefile(['app.js, javascript, , <script>, <style>'], 'const value = 1;');
+  assert.doesNotMatch(invalid, /data-code-style|data-code-theme|<script>|<style>/);
   assert.match(tags.note(['warning', '<script>'], 'body'), /&lt;script&gt;/);
 });
 

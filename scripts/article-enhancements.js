@@ -1,5 +1,6 @@
 'use strict';
 const { escapeHTML, highlight } = require('hexo-util');
+const { styles, themes } = require('../scripts/lib/code-style.cjs');
 const safe = (value, fallback) => {
   if (typeof value !== 'string' || !value) return fallback;
   if (/^\/(?!\/)/.test(value)) return value;
@@ -24,7 +25,7 @@ hexo.extend.tag.register('note', (args, content) => {
   return `<aside class="article-note article-note--${kind}">${title.length ? `<strong>${escapeHTML(title.join(' '))}</strong>` : ''}${body}</aside>`;
 }, { ends: true });
 hexo.extend.tag.register('codefile', (args, content) => {
-  const [filename, lang, lines = ''] = args.join(' ').split(',').map(value => value.trim());
+  const [filename, lang, lines = '', style, theme] = args.join(' ').split(',').map(value => value.trim());
   const mark = new Set();
   for (const part of lines.split(/\s+/)) {
     const match = /^(\d+)(?:-(\d+))?$/.exec(part);
@@ -33,5 +34,6 @@ hexo.extend.tag.register('codefile', (args, content) => {
     const last = Math.min(first + 200, Number(match[2] || first));
     for (let line = first; line <= last; line++) mark.add(line);
   }
-  return `<div class="code-file" data-filename="${escapeHTML(filename || '')}">${highlight(content, { lang: /^[\w+-]+$/.test(lang || '') ? lang : 'plaintext', gutter: true, mark: [...mark] })}</div>`;
+  const attributes = `${styles.includes(style) ? ` data-code-style="${style}"` : ''}${themes.includes(theme) ? ` data-code-theme="${theme}"` : ''}`;
+  return `<div class="code-file" data-filename="${escapeHTML(filename || '')}"${attributes}>${highlight(content, { lang: /^[\w+-]+$/.test(lang || '') ? lang : 'plaintext', gutter: true, mark: [...mark] })}</div>`;
 }, { ends: true });

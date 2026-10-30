@@ -36,6 +36,9 @@ function inspect(config, site = {}, knownKeys) {
     if (config.clock.timezone) try { new Intl.DateTimeFormat('en', { timeZone: config.clock.timezone }); } catch { add('error', 'clock.timezone', '填写有效时区，如 Asia/Shanghai。'); }
   }
   const start = config.footer?.runtime?.start;
+  for (const [field, allowed] of [['style', ['classic', 'mac', 'minimal']], ['theme', ['auto', 'light', 'dark']]]) {
+    if (config.article?.code?.[field] != null && !allowed.includes(config.article.code[field])) add('error', 'article.code.' + field, `可选值：${allowed.join(', ')}。`);
+  }
   if (config.footer?.runtime?.enable && (!start || !Number.isFinite(Date.parse(start)) || !/(?:Z|[+-]\d{2}:\d{2})$/i.test(start))) add('error', 'footer.runtime.start', '填写包含时区的时间，如 2026-01-01T00:00:00+08:00。');
   for (const [field, value] of [['brand', '心灵涂鸦'], ['footer.filing.icp.number', '湘ICP备-2024053403号'], ['comments.env_id', 'https://martinleo-twikoo.hf.space'], ['music.meting.id', '1451608172']]) if (get(field) === value) add('warning', field, '仍使用主题作者的示例资料，请确认是否需要替换。');
   return issues;

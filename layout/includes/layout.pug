@@ -60,6 +60,7 @@ html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || them
       link(rel='stylesheet' href=morii_asset('/css/series.css'))
     if is_post()
       link(rel='stylesheet' href=morii_asset('/css/reading.css'))
+      link(rel='stylesheet' href=morii_asset('/css/code.css'))
     if is_post() && (!theme.article || !theme.article.print || theme.article.print.enable !== false)
       link#article-print-style(rel='stylesheet' href=morii_asset('/css/print.css') media='print')
   body(data-page-loading=morii_t('正在打开页面…') class=page.type === 'music' ? 'is-music' : is_post() ? 'is-reading' : page.path && page.path.startsWith('air-conditioner/') ? 'is-playground' : '')
