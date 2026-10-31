@@ -25,8 +25,8 @@ github_calendar:
   user: ''
   # 支持兼容 GitHub Contributions API v4 的自建服务，{user} 会替换为账号。
   api: 'https://github-contributions-api.jogruber.de/v4/{user}?y=last'
-favicon: /icons/brand/morii-logo-v2.png
-logo: /icons/brand/morii-logo-v2.png
+favicon: /icons/brand/morii-orbit-favicon.png
+logo: /icons/brand/morii-orbit-nav.png
 footer:
   runtime:
     enable: false

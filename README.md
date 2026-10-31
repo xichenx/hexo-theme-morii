@@ -1,5 +1,73 @@
 # Morii Theme
 
+[![npm version](https://img.shields.io/npm/v/hexo-theme-morii?color=5568f6&logo=npm)](https://www.npmjs.com/package/hexo-theme-morii)
+[![MIT license](https://img.shields.io/badge/license-MIT-5568f6)](LICENSE)
+[![Hexo 8+](https://img.shields.io/badge/Hexo-8%2B-0e83cd?logo=hexo&logoColor=white)](package.json)
+[![Node.js 20.19+](https://img.shields.io/badge/Node.js-%3E%3D20.19-339933?logo=nodedotjs&logoColor=white)](package.json)
+[![Languages: EN / 简体 / 繁體](https://img.shields.io/badge/languages-EN%20%2F%20简体%20%2F%20繁體-887de8)](languages/)
+[![GitHub stars](https://img.shields.io/github/stars/xichenx/hexo-theme-morii?style=social)](https://github.com/xichenx/hexo-theme-morii/stargazers)
+
+**Morii by Morainet — A card-based Hexo theme for stories, code, and everyday life.**
+
+Responsive layouts, light and dark modes, local full-text search, reading preferences, and dedicated music and photo pages. Built with Pug and native CSS / JavaScript, with English, Simplified Chinese, and Traditional Chinese interfaces.
+
+[English quick start](#english-quick-start) · [中文说明](#中文说明) · [Documentation (中文)](https://morii-docs.pages.dev/) · [Watch the demo](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4) · [Report an issue](https://github.com/xichenx/hexo-theme-morii/issues)
+
+**Topics:** `hexo` · `hexo-theme` · `blog` · `responsive` · `dark-mode` · `multilingual` · `pug` · `javascript`
+
+## English quick start
+
+Requires an existing Hexo 8+ blog and Node.js 20.19+. Run this command from your **blog root**:
+
+```bash
+npm install hexo-theme-morii@latest hexo-renderer-pug
+```
+
+Update the existing entries in your blog's **`_config.yml`** to use the English interface:
+
+```yaml
+title: My Morii Blog
+subtitle: Notes on code and everyday life
+description: A place for projects, reading notes, and small discoveries.
+author: Your Name
+language: en
+theme: morii
+```
+
+Create **`_config.morii.yml`** in the same blog root, or merge these entries into your existing theme configuration:
+
+```yaml
+# Inherit your blog title, subtitle, and description.
+brand: ''
+tagline: ''
+intro: ''
+
+# Both images are included with the theme.
+logo: /icons/brand/morii-orbit-nav.png
+favicon: /icons/brand/morii-orbit-favicon.png
+
+accent: '#5568f6'
+accent_dark: '#8c9aff'
+
+menu:
+  - name: Home
+    path: /
+  - name: Posts
+    path: /archives/
+```
+
+Generate and preview your blog:
+
+```bash
+npx hexo clean
+npx hexo generate
+npx hexo server
+```
+
+The theme interface follows `language: en`; post content and custom text keep their original language. You can also use `zh-CN` or `zh-TW`, or set `lang: en` in a page's Front Matter. The theme falls back to Simplified Chinese when the language is unsupported. See the [configuration guide](https://morii-docs.pages.dev/config/) for optional features.
+
+## 中文说明
+
 📖 [使用文档](https://morii-docs.pages.dev/) · [配置手册](https://morii-docs.pages.dev/config/) · [多平台博客部署教程](https://morii-docs.pages.dev/guide/publishing) · [文档站开发与部署](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/DOCS-SITE.md)
 
 **Morii by Morainet · 用卡片，收藏技术与生活。**
@@ -140,11 +208,11 @@ hexo server
 `logo` 控制顶部导航栏图标，`favicon` 控制浏览器标签页图标，两者可以分别替换，支持本站路径或完整图片网址。例如：
 
 ```yaml
-logo: /icons/brand/morii-logo-v2.png
-favicon: /icons/brand/morii-logo-v2.png
+logo: /icons/brand/morii-orbit-nav.png
+favicon: /icons/brand/morii-orbit-favicon.png
 ```
 
-个人图片放在博客的 `source/` 目录下，配置中省略 `source`。`logo` 留空时显示默认星形标记，图片加载失败时也会回退为星形。
+上面的两张图片随主题提供，分别适配导航栏和浏览器标签页。个人图片放在博客的 `source/` 目录下，配置中省略 `source`。`logo` 留空时显示默认星形标记，图片加载失败时也会回退为星形。
 
 首页 `featured[].icon` 可使用主题内置线性图标名称，例如 `book`、`code`、`sparkles`、`sun`；快捷导航会按页面路径自动选择同风格图标。自定义单个字符图标仍可使用，找不到对应图标名称时会按原文字显示。
 

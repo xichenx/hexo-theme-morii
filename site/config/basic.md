@@ -86,14 +86,14 @@ favicon: /images/favicon.png
 
 ### 使用 Morii 内置 Logo
 
-当前仓库的新 Logo 配置是：
+主题默认使用 Orbit 标记，导航栏与浏览器标签页分别使用适配尺寸的资源：
 
 ```yaml
-logo: /icons/brand/morii-logo-v2.png
-favicon: /icons/brand/morii-logo-v2.png
+logo: /icons/brand/morii-orbit-nav.png
+favicon: /icons/brand/morii-orbit-favicon.png
 ```
 
-**先检查安装目录中有没有 `source/icons/brand/morii-logo-v2.png`。**如果你安装的 npm 版本尚未包含它，先保留该版本默认图标，或把准备好的图片放进博客 `source/images/` 后使用自己的路径。不要仅复制新路径，否则会出现 404。
+这两个文件位于主题的 `source/icons/brand/`。如果你安装的版本尚未包含它们，先保留该版本默认路径，或把准备好的图片放进博客 `source/images/` 后使用自己的路径。不要仅复制新路径，否则会出现 404。
 
 `logo: ''` 会使用主题默认星形标记；Logo 图片加载失败也会回退为星形。`favicon: ''` 则继续尝试 Hexo 的 `favicon` 设置或 `/favicon.ico`，并不是“完全禁用图标”。
 
