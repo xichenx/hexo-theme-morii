@@ -4,18 +4,20 @@
 [![MIT license](https://img.shields.io/badge/license-MIT-5568f6)](LICENSE)
 [![Hexo 8+](https://img.shields.io/badge/Hexo-8%2B-0e83cd?logo=hexo&logoColor=white)](package.json)
 [![Node.js 20.19+](https://img.shields.io/badge/Node.js-%3E%3D20.19-339933?logo=nodedotjs&logoColor=white)](package.json)
-[![Languages: EN / 简体 / 繁體](https://img.shields.io/badge/languages-EN%20%2F%20简体%20%2F%20繁體-887de8)](languages/)
+[![Languages: EN / zh-CN / zh-TW](https://img.shields.io/badge/languages-EN%20%2F%20zh--CN%20%2F%20zh--TW-887de8)](languages/)
 [![GitHub stars](https://img.shields.io/github/stars/xichenx/hexo-theme-morii?style=social)](https://github.com/xichenx/hexo-theme-morii/stargazers)
+
+**English** · [简体中文](README.zh-CN.md)
 
 **Morii by Morainet — A card-based Hexo theme for stories, code, and everyday life.**
 
 Responsive layouts, light and dark modes, local full-text search, reading preferences, and dedicated music and photo pages. Built with Pug and native CSS / JavaScript, with English, Simplified Chinese, and Traditional Chinese interfaces.
 
-[English quick start](#english-quick-start) · [中文说明](#中文说明) · [Documentation (中文)](https://morii-docs.pages.dev/) · [Watch the demo](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4) · [Report an issue](https://github.com/xichenx/hexo-theme-morii/issues)
+[Quick start](#quick-start) · [Features](#features) · [Configuration](#configuration) · [Documentation (Chinese)](https://morii-docs.pages.dev/) · [Watch the demo](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4) · [Report an issue](https://github.com/xichenx/hexo-theme-morii/issues)
 
 **Topics:** `hexo` · `hexo-theme` · `blog` · `responsive` · `dark-mode` · `multilingual` · `pug` · `javascript`
 
-## English quick start
+## Quick start
 
 Requires an existing Hexo 8+ blog and Node.js 20.19+. Run this command from your **blog root**:
 
@@ -66,307 +68,243 @@ npx hexo server
 
 The theme interface follows `language: en`; post content and custom text keep their original language. You can also use `zh-CN` or `zh-TW`, or set `lang: en` in a page's Front Matter. The theme falls back to Simplified Chinese when the language is unsupported. See the [configuration guide](https://morii-docs.pages.dev/config/) for optional features.
 
-## 中文说明
+## Demo
 
-📖 [使用文档](https://morii-docs.pages.dev/) · [配置手册](https://morii-docs.pages.dev/config/) · [多平台博客部署教程](https://morii-docs.pages.dev/guide/publishing) · [文档站开发与部署](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/DOCS-SITE.md)
+[![Morii theme demo: click to watch the full video](docs/media/morii-demo-preview.gif)](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)
 
-**Morii by Morainet · 用卡片，收藏技术与生活。**
+**[Watch the full demo](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)** · [Download MP4](https://github.com/xichenx/hexo-theme-morii/raw/refs/heads/main/docs/media/morii-demo.mp4)
 
-为“心灵涂鸦”重新开发的 Hexo 主题。保留丰富卡片的视觉方向，模板、样式和交互独立实现。
+About 44 seconds, 1280 × 720, without music. Recorded from the standalone demo site using `v0.1.0-alpha.2`; the preview GIF is an excerpt. The full video includes Chinese subtitles and chapters.
 
-主题品牌为 **Morii**，组织署名为 **Morainet**，项目仓库为 [xichenx/hexo-theme-morii](https://github.com/xichenx/hexo-theme-morii)。博客名称与主题品牌分别配置，当前博客名称继续使用“心灵涂鸦”。
-
-## 界面语言
-
-在**博客根目录** `_config.yml` 设置（不是主题配置文件）：
-
-```yaml
-language: zh-CN # en / zh-CN / zh-TW
-```
-
-修改后运行 `npx hexo clean && npx hexo generate`。默认简体中文；未知语言回退到 `zh-CN`。如果配置的是语言数组，主题使用第一项，不会自动生成三个语言版本的网站。
-
-导航、按钮、搜索、播放器、收藏和图片预览等主题文字会切换；文章标题、正文、分类名称及个人介绍不自动翻译。单篇页面可在 Front Matter 中设置 `lang: en` 或 `lang: zh-TW` 覆盖站点语言。翻译文件位于 `languages/`，英文和繁体浏览器语言包按当前语言加载并缓存。
-
-默认导航名称（如「首页」「文章」）会自动翻译。自定义名称可保持字符串，或在 `_config.morii.yml` 的 `menu` / `explore` 中按语言填写：
-
-```yaml
-menu:
-  - name:
-      zh-CN: 我的笔记
-      zh-TW: 我的筆記
-      en: My notes
-    path: /archives/
-```
-
-多语言名称优先使用当前语言，缺项时依次回退到简体中文、英文、繁体中文。第三方评论服务及外部播放器的内部界面由服务自身控制。
-
-## 演示视频
-
-[![Morii 功能演示：点击查看完整视频](docs/media/morii-demo-preview.gif)](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)
-
-**[▶ 查看完整演示](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)** · [下载 MP4](https://github.com/xichenx/hexo-theme-morii/raw/refs/heads/main/docs/media/morii-demo.mp4)
-
-约 44 秒 · 1280 × 720 · 无配乐。使用独立演示站的真实界面截图剪辑，展示 `v0.1.0-alpha.2` 的功能。动图为节选，完整视频包含中文字幕轨与章节。
-
-| 时间 | 内容 |
+| Time | Preview |
 | --- | --- |
-| 00:00 | 首页、品牌与内容卡片 |
-| 00:07 | 文章阅读与阅读偏好 |
-| 00:14 | 分类导航与时间树归档 |
-| 00:21 | 图片查看器与音乐馆 |
-| 00:28 | 站内搜索与深色模式 |
-| 00:36 | 移动端首页与分类 |
+| 00:00 | Homepage, branding, and content cards |
+| 00:07 | Article reading and preferences |
+| 00:14 | Categories and timeline archives |
+| 00:21 | Image viewer and music player |
+| 00:28 | Search and dark mode |
+| 00:36 | Mobile homepage and categories |
 
-## 系列与内容体验
+## Features
 
-- `series` / `series_order` 自动组织专题总览、系列目录与系列内前后篇，支持三语言和子目录部署。
-- 本地封面自动生成响应式 WebP，补齐宽高和占位；远程图片支持显式候选图，文章头部支持封面取色。
-- 大站点使用字符倒排索引选择正文分片，并通过 Web Worker 进行筛选排序，保留旧索引和主线程回退。
-- 图表随深浅模式重绘，保留源码状态；完善长标题与手机中控台。
+- Responsive home, article, archive, category, tag, and 404 pages, with configurable card, list, directory, and timeline layouts.
+- English, Simplified Chinese, and Traditional Chinese interfaces, selected by the blog's `language` or a page's `lang`.
+- Light and dark modes, optional aurora backgrounds, particles, glass effects, hover lighting, and motion that respects reduced motion preferences.
+- Featured posts, series navigation, category browsing, recent moments, random post discovery, and a GitHub contribution calendar.
+- Local full-text search with highlighted excerpts, category filters, on-demand loading, index shards, and a Web Worker for larger sites.
+- Reading progress, an adaptive table of contents, font sizes, focus mode, saved reading positions, related posts, and previous / next navigation.
+- Code copying, collapsible code blocks, configurable code styles and palettes, and optional Mermaid and KaTeX rendering.
+- A local reading list with filtering and JSON import / export, article sharing, and print / PDF previews.
+- About, friend links, moments, albums, music, cinema, a friends feed, and a small air conditioner web toy.
+- An image viewer with keyboard navigation, 1–8× zoom, dragging, pinch gestures, photo details, and retry controls.
+- A full music player with synchronized lyrics, playlists, playback modes, and continuous audio across navigation within the same tab.
+- Optional weather and clock cards, social links and QR codes, announcements, popular tags, site statistics, and article age notices.
+- Canonical URLs, Open Graph metadata, article timestamps, Waline / Twikoo integration, and compatibility with existing `tabs`, `folding`, `link`, `label`, and `p` tags.
 
-用法与兼容限制见[内容体验配置](site/config/content.md)。本地封面处理使用可选依赖 `sharp`。
+Series use `series` / `series_order` in post Front Matter. Local covers can produce responsive WebP images through the optional `sharp` dependency; remote images support explicit candidates. Article headers support cover color extraction, and diagrams redraw when the color mode changes. See [content configuration](site/config/content.md).
 
-## 本轮迭代
+CSS and JavaScript assets use content fingerprints. The theme also provides `hexo morii:check`, optional local loading diagnostics, `note` and `codefile` tags, and per-post diagram / math rendering. Rendering libraries are not loaded by default; failed rendering preserves the source. See [additional features](site/config/iteration.md).
 
-- 主题 CSS / JS 使用内容指纹；新增 `hexo morii:check` 配置检查和可选本地加载诊断。
-- 音乐导航支持会话内滚动恢复与超时重试；搜索脚本按需加载，支持中文分词、分类筛选及全文分片。
-- 新增 `note`、`codefile` 标签，以及按文章启用的 Mermaid、KaTeX；渲染失败保留源内容。
-- 快捷导航整合阅读和音乐控制；支持 Waline、可选 Twikoo 最新评论侧栏和文章分享元数据。
+## Installation options
 
-完整配置与使用限制见[增强功能说明](site/config/iteration.md)。新功能保持可配置，默认不加载图表和公式渲染库。
-
-## 已实现
-
-- 支持 `en`、`zh-CN`、`zh-TW` 三种主题界面语言，跟随博客 `language` 或页面 `lang`，文章保持原文。
-
-- 可配置极光背景、星尘连线与鼠标避让、毛玻璃、卡片跟随光晕及按钮扫光；深色模式同步配色，手机减少粒子数量。
-- 响应式首页、文章、归档、分类、标签、404 页面
-- 首页可配置精选文章、全站分类导航、页码导航和按年份分组的时间树归档
-- 首页、分类总览、分类文章、归档支持配置布局；分类总览可选双列主题导航、目录和卡片。
-- 首页 GitHub 贡献日历支持主题配色、每日详情、键盘导航、移动端横向滚动、缓存与重试。
-- 首页即刻速览、随机文章发现卡片，支持手动切换和无脚本回退
-- 关于、友链、即刻短文、相册及相册详情页，读取现有 `source/_data` 文件
-- 按需加载的正文搜索、命中摘要高亮、结果分页、深色模式、移动导航、文章目录
-- 移动端折叠目录、当前章节提示、阅读进度、返回顶部、代码复制和文章链接复制
-- 相关文章推荐、文末相邻文章导航、长代码展开与收起
-- 文章字号调整、专注阅读、阅读偏好本机保存与一键恢复
-- 稍后阅读收藏清单、本机保存、跨标签页状态同步
-- 全站快捷导航面板、键盘入口与快捷键提示
-- 原生数字时钟与天气卡片、固定城市、天气缓存和失败重试
-- 资料卡和关于页的社交关注入口、自定义平台与扫码关注
-- 文章打印预览、打印样式、通过浏览器另存为 PDF
-- 可配置公告、热门标签卡片、本地站点统计与文章时效提醒
-- 图片弹窗预览、连续翻图、方向键导航、照片信息和加载失败重试
-- 图片查看器支持 1–8 倍缩放、拖拽、双指缩放和适应窗口下的左右滑动切图；`+` / `−` 调整缩放，`0` 重置，`Esc` 关闭。
-- 长文阅读进度保存在当前浏览器，再次访问可点击“继续上次阅读”；支持清除本篇记录，读完后自动移除。通过 `article.resume.enable: false` 关闭。最多保留 50 篇、90 天的进度；更新过的文章、带章节锚点的链接及加密文章不会显示旧进度提示。
-- 关于页个人介绍、真实站点统计与文章主题；友链分组检索和本站名片复制
-- 朋友圈卡片信息流、分页、重试及本地友链回退
-- 完整音乐播放页、Meting 歌单、同步歌词、播放模式与站内连续播放的悬浮球
-- 小空调网页玩具：开关、16–30°C 调温、冷暖模式和摆风
-- canonical、Open Graph 和文章发布时间等元数据
-- Twikoo 评论入口与原有文章的 `tabs`、`folding`、`link`、`label`、`p` 标签兼容
-
-## 安装
-
-在已有 Hexo 8 站点根目录安装最新版本：
-
-```bash
-npm install hexo-theme-morii@latest hexo-renderer-pug
-```
-
-也可以从 GitHub 克隆到主题目录：
+To install from Git instead of npm, run these commands in your blog root:
 
 ```bash
 git clone https://github.com/xichenx/hexo-theme-morii.git themes/morii
 npm install hexo-renderer-pug
 ```
 
-将站点 `_config.yml` 中的主题改为：
+Set `theme: morii` in your blog's `_config.yml`. Morii uses Pug and native CSS / JavaScript without a separate frontend bundling step. The development environment uses Hexo 8.1.2.
+
+With npm, the theme lives in `node_modules/hexo-theme-morii`; with Git, it lives in `themes/morii`. Put personal overrides in the blog root's `_config.morii.yml` so theme upgrades preserve your settings. Site identity inherits your blog configuration, and external services are opt-in without the author's accounts prefilled.
+
+You can copy the theme's `_config.yml` to the blog root as `_config.morii.yml`, start from the [minimal configuration](site/public/examples/minimal/_config.morii.yml), or use the English example above. Merge fields into an existing configuration rather than adding duplicate keys.
+
+The optional `npx hexo morii:init` command interactively creates pages, menus, and empty data files. Use `--yes` for the default pages, or `--pages about,categories,tags,music --dry-run` to preview the plan. Existing files are preserved, and conflicting configuration is saved as a separate suggestion. See [initialization](site/guide/initialization.md), [updating](site/guide/updating.md), and the [getting started guide (Chinese)](https://morii-docs.pages.dev/guide/getting-started).
+
+## Interface languages
+
+Set the language in the **blog root's `_config.yml`**, not in the theme configuration:
 
 ```yaml
-theme: morii
+language: en # en / zh-CN / zh-TW
 ```
 
-主题使用 Pug 模板与原生 CSS / JavaScript，无额外前端打包步骤。当前开发环境为 Hexo 8.1.2。npm 安装会使用 `node_modules/hexo-theme-morii`；建议通过站点根目录的 `_config.morii.yml` 覆盖主题配置，避免修改安装包。站名、首页标题和介绍默认继承博客 `_config.yml`；账号与外部服务按需开启，不预填作者资料。
+Run `npx hexo clean` and `npx hexo generate` after changing it. Unsupported languages fall back to `zh-CN`. If `language` is an array, the theme uses its first item; it does not generate separate language versions of the site.
 
-配置方式自由选择：可以手动复制主题 `_config.yml` 到博客根目录并重命名为 `_config.morii.yml`，或从[最小配置](site/public/examples/minimal/_config.morii.yml)开始，按需创建页面和数据文件。已有配置只需合并需要的字段。
+Navigation, buttons, search, the music player, the reading list, and the image viewer follow the selected language. Post titles, content, categories, and personal descriptions are not automatically translated. Set `lang: en` or `lang: zh-TW` in a page's Front Matter to override the site language. Translations live in `languages/`; English and Traditional Chinese browser bundles load and cache as needed.
 
-也可以在博客根目录运行可选快捷命令 `hexo morii:init`（或 `npx hexo morii:init`），交互创建页面、菜单与空数据文件。使用 `--yes` 选择默认页面，或 `--pages about,categories,tags,music --dry-run` 查看计划。已有文件保留原文，配置冲突时另存建议文件。手动配置可直接生成站点，无需运行此命令。参阅[两种配置方式](site/guide/initialization.md)与[迁移说明](site/guide/updating.md)。
+Default menu labels are translated automatically. Custom names can be plain strings or language maps in `menu` / `explore`:
 
-```bash
-hexo generate
-hexo server
+```yaml
+menu:
+  - name:
+      en: My notes
+      zh-CN: 我的笔记
+      zh-TW: 我的筆記
+    path: /archives/
 ```
 
-这里的 `hexo` 命令需要先全局安装 `hexo-cli`（`npm install -g hexo-cli`）。从零建站请按[新手教程](https://morii-docs.pages.dev/guide/getting-started)操作。
+Language maps prefer the current language, then Simplified Chinese, English, and Traditional Chinese. Third-party comment widgets and embedded players control their own interface language.
 
-## 配置
+## Configuration
 
-主题设置在 Git 安装的 `themes/morii/_config.yml` 或 npm 安装的 `node_modules/hexo-theme-morii/_config.yml`，也可通过站点根目录的 `_config.morii.yml` 覆盖。
+Use the blog root's `_config.morii.yml` to override the theme settings. The complete defaults live in the theme's `_config.yml`.
 
-`logo` 控制顶部导航栏图标，`favicon` 控制浏览器标签页图标，两者可以分别替换，支持本站路径或完整图片网址。例如：
+### Branding and icons
+
+`logo` controls the navigation mark; `favicon` controls the browser tab icon. Both accept site paths or full image URLs:
 
 ```yaml
 logo: /icons/brand/morii-orbit-nav.png
 favicon: /icons/brand/morii-orbit-favicon.png
 ```
 
-上面的两张图片随主题提供，分别适配导航栏和浏览器标签页。个人图片放在博客的 `source/` 目录下，配置中省略 `source`。`logo` 留空时显示默认星形标记，图片加载失败时也会回退为星形。
+Both Orbit images ship with the theme and are sized for their respective uses. Put custom images in your blog's `source/` directory and omit `source` from the configured path. An empty `logo` or a failed logo image uses the fallback star mark.
 
-首页 `featured[].icon` 可使用主题内置线性图标名称，例如 `book`、`code`、`sparkles`、`sun`；快捷导航会按页面路径自动选择同风格图标。自定义单个字符图标仍可使用，找不到对应图标名称时会按原文字显示。
+Homepage `featured[].icon` entries accept built-in line icon names such as `book`, `code`, `sparkles`, and `sun`. Quick navigation selects matching icons from page paths. Custom characters are also supported; unknown names display as text.
 
-本仓库仅包含 Morii 主题。原 AnZhiYu 主题、博客文章及 `source/_data/` 数据由站点自行管理，不随主题发布。使用旧站数据时，请检查即刻和友链中的演示内容；切换主题后也应按需关闭旧主题专用的时钟和 Live2D 插件，避免重复浮层。
+This repository contains the Morii theme. Blog posts, the original AnZhiYu theme, and site-specific `source/_data/` files are managed separately. When migrating an existing blog, review demo content in moments and friend links, and disable old theme-specific clock or Live2D plugins as needed.
 
-## 页脚备案信息
+### Footer uptime and registration
 
-页脚保留运行时长，使用 `footer.runtime` 配置：
+Uptime is disabled by default. To enable it, provide your own launch date in ISO format with a timezone:
 
 ```yaml
 footer:
   runtime:
     enable: true
     start: '2024-03-15T00:00:00+08:00'
-    label: 本站居然运行了
+    label: Online for
 ```
 
-运行时长默认关闭；启用时请填写自己的、带时区的 ISO 日期。浏览器按秒更新天、小时、分钟和秒；标签页隐藏时暂停更新，返回后重新计算。关闭 JavaScript 时显示构建时的时长；`enable: false` 隐藏，格式无效时不展示。运行时长与备案信息共享紧凑一行，小屏自动换行。
+The browser updates days, hours, minutes, and seconds, pausing while the tab is hidden. Without JavaScript, the build-time value is shown. Invalid dates hide the display; `enable: false` disables it. Uptime shares a compact footer row with registration details and wraps on small screens.
 
-在主题配置中设置 `footer.filing`，支持 ICP 与公安备案号，未填写的条目自动隐藏。`enable: false` 隐藏整个区域。默认关闭且不预填号码；请按自己的实际备案信息填写，主题不会自动校验备案状态。`url` 为点击后打开的查询链接，公安备案未配置链接时显示为纯文本。
+`footer.filing` supports optional Chinese ICP and public security registration details. It is disabled by default, and empty entries are hidden. Fill in your own registration numbers and verification URLs; the theme does not verify registration status. A public security entry without a URL appears as plain text.
 
 ```yaml
 footer:
   filing:
     enable: true
     icp:
-      number: '你的 ICP 备案号'
+      number: 'YOUR_ICP_REGISTRATION_NUMBER'
       url: https://beian.miit.gov.cn/
     police:
       number: ''
       url: ''
 ```
 
-## 首页与文章浏览
+### Homepage and post browsing
 
-通过 `home.selected_posts` 指定精选文章的标题、路径或 slug，顺序即展示顺序；`home.selected_limit` 限制展示数量（1–6）。也可在文章 front matter 设置 `featured: true`。主题会去重并排除加密文章；未选中任何文章时回退到最近发表的公开文章。
+Use `home.selected_posts` to choose featured posts by title, path, or slug, in display order. `home.selected_limit` accepts 1–6 posts. You can also set `featured: true` in a post's Front Matter. Duplicates and encrypted posts are excluded; if nothing is selected, the theme uses recent public posts.
 
 ```yaml
 home:
   selected_limit: 3
   selected_posts:
-    - RecyclerView底层实现原理
-    - Flutter
-    - Ktor 学习与实践文档
+    - Getting Started with Hexo
+    - My Reading Notes
+    - Building a Personal Blog
 ```
 
-大幅介绍和精选卡片仅出现在首页第一页。后续页直接显示文章列表与页码；分类按钮链接到 Hexo 生成的完整分类页面。归档会保留年份、月份的路由范围，分页支持首页空路径、自定义分页目录及长页码省略。
+The large introduction and featured cards appear only on the first homepage page. Later pages show the post list and pagination. Category links lead to complete generated category pages. Archives preserve their year / month scope, and pagination supports custom paths and abbreviated page ranges.
 
-侧栏的分类数量和年份数量来自站点文章，最近更新按 `updated` 排序。自动摘要会跳过代码块、行号和脚本，纯代码文章显示代码笔记提示。
+Sidebar category and year counts come from site posts; recent updates sort by `updated`. Automatic excerpts skip code blocks, line numbers, and scripts, with a code-note fallback for posts containing only code.
 
-## 时钟与天气
+### Clock and weather
 
-`clock.enable` 控制首页、归档和文章侧栏中的数字时钟天气卡片。默认关闭，不预填城市或经纬度。只设置 `enable: true` 时显示本站时区的时钟；提供完整经纬度后才启用天气，可用 `timezone` 单独覆盖组件时区。时钟每秒更新，与天气请求独立，不依赖远程字体。
+`clock.enable` controls clock / weather cards on home, archive, and article sidebars. The feature is disabled by default, without a prefilled city or coordinates. With only `enable: true`, it shows the clock in the site's timezone. Weather requires both latitude and longitude; `clock.timezone` can override the site's timezone for this card.
 
-天气使用 [Open-Meteo Forecast API](https://open-meteo.com/en/docs) 的当前天气数据，显示天气状况、温度、湿度、风向和数据更新时间。每 10 分钟刷新，最多使用 1 小时内缓存，失败可手动重试；无法连接时继续显示时钟与城市。页面不会获取访客 IP 或定位权限，默认显示配置城市。免费接口适用于非商业使用，商业站点请根据提供方条款选择服务。
+Weather uses current data from the [Open-Meteo Forecast API](https://open-meteo.com/en/docs), including conditions, temperature, humidity, wind direction, and update time. It refreshes every 10 minutes and can reuse cached data for up to an hour. Failed requests allow manual retry while the clock and city remain visible. The page uses the configured city without requesting visitor location or looking up visitor IP addresses. Check the provider's terms for commercial use.
 
-旧 `electric_clock` 插件保持关闭，Morii 不读取或输出其中的 API 密钥。原插件的位置定位与和风天气服务并未启用，避免重复挂载。静态站点若需要密钥服务，建议由自有后端代理请求。
+The old `electric_clock` plugin remains disabled, and Morii does not read or output its API keys. If a weather service requires a secret, use your own backend proxy.
 
-## 快捷导航
+### Quick navigation
 
-顶部九宫格按钮或 `?` 键可打开全站导航面板，入口来自 `menu`、`explore` 配置，自动补入标签与稍后阅读，重复路径只显示一次。菜单项可配置 `icon` 和 `description`；关闭稍后阅读时对应入口会自动隐藏。`quick_navigation.enable: false` 可关闭面板、按钮和脚本。
+The header grid button or `?` opens the navigation panel. Links come from `menu` and `explore`, with tags and the reading list added automatically. Duplicate paths appear once. Menu items support `icon` and `description`; disabling the reading list also hides its entry. Set `quick_navigation.enable: false` to disable the panel, button, and script.
 
-面板底部可直接打开搜索，`⌘/Ctrl + K` 继续作为搜索快捷键，`Esc` 关闭导航。输入框、文本编辑区域和其他弹窗打开时，`?` 不触发导航。关闭后焦点回到打开前的位置，手机端使用两列卡片。
+The panel includes search, reading controls, and music controls. `⌘/Ctrl + K` opens search and `Esc` closes navigation. The `?` shortcut is ignored while typing or when another dialog is open. Closing the panel restores focus; mobile uses two columns.
 
-## 站内搜索
+### Local search
 
-首次打开搜索弹窗时加载本站生成的 `morii-search.json`，后续在当前页面复用。支持标题、正文、分类和标签，多关键词按同时匹配处理，标题匹配优先；结果摘要围绕命中位置截取并高亮。`search.content: false` 可关闭正文入索引，仍保留标题、摘要、分类和标签；`search.page_size` 设置每批结果数（5–30，默认 10）。
+Search loads the generated `morii-search.json` on first use and reuses it on the current page. It searches titles, body text, categories, and tags, with all query terms required and title matches ranked first. Excerpts highlight matching text. Set `search.content: false` to exclude body text while keeping titles, excerpts, categories, and tags. `search.page_size` accepts 5–30 results per batch, with a default of 10.
 
-搜索面板支持“全部内容 / 仅标题 / 分类与标签”范围切换，以及热门标签快捷查找。使用 `↑` / `↓` 在结果与输入框之间移动，输入关键词后按 `Enter` 打开第一条结果，`Esc` 关闭；中文输入法组词期间不会触发跳转。头部与底部固定，结果区域独立滚动。全文索引加载失败时仍可搜索页面内的标题、摘要与分类标签，并可重试。
+The panel supports all-content, title-only, and category / tag scopes, plus popular tag shortcuts. Use `↑` / `↓` to move between the query and results, `Enter` to open the first result, and `Esc` to close. Input method composition does not trigger navigation. The results scroll independently of the header and footer.
 
-加密文章只输出标题、路径和日期，不输出描述、摘要、正文或标签；未发布文章不进入索引。搜索词只在浏览器中处理。索引下载失败时保留标题/摘要检索并提供重试。子目录部署时索引和文章链接会跟随站点 `root`。
+Larger sites use an inverted index to select body shards and a Web Worker to filter and rank results, with fallbacks for older indexes and the main thread. Failed body-index downloads retain title / excerpt searches and allow retry. Encrypted posts expose only their title, path, and date; unpublished posts are excluded. Queries are processed locally in the browser, and index / post URLs follow the site's `root` for subdirectory deployments.
 
-## 首页内容发现
+### Moments and random posts
 
-`home.moments.enable` 控制即刻速览，`limit` 限制条数（1–10，默认 5）。从 `source/_data/essay.yml` 中 `home_essay: true` 的分组读取非空内容，按日期从新到旧排列，并遵守各组的 `limit`。速览使用纯文本，点击后跳转到即刻页对应卡片；没有有效内容时隐藏。切换完全由用户操作，不自动轮播。
+`home.moments.enable` controls the moments preview; `limit` accepts 1–10 entries, defaulting to 5. It reads nonempty entries from groups marked `home_essay: true` in `source/_data/essay.yml`, respects each group's limit, and sorts newest first. Plain-text previews link to the corresponding moments card; empty data hides the section. Switching is manual, without autoplay.
 
-`home.random.enable` 控制“随便逛逛”。候选文章排除加密、未发布和重复路径；点击“换一篇”后更新预览，点击阅读链接才打开文章。一轮中不重复，候选耗尽后开始新一轮，也不会立即重复当前文章。没有 JavaScript 时展示第一条即刻和最近的公开文章；只有一条数据时不显示切换按钮。两个模块只在首页第一页展示。
+`home.random.enable` controls random post discovery. It excludes encrypted, unpublished, and duplicate entries. The next-post button changes the preview; the reading link opens the post. Each round avoids repeats, including an immediate repeat across rounds. Without JavaScript, the first moment and latest public post remain visible. Both modules appear only on the first homepage page. Replace inherited demo entries with your own, or set a group's `home_essay` to `false` to hide it from the preview.
 
-当前即刻数据仍含原主题演示记录，可在 `source/_data/essay.yml` 更新为自己的内容；将对应分组的 `home_essay` 设为 `false`，即可从首页隐藏该组。
+### About, albums, and friend links
 
-## 关于、相册与友链
-
-### 社交关注入口
-
-主题配置 `social` 为列表，资料卡和关于页使用同一份配置。默认没有社交账号，请添加自己的链接。主页链接在新标签页打开；手机是否唤起对应 App 取决于平台与系统的链接处理，主题不强制调用应用。
+The profile card and about page share the `social` list. No accounts are prefilled. Profile links open in a new tab; mobile app handling depends on the platform and operating system.
 
 ```yaml
 social:
   - name: GitHub
     icon: github
     url: https://github.com/your-name
-    description: 在 GitHub 关注我
-  - name: 微信
+    description: Follow me on GitHub
+  - name: WeChat
     icon: wechat
     qrcode: /images/wechat-follow.png
-    account: 你的微信号或公众号
-    description: 使用微信扫一扫关注
+    account: YOUR_ACCOUNT
+    description: Scan to follow
 ```
 
-`url` 支持 HTTP/HTTPS 主页，`qrcode` 支持站内绝对路径或 HTTP/HTTPS 图片，可同时配置；需要自己提供真实二维码。只配置二维码时显示扫码按钮，同时配置时显示主页和扫码入口。`enable: false` 可隐藏单项。在博客根目录的 `_config.morii.yml` 中，使用 `social: false` 隐藏全部；Hexo 8 合并配置时，`social: []` 不会清除主题默认列表。无效地址与重复项会被忽略。
+`url` accepts HTTP / HTTPS profile links; `qrcode` accepts a site path or HTTP / HTTPS image URL. Supply your own QR image. You can provide either or both. Set `enable: false` to hide one entry, or `social: false` to hide all entries. With Hexo 8 configuration merging, `social: []` does not clear inherited lists. Invalid addresses and duplicates are ignored.
 
-可用平台图标包括 `github`、`csdn`、`bilibili`、`wechat`、`weibo`、`zhihu`、`douyin`、`xiaohongshu`、`telegram`，使用主题内的本地资源，来源见 `source/icons/social/NOTICE.md`；其他平台默认使用名称前两个字符。二维码弹窗提供加载提示、原图链接和键盘关闭，不会自动执行关注或发送消息。
+Local platform icons include `github`, `csdn`, `bilibili`, `wechat`, `weibo`, `zhihu`, `douyin`, `xiaohongshu`, and `telegram`. See [icon sources](source/icons/social/NOTICE.md). Other platforms use the first two characters of their name. QR dialogs provide loading feedback, an original-image link, and keyboard dismissal.
 
-这些页面继续读取 `source/_data/about.yml`、`album.yml`、`link.yml`。关于页的文章、分类和相册数量自动统计，主题标签来自实际文章分类；个人标签、经历和兴趣沿用数据文件，`about.show_interests` 控制兴趣卡片。
+These pages read `source/_data/about.yml`, `album.yml`, and `link.yml`. About-page post, category, and album counts are calculated from real site content. Personal tags, experience, and interests come from the data files; `about.show_interests` controls interest cards.
 
-相册使用 `path_name` 精确匹配页面路径，`album_list[].image` 支持单个地址或地址数组，空项会被忽略。照片的 `content`、`address`、`from`、`date` 显示为说明信息。点击照片后可用左右按钮或方向键浏览，Esc 关闭；加载失败时可重试或打开原图。
+Albums match page paths using `path_name`. `album_list[].image` accepts an image URL or an array; empty entries are ignored. Photo details use `content`, `address`, `from`, and `date`. Browse with arrows or keyboard keys and close with `Esc`; failed images offer retry and original-image links.
 
-友链采用分组卡片与本站名片侧栏布局，手机端自动改为单列。支持站名、简介、标签和域名关键词组合筛选，可清空搜索，无结果时可一键重置。沿用 `source/_data/link.yml` 中的 `siteshot`、`tag` 和 `recommend` 字段，展示截图、标签和推荐标记；图片失败时显示渐变封面或文字头像。分组标题显示当前匹配数量。
+Friend links use grouped cards with a site contact card in the sidebar, switching to one column on mobile. Filtering combines site names, descriptions, tags, and domains. Existing `siteshot`, `tag`, and `recommend` fields are supported, with gradient or text fallbacks for failed images and matching counts for each group. The contact card uses your site title, URL, description, and theme avatar; its JSON can be copied or selected manually when clipboard access is unavailable.
 
-本站名片取自站点标题、地址、简介和主题头像，默认折叠 JSON 数据，支持一键复制。浏览器不允许自动复制时，会展开数据并选中内容供手动复制。交换友链入口跳转本站留言板，读者可自行留下网站信息。
+### Article sharing and printing
 
-## 文章阅读
+The article share dialog copies plain or Markdown links and offers the system share sheet when supported. Sharing includes only the article title and canonical URL, with Markdown escaping. Clipboard failures select the text for manual copying. Close the dialog or press `Esc` to return focus to its trigger. Set `article.share.enable: false` to disable the dialog; the existing copy-link button remains available.
 
-### 文章分享
+Reading settings and the article footer provide a print / PDF preview. The print stylesheet hides navigation, sidebars, comments, and action buttons, expands folded content and long code, and appends the site, author, and source link. Body images remain; audio, video, embedded pages, and the article cover are excluded.
 
-文章底部“分享文章”提供普通链接、Markdown 链接复制，以及浏览器支持时的系统分享。复制失败会选中内容，支持手动复制；系统分享由读者主动选择应用。分享内容仅包含文章标题与规范链接，不读取正文或解密内容。Markdown 标题中的括号和反斜杠会转义。
+Returning to reading or pressing `Esc` restores the previous folds and scroll position. Direct browser printing also temporarily expands folded content and restores it afterward. Printing uses currently loaded content; it does not retrieve failed resources or decrypt articles. Pagination and paper settings are controlled by the browser. Set `article.print.enable: false` to disable the theme's print controls and stylesheet.
 
-不支持系统分享的浏览器仍可复制链接。关闭弹窗或按 `Esc` 返回原按钮；打印预览期间不打开分享弹窗。设置 `article.share.enable: false` 可关闭分享弹窗，原有“复制文章链接”按钮保留。
+### Reading list
 
-### 打印与 PDF
+Readers can save posts from below the article title and open `/reading-list/` from sidebar or footer links. The list keeps up to 100 post paths in the current browser's `morii-reading-list` storage; titles and dates come from the site index. It does not store article bodies or automatically sync across browsers or devices. Clearing site data removes the list.
 
-阅读设置和文章底部提供“打印 / 导出 PDF”入口。先进入页面内预览，再选择“打印 / 保存 PDF”打开浏览器打印窗口，可使用浏览器的“另存为 PDF”。预览与纸张打印共用 `print.css`，隐藏导航、侧栏、评论和操作按钮；长代码完整展示并换行，正文中的折叠内容自动展开，文末附带站点、作者和原文链接。音视频、嵌入网页和文章封面不会打印，正文图片保留。
+The list supports resume and remove controls, combined title / category / tag / path filters, retry after index failures, and automatic updates across tabs. Missing posts remain saved until removed manually. Unavailable browser storage produces a visible message. Set `reading_list.enable: false` to disable its controls, links, and generated page; `reading-list/` is a reserved theme route.
 
-“返回阅读”或 `Esc` 会恢复折叠状态和原来的滚动位置。浏览器直接打印时，也会临时展开折叠内容并在打印后恢复。打印的是当前已加载的内容，外部资源加载失败或尚未解密的文章不会因此自动补全。PDF 的最终分页、页眉页脚和纸张设置由浏览器决定。设置 `article.print.enable: false` 可关闭主题提供的入口与样式。
+Readers can export JSON and import it in another browser. Imports merge and deduplicate paths, handle changed site roots, and report entries beyond the 100-post limit. Supported Morii backups must be at most 256 KB and are read locally without uploading. Backups contain post paths, not body text, reading positions, or account details.
 
-### 稍后阅读
+### Reading settings and article layout
 
-文章标题下可以加入或移出“稍后阅读”，侧栏导航和页脚提供清单入口 `/reading-list/`。清单按收藏顺序排列，支持继续阅读和逐条移除，最多保存 100 篇。记录只在当前浏览器的 `morii-reading-list` 中保存文章路径；标题与日期从本站索引读取，不保存正文。不同浏览器或设备之间不会同步，清理网站数据会清除收藏。
+Articles use a wide cover with category, tags, publication and update dates, reading time, and author details. Covers prefer `top_img`, then `cover`; `top_img: false` selects a gradient. Body and author sidebar use separate cards. Typography defaults to 17 px, with independent heading, list, table, and quote styles and horizontal scrolling inside long code blocks.
 
-索引加载失败时提供重试；文章被移除或暂未找到时仍保留收藏记录，可以手动移除。浏览器禁用存储时显示提示，操作不会伪装成成功。跨标签页更改会自动刷新状态。通过 `reading_list.enable: false` 可以关闭按钮、导航和页面生成；`reading-list/` 为主题保留路由。
+Reading settings offer 15 / 17 / 19 / 21 px body text and a focus mode that hides the sidebar and centers the article. Preferences persist in the current browser; resetting restores 17 px and clears local preferences. Without storage, controls still affect the current page.
 
-清单支持按标题、分类、标签和路径组合筛选。可以将收藏导出为 JSON，再在其他浏览器中导入；导入会保留当前收藏并合并去重，支持站点根目录变化，超出 100 篇时提示未导入数量。仅接受 256 KB 以内、格式版本受支持的 Morii 收藏备份，文件在浏览器内读取，不上传服务器。备份只包含文章路径，不包含正文、阅读位置和账号信息。
+Desktop table-of-contents and weather cards stick independently of the author card, with scrolling when the window is short. The table of contents supports H1–H6, highlights the current section, and updates after decryption. Mobile, tablet, and focus layouts provide a floating contents control with reading progress. Without JavaScript, a collapsible table of contents remains before the body.
 
-### 阅读设置
+Set `article.reading_settings: false` to hide controls and disable saved preferences. Without JavaScript, the default layout is used.
 
-阅读页采用独立的通栏大封面，集中展示分类、标签、发布日期、更新日期、阅读时长和作者。封面优先使用文章 `top_img`，其次为 `cover`；`top_img: false` 使用纯渐变背景。正文与作者侧栏分为独立卡片，手机端封面信息居中。正文默认 17 px，章节标题、列表、表格和引用有独立排版，长代码在块内横向滚动。
+Reading positions are saved locally for up to 50 posts and 90 days. Returning readers can resume or clear a saved position; completing an article removes it. Updated posts, links with section anchors, and encrypted posts do not offer outdated positions. Set `article.resume.enable: false` to disable this feature.
 
-文章标题下方提供“阅读设置”，支持 15 / 17 / 19 / 21 px 正文字号，以及收起侧栏、居中正文的专注阅读。设置在当前浏览器保存，切换文章时会沿用；“恢复默认”会清除本机阅读偏好并恢复 17 px。无法访问本地存储时仍可调整当前页面。
+### Sidebar cards and article age notices
 
-桌面作者卡片随页面滚出，目录与天气区域独立吸顶，窗口较矮时可在该区域滚动。当前章节高亮并自动保持在目录可见范围。目录支持 H1–H6，解密后的新增章节也会更新。手机、平板及专注模式提供左下角“目录”入口，显示阅读进度，可随时跳转章节；按 Esc 或关闭按钮返回。未开启 JavaScript 时保留正文前的折叠目录。
+`sidebar.announcement` accepts `enable`, `title`, and plain-text `content` with line breaks. `sidebar.tags` accepts `enable` and a `limit` of 1–40, defaulting to 12, sorted by post count. `sidebar.stats.enable` shows post counts, public-content word estimates, and the earliest post date. Counts exclude code, encrypted bodies, and unpublished posts.
 
-通过 `article.reading_settings: false` 隐藏控件并关闭偏好应用。不开启 JavaScript 时使用默认布局，设置面板保持隐藏。
+`article.outdated.enable` displays an age notice after `days` since the last update, defaulting to 365. It falls back to the publication date and stays hidden for invalid dates or encrypted posts. The browser recalculates age to avoid stale static notices. Set `outdated: false` in a post's Front Matter to disable its notice, and maintain the Hexo `updated` field for long-lived articles.
 
-### 侧栏卡片与时效提醒
+### Related posts and code blocks
 
-参考 AnZhiYu 的公告、标签与站点信息模块，为 Morii 独立实现对应卡片。`sidebar.announcement` 支持 `enable`、`title` 和纯文本 `content`（支持换行，不执行 HTML）；`sidebar.tags` 支持 `enable` 和 `limit`（1–40，默认 12），按文章数量排列。`sidebar.stats.enable` 控制站点档案，显示发表数量、公开内容字数与最早文章日期；字数按汉字和外文单词估算，排除代码、加密正文和未发布文章。
+`article.related` ranks recommendations by shared tags (3 points each) and categories (1 point each), with newer posts winning ties. It excludes the current post, duplicates, encrypted posts, and unpublished posts. `limit` accepts 1–6, defaulting to 3; no matches hide the section.
 
-`article.outdated.enable` 开启时效提醒，`days` 为距上次更新的天数阈值，默认 365；超过阈值才显示。无更新日期时使用发表日期，无有效日期或加密文章不展示。浏览器会重新计算天数，避免静态页面缓存造成提示过期；在文章 front matter 中设置 `outdated: false` 可单独关闭。更新日期以 Hexo 的 `updated` 为准，长期文章建议显式维护该字段。
-
-### 继续阅读与代码
-
-`article.related` 按共同标签、共同分类推荐文章：每个共同标签计 3 分，共同分类计 1 分，同分时优先较新的文章。排除当前文章、重复路径、加密文章和未发布文章；没有关联时隐藏整个推荐区。`limit` 支持 1–6，默认 3。
-
-`article.navigation` 控制文末上一篇/下一篇导航。`article.code.collapse` 控制长代码默认收起，`lines` 设置预览行数（5–100，默认 18）。展开按钮可用键盘操作，复制按钮始终复制完整代码；文章解密后也会自动处理新增代码块。关闭 JavaScript 时直接显示完整代码。
+`article.navigation` controls previous / next links. Code blocks support `classic`, `mac`, and `minimal` styles with `dark`, `light`, or `auto` palettes. `article.code.collapse` folds long code; `lines` accepts 5–100 preview lines, defaulting to 18. Expand controls work with the keyboard, copying always includes the full code, and decrypted content is processed too. Without JavaScript, code remains fully visible.
 
 ```yaml
 article:
@@ -381,144 +319,115 @@ article:
     lines: 18
 ```
 
-## 小空调
+### Air conditioner toy
 
-访问 `/air-conditioner/` 使用网页小玩具，入口位于页脚。温度、模式和摆风偏好保存在本机浏览器；重新进入时默认关闭。该功能仅模拟界面，不连接实际设备，也不会播放声音。浏览器禁用本地存储时控件仍可使用。
+The footer links to `/air-conditioner/`, a web toy with power, 16–30°C temperature, heating / cooling, and swing controls. Temperature, mode, and swing settings are stored locally; revisiting starts with the power off. It simulates controls without connecting to a physical device or playing sound, and works without local storage.
 
-## 朋友圈
+### Friends feed
 
-`friends_feed.endpoint` 是返回 JSON 的完整接口地址。前端使用 `start`、`end` 参数分页，支持数组，以及 `article_data` 数组或以键组织的对象。文章字段为 `title`、`link`（或 `url`）、`author`、`avatar`、`created`（或 `date` / `updated`）。跨域接口需要允许博客域名的 CORS 请求。
+Set `friends_feed.endpoint` to your own JSON endpoint. Requests use `start` and `end` pagination parameters and accept arrays or `article_data` arrays / keyed objects. Article fields are `title`, `link` (or `url`), `author`, `avatar`, and `created` (or `date` / `updated`). Cross-origin endpoints must allow the blog's origin through CORS.
 
-接口默认留空；只有填写自己的 `friends_feed.endpoint` 后才请求文章数据。未配置或接口不可用时页面仍显示已有友链。
+The endpoint is empty by default. Without an endpoint, or when requests fail, the page falls back to existing friend links.
 
-## 音乐馆
+### Music
 
-音乐馆是完整的播放页面：封面、同步滚动歌词、可搜索歌单和底部播放控制。支持进度拖动、点击歌词定位、音量调整，以及顺序、列表循环、单曲循环和随机播放。移动端可切换歌词 / 歌单。
+The music page provides cover art, synchronized lyrics, a searchable playlist, seek controls, lyric seeking, volume, and sequential, list-loop, single-loop, and shuffle modes. Mobile readers can switch between lyrics and the playlist.
 
-访问音乐馆会自动获取歌单；点击播放后，站内链接跳转保留同一音频实例，离开音乐馆时显示参考 AnZhiYu 的左下角音乐胶囊：播放时主题色背景、旋转封面和呼吸光效，暂停后恢复普通卡片色。点击封面播放 / 暂停，点击歌名伸展 / 收起当前歌词，伸展或悬停时可切歌及返回完整播放器。支持浏览器前进 / 后退。导航由一个同源内容框架承载，目标页面正常执行自己的初始化和卸载，页面地址和标题会同步更新。外站、下载链接和新标签页仍按各自链接行为打开。
+Opening the music page loads its playlist; playback begins only after user interaction. Once playing, navigation within the same tab retains the audio instance. Other pages show a floating music capsule with play / pause, track navigation, expandable current lyrics, and a link back to the player. Same-origin content navigation updates the URL and title and runs each page's initialization and cleanup. External links, downloads, and new tabs keep their normal behavior.
 
-这是同一标签页内的连续播放；手动刷新或关闭标签页会重新加载播放器，不会自动播放。未播放前不会在普通页面额外请求歌单。
+Refreshing or closing the tab reloads the player without autoplay. Before playback begins, ordinary pages do not request the online playlist.
 
-音乐馆支持与 AnZhiYu 相同的 Meting 配置，访问页面后自动获取平台歌单，在本站选曲播放。默认关闭在线歌单，在博客 `_config.morii.yml` 填写自己的歌单：
+Online playlists use Meting-compatible configuration and are disabled by default. In the blog root's `_config.morii.yml`, supply your own playlist:
 
 ```yaml
 music:
   playlist_url: https://y.qq.com/n/ryqq/playlist/YOUR_PLAYLIST_ID
-  playlist_label: 在 QQ 音乐收听
+  playlist_label: Listen on QQ Music
   volume: 0.7
   meting:
     enable: true
-    server: tencent  # QQ 音乐；网易云使用 netease
+    server: tencent # Use netease for NetEase Cloud Music.
     type: playlist
     id: 'YOUR_PLAYLIST_ID'
     api: 'https://api.injahow.cn/meting/?server=:server&type=:type&id=:id&r=:r'
   tracks: []
 ```
 
-`api` 可替换为自己的 Meting 兼容服务，需允许站点跨域访问。支持返回 `name/artist/cover` 或 `title/author/pic` 字段的歌曲数组。歌单在浏览器端获取，不会在构建时缓存临时音频链接。公开接口和平台歌曲的可用性由服务端决定，部分歌曲可能无法播放；失败时可重试或打开原平台歌单。页面不会自动开始播放。
+Replace `api` with your own Meting-compatible service if needed; it must permit cross-origin requests. Responses support `name/artist/cover` or `title/author/pic` fields. Playlists are fetched in the browser, without caching temporary audio URLs at build time. Availability depends on the service and music platform; failures offer retry and a link to the original playlist.
 
-关闭 `music.meting.enable` 后可只使用本地配置；也可通过 `music.tracks` 提供获取歌单失败时的备用曲目：
+Disable `music.meting.enable` to use configured tracks only, or provide `music.tracks` as an online-playlist fallback:
 
 ```yaml
 music:
   meting:
     enable: false
   tracks:
-    - title: 音频标题
-      artist: 作者
+    - title: Example track
+      artist: Artist name
       url: https://your-domain.example/audio/example.mp3
       cover: https://your-domain.example/images/cover.jpg
 ```
 
-配置官方提供的 HTTPS `music.embed_url` 也可展示嵌入播放器。
+An official HTTPS `music.embed_url` can display an embedded player. Local tracks support `lrc: /audio/example.lrc` or inline timestamped lyrics with `lyrics: |`. Online playlists use the returned `lrc`. Missing lyrics do not prevent audio playback. Track and cover paths can be site paths such as `/audio/example.mp3`. Without JavaScript, the original playlist link remains available.
 
-本地曲目可增加 `lrc: /audio/example.lrc` 指定 LRC 歌词文件，也可用 `lyrics: |` 直接填写带时间戳的歌词。在线歌单自动读取接口返回的 `lrc`；歌词加载失败不影响音频播放。
+### Cinema
 
-曲目的 `url` 和 `cover` 也支持 `/audio/example.mp3` 这样的本站路径。未开启 JavaScript 时可通过原平台歌单入口收听。
-
-## 电影院
-
-主题自动生成 `/cinema/` 页面，包含电影、电视剧、动漫分类、片名搜索和剧集切换。把自有视频文件放在博客根目录的 `source/videos/`，并新建 `source/_data/cinema.yml`：
+When enabled, the theme generates `/cinema/` with movie, series, and anime categories, title search, and episode selection. Put your video files in the blog's `source/videos/` and create `source/_data/cinema.yml`:
 
 ```yaml
-- title: 周末短片
+- title: Weekend short film
   type: movie
   year: '2026'
-  description: 一部适合周末观看的短片。
+  description: A short film for the weekend.
   cover: /images/weekend-poster.jpg
   url: /videos/weekend.mp4
 
-- title: 我的剧集
+- title: My series
   type: series
   year: '2026'
   cover: /images/series-poster.jpg
   episodes:
-    - title: 第 1 集
+    - title: Episode 1
       url: /videos/series-01.mp4
-    - title: 第 2 集
+    - title: Episode 2
       url: /videos/series-02.webm
 
-- title: 动画短片
+- title: Animated short
   type: anime
   episodes:
-    - title: 正片
+    - title: Full video
       url: https://video.example.com/anime.mp4
 ```
 
-`movie`、`series`、`anime` 分别表示电影、电视剧和动漫。单片直接用 `url`；多集使用 `episodes`。也可在主题配置的 `cinema.items` 内填写同样的数据。站点数据文件优先。视频地址支持本站绝对路径或 HTTPS 地址，站点部署在子目录时会自动补上前缀。播放器使用浏览器原生视频控件，是否支持 MP4、WebM 或 HLS 由浏览器和视频编码决定；外部视频服务还需允许页面引用。未填写片单时显示配置提示。设置 `cinema.enable: false` 可关闭页面，关闭后应同时移除 `explore` 中的电影院链接。
+Enable the page with `cinema.enable: true` in `_config.morii.yml`. `movie`, `series`, and `anime` select the categories. Use `url` for a single video or `episodes` for multiple videos. The same data can go in `cinema.items`; site data takes priority. URLs accept site paths or HTTPS addresses, including subdirectory deployment prefixes. Playback uses native browser controls; format support depends on the browser and codecs, and external hosts must allow embedding. Empty data shows a setup prompt. If you disable the page, remove its `explore` link too.
 
-## 页面动效
+### Motion
 
-默认开启卡片滚动入场、首页装饰缓动、悬停反馈、按钮按压和弹窗入场。卡片只在首次进入视口时播放，异步加载的卡片同样适用。正文段落不逐段淡入，键盘聚焦会立即结束对应卡片的入场动画。无 JavaScript 或浏览器缺少动画支持时，内容正常显示。
+Card entrances, homepage decoration, hover feedback, button presses, and dialog transitions are enabled by default. Cards animate on their first entry into view, including asynchronously added cards. Article paragraphs do not animate individually, and keyboard focus immediately finishes the focused card's entrance. Content remains visible without JavaScript or animation support.
 
 ```yaml
 motion:
-  enable: true  # false 关闭本次新增的页面动效
+  enable: true # Set false to disable page motion.
 ```
 
-自动遵循系统“减少动态效果”，偏好变化时会取消正在运行的入场动画。首页装饰离开视口或页面进入后台时暂停，打印时关闭动效。音乐封面、空调和页脚爱心等功能原有动画仍遵循各自配置与系统设置。
+The theme respects reduced motion preferences, including changes during a session. Homepage decoration pauses offscreen and in background tabs; printing disables motion. Music covers, the air conditioner, and footer hearts follow their own settings and system preferences.
 
-## 开发与发布
+### GitHub contribution calendar
 
-主题仓库已提供独立演示站、CI、GitHub Release 草稿和可选 GitHub Pages 部署工作流。
-
-```bash
-# 在主题仓库根目录执行
-npm ci
-npm test
-npm run build:demo
-npm run audit:performance
-npm run package:theme
-```
-
-`audit:performance` 会独立构建演示站，统计首页、归档、文章、相册、音乐馆和电影院的 HTML、CSS、JavaScript 与图片体积，以及首屏阻塞样式和请求数；超出 `tools/performance.cjs` 中的预算时 CI 失败。统计值是本地文件的未压缩大小，不等同于线上传输量或 LCP / INP / CLS；线上体验仍需用浏览器性能工具和真实访问数据核对。报告会标出超过 500 KiB 的示例图片。
-
-创建版本标签、发布 GitHub Release 与 npm 包、提交 Hexo 主题目录的具体步骤见 [发布指南](docs/RELEASING.md)。当前正式版为 `1.0.0`，采用 MIT 许可证。
-
-## 交互与回归验证
-
-主题仓库的 `npm test` 覆盖独立 Hexo 站点在根路径和子目录的构建、页面与资源路径、音乐队列与搜索、歌词加载竞争和进度定位、悬浮胶囊、发布版本校验、ZIP 内容和 SHA256 校验。
-
-开发者还可运行 `npx playwright install chromium webkit`，然后执行 `npm run test:browser`，检查 Chromium / WebKit、深浅模式、手机、窄桌面与短窗口中的真实布局。覆盖长标题、长目录、天气时钟和弹窗边界，结果包含截图与失败调试记录。使用独立测试站点和固定天气响应，不依赖真实博客与外部服务；详见[浏览器布局回归](docs/BROWSER-TESTING.md)。
-
-作者博客工作区保留更多依赖真实文章的回归测试，两者用途不同。在线音乐、评论、天气和朋友圈的实际可用性仍需浏览器核对；独立构建不会请求这些外部服务。
-
-### GitHub 贡献日历
-
-首页第一页在内容推荐区下方显示贡献日历，无需旧 AnZhiYu 的 `recent-posts` 容器。主题配置示例：
+The first homepage page can show a contribution calendar below featured content:
 
 ```yaml
 github_calendar:
   enable: true
-  user: xichenx
+  user: YOUR_GITHUB_USERNAME
   api: 'https://github-contributions-api.jogruber.de/v4/{user}?y=last'
 ```
 
-未配置主题账号时可沿用站点 `githubcalendar.user`。原插件的 `layout`、`calendar_js`、`color` 由 Morii 的原生布局与样式替代；旧接口不自动沿用，因为返回格式可能不同。`api` 可替换为兼容 [GitHub Contributions API v4](https://github.com/grubersjoe/github-contributions-api) 的自建服务，需允许博客跨域读取，无需在主题中设置 GitHub Token。浏览器会将成功响应缓存一小时，展示数据的截止日期；接口失败时可重试，账号链接仍可访问。数字表示服务返回的贡献次数，不代表提交数量。关闭 `enable` 后不加载日历脚本。
+If the theme username is unset, the site-level `githubcalendar.user` can supply it. Morii replaces the old plugin's layout, script, and colors with native rendering; old API settings are not inherited. You can use your own [GitHub Contributions API v4](https://github.com/grubersjoe/github-contributions-api) compatible endpoint with CORS enabled, without putting a GitHub token in the theme. Results cache for an hour, show the data end date, and provide retry / profile links. Values represent the service's contribution counts, not commit counts. Disabling the feature prevents script loading.
 
-### 页面布局配置
+### Page layouts
 
-推荐在**博客根目录**创建或编辑 `_config.morii.yml`，通过 Hexo 的主题覆盖配置选择布局。这样升级 `themes/morii` 时可保留自己的设置；直接修改主题的 `_config.yml` 也支持。布局配置在生成站点时生效，修改后执行 `hexo clean && hexo generate`，本地预览服务需重新启动。
+Choose layouts in the blog root's `_config.morii.yml`, then regenerate the site and restart local preview:
 
 ```yaml
 appearance:
@@ -529,20 +438,18 @@ appearance:
     archives: timeline
 ```
 
-| 配置项 | 可选值 | 默认值 |
+| Setting | Choices | Default |
 | --- | --- | --- |
-| `home` | `featured`：最新文章列表在奇数篇时突出首篇；`grid`：普通双列文章卡片 | `featured` |
-| `categories` | `atlas`：双列主题导航；`directory`：左侧索引与近期文章目录；`cards`：独立分类卡片 | `atlas` |
-| `category` | `list`：顶部主题切换和文章行列表；`cards`：文章卡片与侧栏 | `list` |
-| `archives` | `timeline`：年份时间树；`grouped`：按年份分组的列表卡片 | `timeline` |
+| `home` | `featured`: emphasize the first post when the latest-post count is odd; `grid`: two-column cards | `featured` |
+| `categories` | `atlas`: two-column topic navigation; `directory`: index and recent posts; `cards`: category cards | `atlas` |
+| `category` | `list`: topic navigation and post rows; `cards`: post cards and a sidebar | `list` |
+| `archives` | `timeline`: year-based timeline; `grouped`: cards grouped by year | `timeline` |
 
-每项可独立选择。例如喜欢经典卡片时，将 `categories` 和 `category` 都设为 `cards`；喜欢目录时，只将 `categories` 设为 `directory`。未填写的项使用默认值，非法值会在构建日志提示并回退默认布局。配置值只从上述内置方案中选择，不加载任意模板。
+Each choice is independent. Missing values use defaults; invalid values log a warning and fall back. Only built-in layouts are accepted. Layouts do not change post counts, ordering, routes, pagination scope, or saved reading preferences. Hexo's `index_generator`, `category_generator`, `archive_generator`, and global `per_page` still control pagination.
 
-布局选择不修改每页文章数量、文章顺序、路由或分页范围；每页数量仍由 Hexo 的 `index_generator`、`category_generator`、`archive_generator` 和全局 `per_page` 决定。此配置不会覆盖浏览器内保存的字号、专注阅读等阅读偏好。
+### Visual effects
 
-### 视觉特效
-
-在博客根目录 `_config.morii.yml` 中配置，与 `appearance.layouts` 放在同一个 `appearance` 下：
+Configure effects alongside layouts under the same `appearance` mapping:
 
 ```yaml
 appearance:
@@ -558,15 +465,43 @@ appearance:
     theme_transition: true
 ```
 
-- `aurora`：缓慢流动的渐变极光背景。
-- `particles`：原生 Canvas 星尘、近邻连线与鼠标避让；`density` 限制在 12–80，手机最多 18 个，绘制频率约 30 fps，像素倍率最高 1.5。
-- `glass`：导航与展示卡片毛玻璃，正文区域保留实色背景；浏览器不支持时沿用原样式，手机关闭卡片背景模糊。
-- `spotlight`：精细指针设备上的卡片跟随光晕；首页主按钮悬停时有扫光。
-- `tilt`：鼠标移动时卡片沿两个方向轻微倾斜（最多 3°），离开或滚动立即复位；触摸设备关闭。
-- `ripple`：按钮点击波纹，支持键盘触发，保持原有点击行为。
-- `theme_transition`：深浅色切换时从按钮位置圆形扩散，基于 [View Transition API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API/Using)；不支持、减少动态效果或节省流量时直接切换。
-- `enable: false`：关闭整套新特效，不加载其样式与脚本。原有滚动入场等动画仍由 `motion.enable` 控制。
+- `aurora`: a slowly moving gradient background.
+- `particles`: native Canvas stardust, nearby connections, and pointer avoidance. `density` accepts 12–80; mobile uses at most 18 particles, with drawing capped around 30 fps and a 1.5 pixel ratio.
+- `glass`: translucent navigation and display cards, with solid article backgrounds and browser fallbacks. Mobile cards disable background blur.
+- `spotlight`: pointer-following card lighting on precise pointing devices and a hover highlight on the homepage action button.
+- `tilt`: up to 3° of card tilt on precise pointing devices, reset on pointer leave or scrolling and disabled for touch.
+- `ripple`: button feedback for pointer and keyboard activation.
+- `theme_transition`: circular light / dark transitions using the [View Transition API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API/Using), with instant switching when unsupported, reduced motion is requested, or data saving is enabled.
+- `enable: false`: disable these effects and their CSS / JavaScript. Page entrance animations remain controlled by `motion.enable`.
 
-`motion.enable: false` 会同时停止新特效中的持续运动和指针光晕，但保留静态极光与毛玻璃。系统设置减少动态效果、高对比度或浏览器启用节省流量时不运行粒子；切入后台、打印、离开页面会暂停，返回后恢复。特效不依赖第三方动画库，不读取定位或发送网络请求。修改配置后重新生成站点并重启本地预览。
+`motion.enable: false` also stops continuous effect motion and pointer lighting, while preserving static aurora and glass. Reduced motion, high contrast, and browser data saving suppress particles. Effects pause in background tabs, during printing, and when leaving the page. They use no third-party animation library and do not request location or send network requests.
 
-特效仅由网站所有者通过主题 `_config.yml` 或站点根目录 `_config.morii.yml` 配置。页面不提供访客特效开关，不读取或保存浏览器中的特效偏好；旧版本保存的特效偏好不再生效。深浅色切换和阅读字号等已有功能仍可正常使用。
+Effects are configured by the site owner. There is no visitor effects toggle or stored visitor effects preference; earlier saved effect preferences are ignored. Light / dark and reading settings continue to work independently. Regenerate the site after configuration changes.
+
+## Development and releases
+
+The repository includes a standalone demo site, CI, release drafts, and optional GitHub Pages deployment workflows. Run these commands from the theme repository:
+
+```bash
+npm ci
+npm test
+npm run build:demo
+npm run audit:performance
+npm run package:theme
+```
+
+`audit:performance` builds the demo and checks HTML, CSS, JavaScript, image sizes, blocking styles, and request counts across home, archive, article, album, music, and cinema pages. CI fails when budgets in `tools/performance.cjs` are exceeded. These are uncompressed local sizes, not network transfer sizes or LCP / INP / CLS measurements. Reports also flag example images larger than 500 KiB.
+
+See the [release guide](docs/RELEASING.md) for version tags, GitHub Releases, npm publishing, and submitting the theme to the Hexo theme directory. See [documentation site development and deployment](docs/DOCS-SITE.md) to maintain the documentation.
+
+## Testing
+
+`npm test` covers independent Hexo builds at root and subdirectory paths, page and asset URLs, music queues, search, lyric loading races, seeking, the floating player, release version checks, ZIP contents, and SHA256 verification.
+
+For browser layout checks, run `npx playwright install chromium webkit`, then `npm run test:browser`. Chromium / WebKit coverage includes light / dark modes, mobile, narrow desktops, short windows, long titles and tables of contents, weather cards, and dialog boundaries. Reports include screenshots and failure traces. Tests use an isolated site with fixed weather responses; see [browser testing](docs/BROWSER-TESTING.md).
+
+Online music, comments, weather, and friends-feed availability depend on their services and need browser verification; standalone builds do not request those services.
+
+## License
+
+[MIT](LICENSE) · Theme by **Morainet**.
