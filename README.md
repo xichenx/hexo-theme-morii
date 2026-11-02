@@ -38,6 +38,7 @@ theme: morii
 
 Create **`_config.morii.yml`** in the same blog root, or merge these entries into your existing theme configuration:
 
+
 ```yaml
 # Inherit your blog title, subtitle, and description.
 brand: ''
