@@ -6,7 +6,7 @@ const path = require('node:path');
 const { JSDOM } = require('jsdom');
 const source = fs.readFileSync(path.join(__dirname, '../source/js/motion.js'), 'utf8');
 function fixture({ reduced = false, support = true, enabled = true } = {}) {
-  const dom = new JSDOM(`<html data-motion="${enabled ? 'on' : 'off'}"><body><main id="main"><section class="hero__main"></section><article class="post-card"><a href="#">阅读</a></article></main></body></html>`, { runScripts: 'outside-only', pretendToBeVisual: true });
+  const dom = new JSDOM(`<html data-motion="${enabled ? 'on' : 'off'}"><body><main id="main"><section class="hero__main"><div class="eyebrow">MORII</div><h1>首页</h1><p>介绍</p><div class="hero__actions"><a href="#">开始阅读</a></div></section><article class="post-card"><a href="#">阅读</a></article></main></body></html>`, { runScripts: 'outside-only', pretendToBeVisual: true });
   const { window } = dom;
   const observers = []; const mutations = []; const animations = [];
   const preference = { matches: reduced, addEventListener(type, listener) { this.changed = listener; } };
@@ -63,7 +63,7 @@ test('reduced motion, hidden pages and print cancel effects without hiding conte
   assert.equal(f.animations[0].cancelled, true);
   f.observers[0].enter([document.querySelector('.post-card')]);
   f.mutations[0].callback([{ addedNodes: [document.createElement('article')] }]);
-  assert.equal(f.animations.length, 1);
+  assert.equal(f.animations.length, 4);
   assert.equal(hero.style.getPropertyValue('--morii-ambient-state'), 'paused');
   f.preference.matches = false; f.preference.changed();
   const latest = f.observers.at(-2);
@@ -78,6 +78,29 @@ test('reduced motion, hidden pages and print cancel effects without hiding conte
   assert.equal(latest.elements.size, 0);
   assert.equal(card.style.opacity, '');
   assert.equal(card.hidden, false);
+  f.dom.window.close();
+});
+
+test('hero text enters in layers without fading the title or the large background', () => {
+  const f = fixture(); const hero = f.window.document.querySelector('.hero__main');
+  f.observers[0].enter([hero]);
+  assert.deepEqual(f.animations.map(a => a.options.delay), [0, 55, 110, 165]);
+  assert.ok(f.animations.every(a => a.element !== hero && a.frames.every(frame => frame.opacity === undefined)));
+  hero.querySelector('a').focus();
+  assert.equal(f.animations.at(-1).cancelled, true);
+  f.preference.matches = true; f.preference.changed();
+  assert.ok(f.animations.every(a => a.cancelled));
+  f.dom.window.close();
+});
+
+test('nested cards avoid duplicate movement and focused cards never fade', () => {
+  const f = fixture(); const doc = f.window.document;
+  const card = doc.querySelector('.post-card');
+  const nested = doc.createElement('div'); nested.className = 'related-card'; card.append(nested);
+  f.mutations[0].callback([{ addedNodes: [nested] }]);
+  assert.equal(f.observers[0].elements.has(nested), false);
+  card.querySelector('a').focus(); f.observers[0].enter([card]);
+  assert.equal(f.animations.length, 0);
   f.dom.window.close();
 });
 

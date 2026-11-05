@@ -406,6 +406,8 @@ Enable the page with `cinema.enable: true` in `_config.morii.yml`. `movie`, `ser
 
 Card entrances, homepage decoration, hover feedback, button presses, and dialog transitions are enabled by default. Cards animate on their first entry into view, including asynchronously added cards. Article paragraphs do not animate individually, and keyboard focus immediately finishes the focused card's entrance. Content remains visible without JavaScript or animation support.
 
+Homepage text enters in layers while the title and background stay visible from the first frame. Sibling cards use a short stagger; nested cards move only with their parent. Quick navigation adds staggered entrances and hover feedback, with immediate visibility on keyboard focus. Motion uses native browser animation without extra dependencies or requests.
+
 ```yaml
 motion:
   enable: true # Set false to disable page motion.

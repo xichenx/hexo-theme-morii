@@ -13,7 +13,17 @@
   let ambient;
   let changes;
   let stopped = false;
+  const easing = 'cubic-bezier(.22, 1, .36, 1)';
   const cancel = element => { active.get(element)?.cancel(); active.delete(element); };
+  const play = (element, frames, delay = 0, duration = 500) => {
+    // Focus and hover stay responsive: translate does not replace the card's transform.
+    if (element.contains(document.activeElement)) return;
+    try {
+      const animation = element.animate(frames, { duration, delay, easing, fill: 'backwards' });
+      active.set(element, animation);
+      animation.finished.then(() => { if (active.get(element) === animation) active.delete(element); }).catch(() => {});
+    } catch { /* Keep the normal, visible page if animation is unavailable. */ }
+  };
   const stop = () => {
     reveals?.disconnect(); ambient?.disconnect(); changes?.disconnect();
     reveals = ambient = changes = undefined;
@@ -26,7 +36,9 @@
     if (!reveals || stopped || preference?.matches || root.dataset.motion === 'off' || node.nodeType !== 1) return;
     const elements = [...(node.matches(selector) ? [node] : []), ...node.querySelectorAll(selector)];
     elements.forEach(element => {
-      if (!seen.has(element) && !observed.has(element)) { observed.add(element); reveals.observe(element); }
+      // A nested card travels with its parent; a second reveal would double the movement.
+      const parent = element.parentElement?.closest(selector);
+      if ((!parent || !main.contains(parent)) && !seen.has(element) && !observed.has(element)) { observed.add(element); reveals.observe(element); }
       if (ambient && element.matches(ambientSelector) && !ambientObserved.has(element)) { ambientObserved.add(element); ambient.observe(element); }
     });
   };
@@ -34,22 +46,24 @@
     if (stopped || root.dataset.motion === 'off' || preference?.matches || reveals || typeof IntersectionObserver !== 'function' || typeof Element.prototype.animate !== 'function') return;
     reveals = new IntersectionObserver(entries => {
       if (!reveals || stopped || preference?.matches || root.dataset.motion === 'off') return;
-      let order = 0;
+      const groups = new Map();
       entries.forEach(entry => {
         const element = entry.target;
         if (document.hidden || !entry.isIntersecting || element.hidden || !element.getClientRects().length) return;
         reveals.unobserve(element);
         if (seen.has(element)) return;
         seen.add(element);
-        // Elements remain visible in CSS; cancelling or missing browser support never hides content.
-        try {
-          const animation = element.animate([
-            { opacity: 0, translate: '0 18px' },
-            { opacity: 1, translate: '0 0' }
-          ], { duration: 560, delay: Math.min(order++, 4) * 65, easing: 'cubic-bezier(.22, 1, .36, 1)', fill: 'backwards' });
-          active.set(element, animation);
-          animation.finished.then(() => { if (active.get(element) === animation) active.delete(element); }).catch(() => {});
-        } catch { /* Keep the normal, visible page if animation is unavailable. */ }
+        if (element.matches('.hero__main')) {
+          // Keep the large hero and title painted from the first frame (including LCP).
+          [...element.children].filter(child => child.matches('.eyebrow, h1, p, .hero__actions')).forEach((child, index) => {
+            play(child, [{ translate: '0 12px' }, { translate: '0 0' }], Math.min(index, 3) * 55, 620);
+          });
+          return;
+        }
+        const order = groups.get(element.parentElement) || 0;
+        groups.set(element.parentElement, order + 1);
+        // Stagger siblings, not unrelated sections; no baseline CSS hides content.
+        play(element, [{ opacity: .25, translate: '0 14px' }, { opacity: 1, translate: '0 0' }], Math.min(order, 3) * 55);
       });
     }, { threshold: .06 });
     ambient = new IntersectionObserver(entries => entries.forEach(entry => {
