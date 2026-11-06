@@ -9,10 +9,10 @@ mixin postCard(post, featured, eager)
         span.post-card__placeholder ✦
     .post-card__body
       .post-card__meta
-        span= date(post.date, 'YYYY.MM.DD')
+        time(datetime=date_xml(post.date))= date(post.date, 'YYYY.MM.DD')
         if post.categories && post.categories.length
           span.post-card__dot ·
-          span= post.categories.toArray()[0].name
+          span.post-card__category(title=post.categories.toArray()[0].name)= post.categories.toArray()[0].name
       h3
         a(href=postUrl)= post.title
       p= morii_excerpt(post, featured ? 108 : 82)

@@ -1,8 +1,8 @@
 nav.category-nav(aria-label=morii_t("按分类浏览"))
   a(href=url_for(is_home() ? '/' : '/archives/') aria-current=(!is_category() && !is_tag()) ? 'page' : false) #{morii_t("全部")}
   each category in morii_categories(site.categories)
-    a(href=url_for(category.path) aria-current=(is_category() && page.category === category.name) ? 'page' : false)
-      = category.name
+    a(href=url_for(category.path) title=category.name aria-current=(is_category() && page.category === category.name) ? 'page' : false)
+      span= category.name
       small= category.count
   if morii_has_page('/categories/')
     a.category-nav__more(href=url_for('/categories/')) #{morii_t("更多分类 ↗")}

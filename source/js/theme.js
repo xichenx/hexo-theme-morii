@@ -195,7 +195,11 @@
     if (link && !link.contains(event.relatedTarget)) clearTimeout(pendingPrefetch);
   }, { passive: true });
   document.addEventListener('focusin', event => {
-    if (event.target instanceof Element) prefetch(event.target.closest('a[href]'));
+    if (!(event.target instanceof Element)) return;
+    prefetch(event.target.closest('a[href]'));
+    const category = event.target.closest('.category-nav a');
+    // Native focus may expose only a sliver of a link in a horizontal scroller.
+    category?.scrollIntoView?.({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
   });
   window.addEventListener('pagehide', () => clearTimeout(pendingPrefetch));
 })();
