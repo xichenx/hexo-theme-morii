@@ -183,6 +183,8 @@ html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || them
             p#image-status(role='status' aria-live='polite')
             button.button.service-button#image-retry(type='button' hidden) #{morii_t("重新加载图片")}
         figcaption#image-caption
+      if page.type === 'album_detail'
+        .lightbox-thumbnails#image-thumbnails(role='group' aria-label=morii_t("相册缩略图") hidden)
       .lightbox-zoom(role='group' aria-label=morii_t("图片缩放"))
         button.icon-button#image-zoom-out(type='button' aria-label=morii_t("缩小图片") title=morii_t("缩小（−）")) −
         output#image-scale(aria-label=morii_t("当前缩放倍数")) 1.0×

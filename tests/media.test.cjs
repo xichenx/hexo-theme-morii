@@ -5,11 +5,16 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { JSDOM } = require('jsdom');
 const source = fs.readFileSync(path.join(__dirname, '../source/js/media.js'), 'utf8');
-function fixture() {
+function fixture(album = '') {
   const dom = new JSDOM(`<body><article class="article-body"><img id="one" src="/one.png" alt="第一张"><img id="two" src="/two.png" alt="第二张"><a href="https://example.org/"><img id="linked" src="/linked.png"></a></article><dialog id="image-dialog"><div id="image-stage"><img id="image-preview"></div><p id="image-caption"></p><p id="image-status"></p><button id="image-close"></button><button id="image-previous"></button><button id="image-next"></button><span id="image-counter"></span><button id="image-retry"></button><a id="image-original"></a><button id="image-zoom-out"></button><output id="image-scale"></output><button id="image-zoom-in"></button><button id="image-reset"></button></dialog></body>`, { url: 'https://example.test/', runScripts: 'outside-only' });
   const { window } = dom;
   const document = window.document;
+  if (album) document.body.insertAdjacentHTML('beforeend', album);
   const dialog = document.querySelector('dialog');
+  const thumbnails = document.createElement('div');
+  thumbnails.id = 'image-thumbnails';
+  thumbnails.hidden = true;
+  dialog.append(thumbnails);
   dialog.showModal = () => { dialog.open = true; };
   dialog.close = () => { dialog.open = false; dialog.dispatchEvent(new window.Event('close')); };
   const stage = document.getElementById('image-stage');
@@ -65,6 +70,30 @@ test('image zoom clamps bounds, pans within the picture and resets on navigation
   f.click('one');
   assert.equal(f.scale(), '1.0×');
   f.dom.window.close();
+});
+
+test('album thumbnails use numbers until the source is available and clean up on close', () => {
+  const f = fixture('<div data-gallery><a class="photo-card" href="/first.png"><img id="first" src="/first.png"></a><a class="photo-card" href="/second.png"><img src="/second.png"></a><a class="photo-card" href="/third.png"><img src="/third.png"></a></div>');
+  try {
+    f.click('first');
+    const strip = f.document.getElementById('image-thumbnails');
+    assert.equal(strip.hidden, false);
+    assert.equal(strip.querySelectorAll('button').length, 3);
+    assert.equal(strip.querySelectorAll('img').length, 0);
+    f.load();
+    assert.equal(strip.querySelectorAll('img').length, 1);
+    strip.querySelectorAll('button')[2].click();
+    assert.equal(f.document.getElementById('image-counter').textContent, '3 / 3');
+    assert.equal(strip.querySelector('[aria-current="true"]').textContent, '3');
+    f.load();
+    assert.equal(f.preview.getAttribute('src'), 'https://example.test/third.png');
+    assert.equal(strip.querySelectorAll('img').length, 2);
+    f.dialog.close();
+    assert.equal(strip.hidden, true);
+    assert.equal(strip.childElementCount, 0);
+    f.click('one');
+    assert.equal(strip.hidden, true);
+  } finally { f.dom.window.close(); }
 });
 
 test('touch swipe changes images only when fitted; pinch and cancelled gestures never navigate', () => {

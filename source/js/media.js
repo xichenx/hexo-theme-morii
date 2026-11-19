@@ -17,6 +17,7 @@
   const reset = document.getElementById('image-reset');
   const feedback = document.getElementById('image-feedback');
   const stateTitle = document.getElementById('image-state-title');
+  const thumbnails = document.getElementById('image-thumbnails');
   let loadingTimer;
   let feedbackTimer;
   let requestId = 0;
@@ -55,6 +56,44 @@
   };
   let images = [];
   let index = 0;
+  let thumbnailButtons = [];
+  const setThumbnail = (button, src) => {
+    if (!button || !src || button.querySelector('img')) return;
+    const thumbnail = document.createElement('img');
+    thumbnail.alt = '';
+    thumbnail.decoding = 'async';
+    thumbnail.addEventListener('error', () => thumbnail.remove(), { once: true });
+    thumbnail.src = src;
+    button.append(thumbnail);
+  };
+  const buildThumbnails = gallery => {
+    if (!thumbnails) return;
+    const enabled = gallery?.matches('[data-gallery]') && images.length > 1;
+    thumbnailButtons = enabled ? images.map((image, position) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.imageIndex = String(position);
+      button.textContent = String(position + 1);
+      const label = t("查看第 {0} 张照片", position + 1);
+      button.setAttribute('aria-label', image.alt ? label + ' · ' + image.alt : label);
+      if (image.complete && image.naturalWidth) setThumbnail(button, image.currentSrc || image.src);
+      return button;
+    }) : [];
+    thumbnails.hidden = !enabled;
+    thumbnails.replaceChildren(...thumbnailButtons);
+  };
+  const syncThumbnails = () => {
+    const current = thumbnailButtons[index];
+    if (!current) return;
+    const focused = thumbnails.contains(document.activeElement);
+    for (const button of thumbnailButtons) {
+      button.tabIndex = button === current ? 0 : -1;
+      if (button === current) button.setAttribute('aria-current', 'true');
+      else button.removeAttribute('aria-current');
+    }
+    if (focused) current.focus({ preventScroll: true });
+    thumbnails.scrollLeft = current.offsetLeft - (thumbnails.clientWidth - current.offsetWidth) / 2;
+  };
   const setImageState = state => {
     if (!dialog || !preview) return;
     dialog.dataset.imageState = state;
@@ -93,6 +132,7 @@
       clearTimeout(feedbackTimer);
       preview.src = source;
       preview.alt = image.alt || t("图片预览");
+      setThumbnail(thumbnailButtons[index], source);
       setImageState('ready');
       resetZoom();
     };
@@ -116,12 +156,22 @@
     if (next) next.disabled = index === images.length - 1;
     if (original) original.href = sourceFor(image);
   };
-  const move = direction => {
-    const target = index + direction;
-    if (target < 0 || target >= images.length) return;
+  const moveTo = target => {
+    if (!Number.isInteger(target) || target < 0 || target >= images.length || target === index) return;
     index = target;
     render();
+    syncThumbnails();
   };
+  const move = direction => moveTo(index + direction);
+  thumbnails?.addEventListener('click', event => {
+    const button = event.target.closest?.('button[data-image-index]');
+    if (button) moveTo(Number(button.dataset.imageIndex));
+  });
+  if (thumbnails) document.addEventListener('load', event => {
+    if (!dialog?.open || !thumbnailButtons.length || !(event.target instanceof HTMLImageElement)) return;
+    const image = event.target;
+    setThumbnail(thumbnailButtons[images.indexOf(image)], image.currentSrc || image.src);
+  }, true);
   const openImage = image => {
     if (document.documentElement.dataset.printPreview === 'true') return;
     if (!dialog || !preview) return;
@@ -129,8 +179,10 @@
     images = gallery ? [...gallery.querySelectorAll('img')].filter(item => item.matches(selector) && (!item.closest('a') || item.closest('.photo-card, .essay-images') || item.closest('a').href === item.src)) : [image];
     index = images.indexOf(image);
     if (index < 0) { images = [image]; index = 0; }
+    buildThumbnails(gallery);
     render();
     if (!dialog.open) dialog.showModal();
+    syncThumbnails();
     applyZoom();
   };
   zoomIn?.addEventListener('click', () => setScale(scale + .5));
@@ -251,6 +303,7 @@
     clearTimeout(feedbackTimer);
     if (pendingImage) pendingImage.onload = pendingImage.onerror = null;
     pendingImage = null;
+    buildThumbnails(null);
     resetZoom();
     preview?.removeAttribute('src');
   });

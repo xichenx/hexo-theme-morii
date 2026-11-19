@@ -15,6 +15,12 @@ html:has(.lightbox[open]) { overflow: hidden; }
 .lightbox-help { margin: 10px 0 0; color: var(--muted); text-align: center; font-size: 11px; line-height: 1.6; }
 .lightbox figcaption { height: 40px; overflow: auto; margin-top: 12px; line-height: 20px; }
 .lightbox figcaption:empty { display: block; }
+.lightbox-thumbnails { position:relative;display:flex;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;padding:4px;margin-top:8px;scrollbar-width:thin; }
+.lightbox-thumbnails button { position:relative;flex:0 0 56px;width:56px;height:44px;display:grid;place-items:center;overflow:hidden;padding:0;border:2px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);font:inherit;font-size:13px;cursor:pointer; }
+.lightbox-thumbnails img { position:absolute;inset:0;width:100%;height:100%;max-height:none;margin:0;object-fit:cover; }
+.lightbox-thumbnails button[aria-current] { border-color:var(--accent); }
+.lightbox-thumbnails button:focus-visible { outline:2px solid var(--accent);outline-offset:2px; }
+.lightbox:has(.lightbox-thumbnails:not([hidden])) .lightbox-stage { height:min(44dvh,540px); }
 .lightbox-feedback { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; width: 100%; padding: 24px; text-align: center; background: var(--surface-2); }
 .lightbox-feedback[hidden] { display: none; }
 .lightbox-feedback-icon { display: grid; place-items: center; width: 48px; height: 48px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); color: var(--muted); }
