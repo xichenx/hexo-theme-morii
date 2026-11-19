@@ -27,10 +27,37 @@ test('copy and folding preserve the complete source in styled blocks', async ({ 
   await ready(page, 'posts/code-styles/');
   const block = shell(page, 'mac', 'auto'), toggle = block.locator('.code-toggle');
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
-  await block.locator('.code-tools button').click();
+  await block.locator('.code-copy').click();
   await expect.poll(() => page.evaluate(() => window.__moriiCopiedCode)).toBe(sampleCode + '\n');
   await toggle.click(); await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   await toggle.click(); await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+});
+
+test('code viewer opens the complete block and restores position and focus', async ({ page, viewport }) => {
+  await page.addInitScript(() => Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async text => { window.__moriiCopiedCode = text; } } }));
+  await ready(page, 'posts/code-styles/');
+  const block = shell(page, 'mac', 'auto');
+  const trigger = block.locator('.code-view');
+  const dialog = page.locator('.code-dialog');
+  await trigger.click();
+  await expect(dialog).toBeVisible();
+  expect((await dialog.boundingBox()).width).toBeLessThan(viewport.width);
+  await expect(dialog.locator('figure')).toHaveCSS('max-height', 'none');
+  await expect(dialog.locator('.line.marked')).toHaveCount(2);
+  await dialog.locator('.code-wrap').click();
+  await expect(dialog.locator('.code pre')).toHaveCSS('white-space', 'pre-wrap');
+  await dialog.locator('.code-copy').click();
+  await expect.poll(() => page.evaluate(() => window.__moriiCopiedCode)).toBe(sampleCode + '\n');
+  await page.keyboard.press('Escape');
+  await expect(dialog).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+  await expect(block.locator('.code-toggle')).toHaveAttribute('aria-expanded', 'false');
+  await expect(block.locator('.code-wrap')).toHaveAttribute('aria-pressed', 'true');
+  await expect(block.locator(':scope > figure')).toHaveCount(1);
+  await trigger.click();
+  await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')));
+  await expect(dialog).toHaveCount(0);
+  await expect(block.locator(':scope > figure')).toHaveCount(1);
 });
 
 test('auto palettes follow theme changes without rebuilding or expanding code blocks', async ({ page, colorScheme }) => {
@@ -44,6 +71,34 @@ test('auto palettes follow theme changes without rebuilding or expanding code bl
   await expect(block.locator('.code-toggle')).toHaveAttribute('aria-expanded', 'false');
   expect(await block.locator('.code pre').textContent()).toBe(original);
   await expect(page.locator('.code-shell .code-shell')).toHaveCount(0);
+});
+
+test('wrapping contains long lines, preserves source and toggles independently', async ({ page }) => {
+  await ready(page, 'posts/layout-stress/');
+  const block = page.locator('.code-shell').first();
+  const code = block.locator('.code pre');
+  const original = await code.textContent();
+  const wrap = block.locator('.code-wrap');
+  await expect(wrap).toHaveAttribute('aria-pressed', 'false');
+  await wrap.click();
+  await expect(wrap).toHaveAttribute('aria-pressed', 'true');
+  await expect(code).toHaveCSS('white-space', 'pre-wrap');
+  await expect(block.locator('.gutter')).toBeHidden();
+  expect(await code.evaluate(e => e.scrollWidth - e.clientWidth)).toBeLessThanOrEqual(1);
+  expect(await code.textContent()).toBe(original);
+  await noOverflow(page);
+  await wrap.click();
+  await expect(wrap).toHaveAttribute('aria-pressed', 'false');
+  await expect(block.locator('.gutter')).toBeVisible();
+});
+
+test('attribution stays in bounds with canonical and source edit links', async ({ page }) => {
+  await ready(page, 'posts/code-styles/');
+  await expect(page.locator('.article-copyright')).toBeVisible();
+  await expect(page.locator('.article-copyright a').first()).toHaveAttribute('href', 'https://example.test/layout/posts/code-styles/');
+  await expect(page.locator('.article-edit')).toHaveAttribute('href', 'https://github.com/example/blog/edit/main/source/_posts/code-styles.md');
+  expect(await page.locator('.article-copyright').evaluate(e => e.scrollWidth - e.clientWidth)).toBeLessThanOrEqual(1);
+  await noOverflow(page);
 });
 
 test('print expands styled code and hides interactive decorations', async ({ page }) => {

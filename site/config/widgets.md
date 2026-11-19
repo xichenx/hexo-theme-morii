@@ -133,6 +133,27 @@ footer:
     enable: false
 ```
 
-## 6. 发布前核对
+## 6. 页脚分组导航
+
+在博客的 `_config.morii.yml` 中，把 `nav` 添加到已有的 `footer:` 分组：
+
+```yaml
+footer:
+  nav:
+    - title: { zh-CN: 阅读, zh-TW: 閱讀, en: Reading }
+      links:
+        - { name: 文章, path: /archives/ }
+        - { name: 专题与系列, path: /series/ }
+    - title: 关于
+      links:
+        - { name: 友链, path: /link/ }
+        - { name: 项目文档, path: 'https://example.com/docs/' }
+```
+
+每组使用 `title` 和 `links`，链接使用 `name` 和 `path`。名称可以是纯文本或多语言映射，站内路径以 `/` 开头，由 Hexo 补上部署前缀。请填写实际存在的页面。
+
+有可用分组时，分组导航会替换页脚原有的 `explore` 链接行。若需要保留「稍后阅读」等入口，可把它加进分组。将 `nav` 留空或设为 `false` 可恢复原有页脚链接。备案和运行时长仍可单独配置。
+
+## 7. 发布前核对
 
 打开首页和任意文章页，分别查看侧栏、天气城市、GitHub 账号和页脚。确认没有出现作者的账号、城市、上线日期和备案号。首次配置关闭的服务，只有在自己的资料准备好后再开启。

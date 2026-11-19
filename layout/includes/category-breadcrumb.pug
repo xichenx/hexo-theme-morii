@@ -1,0 +1,10 @@
+nav.category-path(aria-label=morii_t("分类路径"))
+  ol
+    if morii_has_page('/categories/')
+      li
+        a(href=url_for('/categories/'))= morii_t("分类")
+    each ancestor in hierarchy.ancestors
+      li
+        a(href=url_for(ancestor.path))= ancestor.name
+    li
+      span(aria-current='page')= hierarchy.current.name

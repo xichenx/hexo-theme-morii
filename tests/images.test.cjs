@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { localFile, prepare, safeURL } = require('../scripts/lib/images.cjs');
+const { localFile, prepare, safeURL, lazyArticleImages } = require('../scripts/lib/images.cjs');
 let sharp; try { sharp = require('sharp'); } catch {}
 
 test('local image lookup stays in the configured sources and never downloads remote resources', () => {
@@ -35,10 +35,32 @@ test('responsive covers are real WebP files, preserve aspect ratios, reuse cache
 });
 
 test('explicit remote candidates and reserved dimensions work without the optional image library', () => {
-  const vm = require('node:vm'); let cover;
-  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../scripts/images.js'), 'utf8'), { require: name => { if (name === 'sharp') throw Error('optional'); return require(name); }, hexo: { extend: { filter: { register() {} }, generator: { register() {} }, helper: { register(name, fn) { cover = fn; } } } } });
+  const vm = require('node:vm');
+  const helpers = {};
+  const config = { images: {} };
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../scripts/images.js'), 'utf8'), { require: name => { if (name === 'sharp') throw Error('optional'); return require(name); }, hexo: { theme: { config }, extend: { filter: { register() {} }, generator: { register() {} }, helper: { register(name, fn) { helpers[name] = fn; } } } } });
+  const cover = helpers.morii_cover;
   const context = { url_for: src => src.startsWith('/') ? '/blog' + src : src };
   const result = cover.call(context, 'https://cdn.test/cover.webp', { cover_width: 1600, cover_height: 900, cover_srcset: [{ src: 'https://cdn.test/480.webp', width: 480 }, { src: '/covers/800.webp', width: 800 }, { src: 'javascript:bad', width: 900 }] });
   assert.equal(result.width, 1600); assert.equal(result.height, 900); assert.match(result.srcset, /\/blog\/covers\/800.webp 800w/); assert.ok(!result.srcset.includes('javascript'));
   assert.equal(cover.call(context, 'javascript:bad').src, undefined);
+
+  const content = '<img src="first.jpg"><img src="second.jpg">';
+  const article = helpers.morii_article_images;
+  assert.equal(article({ content }), lazyArticleImages(content));
+  assert.equal(article({ content, password: true }), content);
+  assert.equal(article({ content, lazy_images: false }), content);
+  config.images.lazy_article = false;
+  assert.equal(article({ content }), content);
+  assert.equal(article({ content, lazy_images: true }), lazyArticleImages(content));
+});
+
+test('native lazy loading preserves the first image, explicit attributes and self-closing responsive markup', () => {
+  const inert = '<!-- <img src="comment.png"> --><template><img src="template.png"></template><noscript><img src="fallback.png"></noscript><textarea><img src="text.png"></textarea>';
+  const initial = '<img src="data:image/png;base64,AA"><img src="first.jpg"><img src="high.jpg" fetchpriority="high"><img src="eager.jpg" LOADING="eager">';
+  const responsive = '<picture><source srcset="large.webp 1200w"><IMG src="small.jpg" alt="A > B" srcset="small.jpg 400w, medium.jpg 800w" /></picture>';
+  const html = inert + initial + responsive + '<img srcset="other.webp 800w"><img data-src="plugin.jpg">';
+  const output = lazyArticleImages(html);
+  assert.equal(output, inert + initial + responsive.replace('<IMG ', '<IMG loading="lazy" ') + '<img loading="lazy" srcset="other.webp 800w"><img data-src="plugin.jpg">');
+  assert.equal(lazyArticleImages(output), output);
 });

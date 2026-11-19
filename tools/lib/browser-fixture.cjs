@@ -11,10 +11,33 @@ const longArticle = `---\n${yaml.dump({ title, date: '2026-10-30 09:00:00', perm
 const options = {
   fixture: 'browser-layout', root: prefix,
   themeOverrides: {
+    article: {
+      copyright: { enable: true, license: 'Example license', license_url: 'https://example.test/license' },
+      edit: { enable: true, url: 'https://github.com/example/blog/edit/main/source/{path}' }
+    },
     clock: { enable: true, city: '布局测试城市', latitude: 0, longitude: 0, timezone: 'UTC' },
     music: { meting: { enable: false }, tracks: [] },
     github_calendar: { enable: false }, comments: { enable: false }, friends_feed: { endpoint: '' }
   },
-  sourceOverrides: { '_posts/layout-stress.md': longArticle, '_posts/code-styles.md': codeArticle }
+  sourceOverrides: {
+    '_posts/layout-stress.md': longArticle,
+    '_posts/code-styles.md': codeArticle,
+    '_posts/lazy-images.md': `---
+title: Article image loading
+date: 2020-01-01 00:00:00
+permalink: posts/lazy-images/
+---
+
+<img src="${prefix}test-images/first.svg" alt="First" width="120" height="60">
+
+<div style="height:12000px"></div>
+
+<img src="${prefix}test-images/later.svg" alt="Later" width="120" height="60" />
+
+<div style="height:12000px"></div>
+
+<img src="${prefix}test-images/print.svg" alt="Print" width="120" height="60">
+`
+  }
 };
 module.exports = { prefix, title, options, sampleCode };

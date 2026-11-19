@@ -34,6 +34,61 @@ test('diagram failures preserve source and math rendering uses untrusted mode', 
   assert.equal(w.document.querySelector('.morii-math').dataset.rendered, 'true'); dom.window.close();
 });
 
+test('preconnect excludes local resources, disabled features and encrypted or inert content', () => {
+  const helpers = {};
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../scripts/article-enhancements.js'), 'utf8'), {
+    require, URL,
+    hexo: {
+      config: { url: 'https://blog.example.test/site/' },
+      theme: { config: {} },
+      extend: { tag: { register() {} }, helper: { register: (name, fn) => { helpers[name] = fn; } } }
+    }
+  });
+  const hints = (page, resources) => Array.from(helpers.morii_enhancement_connections(page, resources), hint => [hint.origin, hint.anonymous]);
+  const content = '<span class="morii-math">x^2</span><pre class="morii-diagram-source">graph TD</pre>';
+  const resources = {
+    math: true, mermaid: true,
+    mathURL: 'https://scripts.example.test/katex.js',
+    mathCSS: 'https://styles.example.test/katex.css',
+    mermaidURL: 'https://blog.example.test/site/mermaid.mjs'
+  };
+  assert.deepEqual(hints({ content }, resources), [['https://scripts.example.test', false], ['https://styles.example.test', true]]);
+  assert.deepEqual(hints({ content }, { ...resources, mathURL: '/katex.js' }), [['https://styles.example.test', true]]);
+  assert.deepEqual(hints({ content }, { ...resources, math: false }), []);
+  assert.deepEqual(hints({ content, password: true }, resources), []);
+  assert.deepEqual(hints({ content: `<!-- ${content} --><template>${content}</template>` }, resources), []);
+});
+
+test('concurrent math rendering shares one request and can retry after a load failure', async () => {
+  const dom = new JSDOM('<article class="article-body"><span class="morii-math">x^2</span></article><script id="config" data-math="/math.js" data-math-css="/math.css"></script>', { runScripts: 'outside-only' });
+  const w = dom.window;
+  const d = w.document;
+  Object.defineProperty(d, 'currentScript', { value: d.getElementById('config') });
+  const scripts = () => d.querySelectorAll('script[src="/math.js"]');
+  const settle = () => new Promise(resolve => setImmediate(resolve));
+  try {
+    w.eval(source);
+    w.dispatchEvent(new w.Event('hexo-blog-decrypt'));
+    assert.equal(scripts().length, 1);
+    scripts()[0].dispatchEvent(new w.Event('error'));
+    await settle();
+    assert.equal(scripts().length, 0);
+    assert.equal(d.querySelectorAll('.enhancement-retry').length, 1);
+
+    d.querySelector('.enhancement-retry').click();
+    w.dispatchEvent(new w.Event('hexo-blog-decrypt'));
+    assert.equal(scripts().length, 1);
+    assert.equal(d.querySelectorAll('link[data-morii-math-style]').length, 1);
+    const rendered = [];
+    w.katex = { render: formula => rendered.push(formula) };
+    scripts()[0].dispatchEvent(new w.Event('load'));
+    await settle();
+    assert.deepEqual(rendered, ['x^2']);
+    assert.equal(d.querySelector('.morii-math').dataset.rendered, 'true');
+    assert.equal(d.querySelector('.enhancement-retry'), null);
+  } finally { dom.window.close(); }
+});
+
 test('diagrams redraw for theme changes while keeping one figure and the source disclosure state', async () => {
   const dom = new JSDOM('<article class="article-body"><pre class="morii-diagram-source">graph TD; A-->B;</pre></article><script id="config" data-mermaid="/mermaid.js"></script>', { runScripts: 'outside-only' });
   const w = dom.window; const themes = []; const ids = []; let fail = false;

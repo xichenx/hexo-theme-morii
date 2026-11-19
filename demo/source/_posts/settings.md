@@ -5,8 +5,10 @@ title: 把主题变成自己的样子
 date: 2026-10-11 12:00:00
 categories:
   - 主题使用
+  - 入门
 tags:
   - 配置
+  - 开始写作
 comments: false
 ---
 

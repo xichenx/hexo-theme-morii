@@ -1,9 +1,10 @@
-- var directoryTopics = morii_category_directory(site.categories)
-- var currentTopic = directoryTopics.find(function(topic) { return topic.name === page.category })
+- var currentTopic = hierarchy.current
 .wrap.listing-page.category-directory-page
   header.page-intro.category-directory-intro(data-intro-word='TOPICS' data-intro-tone='taxonomy')
     include ../intro-atmosphere.pug
-    if morii_has_page('/categories/')
+    if hierarchy.ancestors.length
+      include ../category-breadcrumb.pug
+    else if morii_has_page('/categories/')
       a.category-breadcrumb(href=url_for('/categories/')) #{morii_t("← 返回分类目录")}
     h1= page.category
     p #{morii_t("这个主题下的思考、实践与持续记录。")}
@@ -17,11 +18,12 @@
         h2 #{morii_t("所有主题")}
       nav(aria-label=morii_t("所有分类"))
         each category in directoryTopics
-          a(href=url_for(category.path) aria-current=category.name === page.category ? 'page' : undefined)
+          a(href=url_for(category.path) aria-current=category === currentTopic ? 'page' : undefined)
             span= category.name
             small= String(category.count).padStart(2, '0')
       a.category-index-all(href=url_for('/archives/')) #{morii_t("全部文章 ↗")}
     section.category-post-list(aria-label=page.category + morii_t("分类下的文章"))
+      include ../category-children.pug
       each post, index in page.posts.toArray()
         article.category-post-row
           span.category-topic-number(aria-hidden='true')= String(((page.current || 1) - 1) * (config.category_generator && config.category_generator.per_page || config.per_page || page.posts.length) + index + 1).padStart(2, '0')

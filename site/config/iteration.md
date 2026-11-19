@@ -115,6 +115,8 @@ article:
 
 全站配置为 `true` 时，单篇文章仍可用 `mermaid: false`、`math: false` 关闭。
 
+只有正文实际包含对应内容时，公开文章才会为第三方渲染资源添加预连接。同源资源无需额外连接。加密文章仍在解锁后按需加载，并发的公式渲染会共用同一次 KaTeX 加载。
+
 参考：[Mermaid 使用说明](https://mermaid.js.org/config/usage)、[KaTeX 浏览器集成](https://katex.org/docs/browser.html)。
 
 ## 搜索

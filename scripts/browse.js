@@ -24,6 +24,15 @@ hexo.extend.helper.register('morii_categories', (categories, limit = 8) => list(
   .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'zh-CN'))
   .slice(0, limit));
 
+hexo.extend.helper.register('morii_tag_directory', function (tags) {
+  const collator = new Intl.Collator(forPage(hexo, this).locale, { numeric: true });
+  const entries = list(tags).map(tag => ({ name: tag.name, path: tag.path, count: tag.posts?.length || 0 }))
+    .filter(tag => tag.count > 0 && tag.path);
+  entries.sort((a, b) => collator.compare(a.name, b.name) || a.path.localeCompare(b.path, 'en'));
+  entries.forEach((tag, index) => { tag.nameOrder = index; });
+  return entries.sort((a, b) => b.count - a.count || a.nameOrder - b.nameOrder);
+});
+
 hexo.extend.helper.register('morii_archive_years', posts => {
   const years = new Map();
   list(posts).forEach(post => {
@@ -33,6 +42,30 @@ hexo.extend.helper.register('morii_archive_years', posts => {
   });
   const archiveDir = String(hexo.config.archive_dir || 'archives').replace(/^\/+|\/+$/g, '');
   return [...years].sort(([a], [b]) => Number(b) - Number(a)).map(([year, count]) => ({ year, count, path: `${archiveDir}/${year}/` }));
+});
+
+let archiveMonthIndex;
+hexo.extend.filter.register('before_generate', () => { archiveMonthIndex = undefined; });
+hexo.extend.helper.register('morii_archive_months', () => {
+  const settings = hexo.config.archive_generator;
+  if (!settings?.yearly || !settings.monthly || settings.enabled === false) return [];
+  if (archiveMonthIndex) return archiveMonthIndex;
+
+  const counts = new Map();
+  for (const post of list(hexo.locals.get('posts'))) {
+    const key = post.date?.format?.('YYYY-MM');
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(key)) continue;
+    counts.set(key, (counts.get(key) || 0) + 1);
+  }
+  const archiveDir = String(hexo.config.archive_dir || 'archives').replace(/^\/+|\/+$/g, '');
+  const years = new Map();
+  for (const key of [...counts.keys()].sort().reverse()) {
+    const [year, month] = key.split('-');
+    if (!years.has(year)) years.set(year, { year, months: [] });
+    years.get(year).months.push({ month: Number(month), count: counts.get(key), path: `${archiveDir}/${year}/${month}/` });
+  }
+  archiveMonthIndex = [...years.values()];
+  return archiveMonthIndex;
 });
 
 hexo.extend.helper.register('morii_archive_groups', posts => {

@@ -17,10 +17,23 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       const codeStyle = document.querySelector('link[href*="/css/code."]');
       assert.equal(!!codeStyle, file.startsWith('posts/'), `${file}: code styles load only on article pages`);
       if (file === 'posts/welcome/index.html') {
+        assert.equal(document.querySelector('.article-copyright, .article-edit'), null);
         assert.equal(document.querySelector('.article-body').dataset.codeStyle, 'classic');
         assert.equal(document.querySelector('.article-body').dataset.codeTheme, 'dark');
       }
       assert.equal(document.querySelectorAll('main h1').length, 1, `${file}: one page heading`);
+      assert.equal(!!document.querySelector('script[src*="/js/tag-order."]'), file === 'tags/index.html');
+      if (file === 'tags/index.html') {
+        const links = [...document.querySelectorAll('.taxonomy-tags a')];
+        assert.equal(decodeURIComponent(links[0].getAttribute('href')), `${prefix}tags/开始写作/`);
+        assert.equal(links[0].querySelector('small').textContent, '2');
+        assert.ok(document.querySelector('.tag-order').hidden);
+        assert.equal(new Set(links.map(link => link.href)).size, links.length);
+        for (const link of links) {
+          const localPath = decodeURIComponent(new URL(link.href).pathname.slice(prefix.length));
+          assert.ok(fs.existsSync(path.join(output, localPath, 'index.html')));
+        }
+      }
       const introTones = {
         'page/2/index.html': 'archive',
         'archives/index.html': 'archive',
@@ -75,11 +88,16 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
         const local = decodeURIComponent(url.pathname.slice(prefix.length));
         assert.ok(fs.existsSync(path.join(output, local)), `${file}: missing asset ${local}`);
       }
-      for (const link of document.querySelectorAll('.site-nav a, .footer-explore a')) {
+      for (const link of document.querySelectorAll('.site-nav a, .footer-explore a, .footer-nav a')) {
         const url = new URL(link.href);
+        if (url.origin !== 'https://example.test') continue;
         assert.ok(url.pathname.startsWith(prefix), `${file}: navigation root`);
         const local = decodeURIComponent(url.pathname.slice(prefix.length));
         assert.ok(fs.existsSync(path.join(output, local, 'index.html')), `${file}: navigation ${local}`);
+      }
+      assert.equal(document.querySelectorAll('.footer-nav__group').length, 3);
+      if (file === 'archives/index.html') {
+        assert.equal(document.querySelector('.footer-nav a[aria-current="page"]').getAttribute('href'), `${prefix}archives/`);
       }
       const music = JSON.parse(document.querySelector('#morii-audio-hub').dataset.musicConfig);
       assert.ok(music.remote && music.remote.api.startsWith('https://'));
@@ -124,6 +142,12 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       const first = read('');
       const second = read('page/2');
       const entries = first.window.document.querySelectorAll('.archive-tree-list .archive-entry');
+      const monthIndex = first.window.document.querySelector('.archive-months');
+      assert.equal(monthIndex.querySelector('a').getAttribute('href'), `${prefix}archives/2026/10/`);
+      assert.equal(monthIndex.querySelector('small').textContent, '7 篇文章');
+      const isMonth = route === 'archives/2026/10/';
+      assert.equal(monthIndex.open, isMonth);
+      assert.equal(!!monthIndex.querySelector('[aria-current="date"]'), isMonth);
       assert.equal(entries.length, 4, `${route}: first page keeps archive page size`);
       assert.equal(second.window.document.querySelectorAll('.archive-entry').length, 3);
       const dates = [...entries].map(entry => entry.querySelector('time').dateTime);
@@ -160,22 +184,42 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
     { home: 'grid', categories: 'cards', category: 'cards', archives: 'grouped' },
     { home: 'featured', categories: 'directory', category: 'list', archives: 'timeline' }
   ]) await t.test(`configurable layouts: ${layouts.categories}`, async () => {
-    const output = await buildDemo({ root: '/theme/', url: 'https://example.test', themeOverrides: { appearance: { layouts, effects: { enable: false } } } });
+    const monthly = layouts.archives === 'grouped';
+    const output = await buildDemo({ root: '/theme/', url: 'https://example.test', siteOverrides: { archive_dir: 'history', archive_generator: { monthly }, category_generator: { per_page: 1 } }, themeOverrides: { footer: { nav: false }, appearance: { layouts, effects: { enable: false } } } });
     const documentFor = file => new JSDOM(fs.readFileSync(path.join(output, file, 'index.html'), 'utf8')).window.document;
     const home = documentFor('');
+    assert.equal(home.querySelector('.footer-nav'), null);
+    assert.ok(home.querySelector('.footer-explore a[href="/theme/reading-list/"]'));
     assert.equal(home.querySelector('.morii-atmosphere'), null);
     assert.equal(home.querySelector('script[src*="/js/effects."], link[href*="/css/effects."]'), null);
     assert.equal(home.documentElement.hasAttribute('data-glass'), false);
     assert.equal(home.querySelector('#effects-dialog, [data-open-effects]'), null);
     const overview = documentFor('categories');
     const category = documentFor('categories/主题使用');
-    const archive = documentFor('archives');
+    const child = documentFor('categories/主题使用/入门/page/2');
+    const otherChild = documentFor('categories/开发笔记/入门');
+    const href = link => decodeURIComponent(link.getAttribute('href'));
+    assert.equal(href(category.querySelector('.category-children a')), '/theme/categories/主题使用/入门/');
+    assert.match(category.querySelector('.category-children small').textContent, /2 篇/);
+    assert.equal(href(child.querySelector('.category-path li:nth-child(2) a')), '/theme/categories/主题使用/');
+    assert.equal(href(otherChild.querySelector('.category-path li:nth-child(2) a')), '/theme/categories/开发笔记/');
+    const activeCategory = child.querySelectorAll('.category-index a[aria-current="page"], .category-nav a[aria-current="page"]');
+    assert.equal(activeCategory.length, 1);
+    assert.equal(href(activeCategory[0]), '/theme/categories/主题使用/入门/');
+    assert.equal(child.querySelector('.category-children'), null);
+    const archive = documentFor('history');
+    const monthIndex = archive.querySelector('.archive-months');
+    assert.equal(!!monthIndex, monthly);
+    if (monthly) {
+      assert.equal(monthIndex.querySelector('a').getAttribute('href'), '/theme/history/2026/10/');
+      assert.ok(fs.existsSync(path.join(output, 'history/2026/10/index.html')));
+    } else assert.ok(!fs.existsSync(path.join(output, 'history/2026/10/index.html')));
     assert.equal(home.querySelectorAll('#latest .post-card--featured').length, layouts.home === 'grid' ? 0 : 1);
     assert.ok(overview.querySelector(layouts.categories === 'cards' ? '.taxonomy-grid .taxonomy-card' : '.category-directory-variant .category-directory-row'));
     assert.ok(category.querySelector(layouts.category === 'cards' ? '.post-grid .post-card' : '.category-post-list .category-post-row'));
     assert.ok(archive.querySelector(layouts.archives === 'grouped' ? '.archive-groups .archive-year' : '.archive-tree'));
     assert.equal(archive.querySelectorAll('.archive-entry').length, 4, 'Changing layout must not change archive page size');
-    for (const document of [home, overview, category, archive]) {
+    for (const document of [home, overview, category, archive, child, otherChild]) {
       assert.equal(document.querySelectorAll('main h1').length, 1);
       for (const link of document.querySelectorAll('main a[href]')) {
         const href = link.getAttribute('href');
@@ -198,6 +242,8 @@ test('English and Traditional Chinese build at a subpath with cached locale asse
       assert.equal(document.querySelector('.site-nav a').textContent, translations['首页']);
       assert.equal(document.querySelectorAll('.site-nav a')[1].textContent, language === 'en' ? 'My notes' : '我的筆記');
       assert.equal(document.querySelector('.navigation-card strong').textContent, translations['首页']);
+      assert.equal(document.querySelector('.footer-nav').getAttribute('aria-label'), translations['页脚导航']);
+      assert.equal(document.querySelector('.footer-nav h2').textContent, language === 'en' ? 'Reading' : '閱讀');
       const localeScript = document.querySelector('script[src*="/js/locales/"]');
       assert.ok(localeScript, `${file}: locale asset`);
       const relative = localeScript.getAttribute('src').replace(/^\/theme\//, '');
@@ -212,13 +258,21 @@ test('English and Traditional Chinese build at a subpath with cached locale asse
 });
 
 test('optional enhancements and Waline produce configured assets and safe sharing metadata', async () => {
-  const output = await buildDemo({ root: '/theme/', sourceOverrides: { 'comments/index.md': '---\ntitle: 留言板\ncomments: true\n---\n欢迎留言。' }, themeOverrides: {
+  const output = await buildDemo({ root: '/theme/', sourceOverrides: {
+    'comments/index.md': '---\ntitle: 留言板\ncomments: true\n---\n欢迎留言。',
+    '_posts/formulas.md': '---\ntitle: Formulas and diagrams\npermalink: posts/formulas/\n---\n\n{% math %}x^2{% endmath %}\n\n{% mermaid %}\ngraph TD; A-->B;\n{% endmermaid %}'
+  }, themeOverrides: {
     article: { enhancements: { mermaid: true, math: true } },
     comments: { enable: true, provider: 'waline', server_url: 'https://comments.example.test' },
     seo: { default_image: '/share.jpg', structured_data: true }
   } });
   const dom = new JSDOM(fs.readFileSync(path.join(output, 'posts/welcome/index.html'), 'utf8'));
   const d = dom.window.document;
+  assert.equal(d.querySelector('link[rel="preconnect"]'), null, 'Enabling features alone does not emit a CDN hint');
+  const technical = new JSDOM(fs.readFileSync(path.join(output, 'posts/formulas/index.html'), 'utf8'));
+  const connections = [...technical.window.document.querySelectorAll('link[rel="preconnect"]')];
+  assert.deepEqual(connections.map(link => [link.getAttribute('href'), link.crossOrigin]), [['https://cdn.jsdelivr.net', 'anonymous']]);
+  technical.window.close();
   assert.match(d.querySelector('script[data-mermaid]').dataset.mermaid, /mermaid@11\.12\.0/);
   assert.match(d.querySelector('script[data-math]').dataset.math, /katex@0\.19\.1/);
   assert.ok(d.querySelector('.article-note--tip')); assert.equal(d.querySelector('.code-file').dataset.filename, 'app.js'); assert.ok(d.querySelector('.line.marked'));
@@ -230,6 +284,7 @@ test('optional enhancements and Waline produce configured assets and safe sharin
   // This article explicitly disables comments; a normal page uses the selected provider.
   assert.equal(d.querySelector('#comment-service'), null);
   const about = new JSDOM(fs.readFileSync(path.join(output, 'comments/index.html'), 'utf8'));
+  assert.equal(about.window.document.querySelector('link[rel="preconnect"]'), null, 'On-demand comments do not open a speculative connection');
   const service = about.window.document.getElementById('comment-service');
   assert.equal(service.dataset.provider, 'waline'); assert.equal(service.dataset.server, 'https://comments.example.test/'); assert.ok(service.querySelector('#waline'));
   assert.ok(about.window.document.querySelector('script[src*="/js/services."]'));

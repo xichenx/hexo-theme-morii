@@ -1,0 +1,9 @@
+if hierarchy.children.length
+  nav.category-children(aria-label=morii_t("子分类"))
+    h2= morii_t("子分类")
+    ul
+      each child in hierarchy.children
+        li
+          a(href=url_for(child.path))
+            span= child.name
+            small #{child.count} #{morii_t("篇文章")}

@@ -15,6 +15,9 @@ html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || them
     meta(name='description' content=documentDescription)
     title= is_home() && (!page.current || page.current === 1) ? config.title : documentTitle + ' · ' + config.title
     link(rel='canonical' href=canonicalUrl)
+    if is_post()
+      each connection in morii_enhancement_connections(page, articleEnhancements)
+        link(rel='preconnect' href=connection.origin crossorigin=connection.anonymous ? 'anonymous' : null)
     meta(property='og:title' content=documentTitle)
     meta(property='og:description' content=documentDescription)
     meta(property='og:site_name' content=config.title)
@@ -117,14 +120,24 @@ html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || them
       main#main
         block content
       footer.site-footer
+        - var footerGroups = morii_footer_nav()
         .footer-top
           div
             strong= siteIdentity.brand
             p= siteIdentity.tagline
           a(href=url_for('/archives/')) #{morii_t("继续探索")} #[span →]
+        if footerGroups.length
+          nav.footer-nav(aria-label=morii_t("页脚导航"))
+            each group in footerGroups
+              .footer-nav__group
+                h2= morii_nav_label(group.title)
+                ul
+                  each item in group.links
+                    - var footerActive = item.local && is_current(item.path, true)
+                    li: a(href=item.local ? url_for(item.path) : item.path aria-current=footerActive ? 'page' : null)= morii_nav_label(item.name)
         .footer-bottom
           span © #{new Date().getFullYear()} #{config.author}
-          if theme.explore && theme.explore.length
+          if !footerGroups.length && theme.explore && theme.explore.length
             nav.footer-explore(aria-label=morii_t("更多探索"))
               each item in theme.explore
                 a(href=url_for(item.path))= morii_nav_label(item.name)
@@ -212,6 +225,8 @@ html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || them
         script(src=morii_asset('/js/github-calendar.js') defer)
     if page.type === 'link'
       script(src=morii_asset('/js/directory.js') defer)
+    if page.type === 'tags' && site.tags.length > 1
+      script(src=morii_asset('/js/tag-order.js') defer)
     if page.path && page.path.startsWith('air-conditioner/')
       script(src=morii_asset('/js/air-conditioner.js') defer)
     if is_post()

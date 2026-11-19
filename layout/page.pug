@@ -71,9 +71,7 @@ block content
         else
           include includes/page/categories.pug
       when 'tags'
-        .pill-cloud.taxonomy-tags
-          each tag in site.tags.toArray()
-            a(href=url_for(tag.path)) # #{tag.name} #[small=tag.posts.length]
+        include includes/page/tags.pug
       when 'fcircle'
         include includes/page/friends.pug
       when 'music'

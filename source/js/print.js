@@ -18,6 +18,9 @@
     detailsState?.forEach(([details, open]) => { details.open = open; });
     detailsState = null;
   };
+  const prepareImages = () => {
+    article.querySelectorAll('img[loading="lazy" i]').forEach(image => { image.loading = 'eager'; });
+  };
   const close = () => {
     if (!active) return;
     active = false;
@@ -38,6 +41,7 @@
       opener = button;
       scrollPosition = window.scrollY;
       prepareDetails();
+      prepareImages();
       stylesheet.media = 'all';
       toolbar.hidden = false;
       window.scrollTo({ top: 0, behavior: 'instant' });
@@ -52,6 +56,9 @@
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && active) { event.preventDefault(); close(); }
   });
-  window.addEventListener('beforeprint', prepareDetails);
+  window.addEventListener('beforeprint', () => {
+    prepareDetails();
+    prepareImages();
+  });
   window.addEventListener('afterprint', () => { if (!active) restoreDetails(); });
 })();

@@ -59,6 +59,12 @@ series:
 
 如果博客已经存在 `source/series/index.md`，主题会保留该路径的手工页面。不要将手工页面放在自动专题的同名路径上，除非你希望由手工页面接管展示。
 
+## 正文图片延迟加载
+
+公开文章从第二张有网络资源的正文图片起，默认使用浏览器原生的延迟加载。已有的 `loading` 或 `fetchpriority="high"` 优先，封面、响应式候选图和原图预览继续按原有方式工作。浏览器根据图片与视口的距离决定何时请求。
+
+站点可在 `_config.morii.yml` 中设置 `images.lazy_article: false`。单篇文章可在 Front Matter 中用 `lazy_images: true` 或 `false` 覆盖全站设置。加密文章正文由加密插件负责。
+
 ## 响应式封面
 
 ### 本地图片

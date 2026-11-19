@@ -91,3 +91,34 @@ test('search, navigation and mobile TOC dialogs stay inside the viewport', async
     await noOverflow(page);
   }
 });
+
+test('long post section search filters titles and jumps to the selected heading', async ({ page, viewport }) => {
+  await ready(page, 'posts/welcome/');
+  await expect(page.locator('[data-toc-filter]:not([hidden])')).toHaveCount(0);
+  await ready(page, 'posts/layout-stress/');
+  const mobile = viewport.width <= 960;
+  if (mobile) await page.locator('[data-reading-toc]').click();
+  const outline = page.locator(mobile ? '#reading-toc-dialog' : '.reading-aside .toc-card');
+  const query = outline.getByRole('searchbox');
+  const links = outline.locator('.toc-content a:visible');
+  await expect(links).toHaveCount(37);
+  await query.fill('没有这个章节');
+  await expect(links).toHaveCount(0);
+  await expect(outline.getByRole('status')).toHaveText('没有匹配的章节');
+  await query.fill('１３. 实践记录');
+  await expect(links).toHaveCount(1);
+  await expect(outline.getByRole('status')).toBeHidden();
+  await query.clear();
+  await expect(links).toHaveCount(37);
+  await query.fill('１３. 实践记录');
+  const hash = await links.first().getAttribute('href');
+  await query.press('ArrowDown');
+  await expect(links.first()).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect.poll(() => page.evaluate(() => location.hash)).toBe(hash);
+  if (mobile) {
+    await expect(outline).not.toBeVisible();
+    await expect(page.locator('[data-reading-toc]')).toBeFocused();
+  }
+  await noOverflow(page);
+});

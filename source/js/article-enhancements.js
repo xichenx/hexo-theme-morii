@@ -53,19 +53,36 @@
     } catch { active.forEach(item => error(item.root, renderDiagrams)); }
     finally { diagramPending = false; if (redraw) { redraw = false; renderDiagrams(); } }
   };
+  let mathLoad;
+  const loadMath = () => {
+    if (window.katex?.render) return;
+    if (!mathLoad) {
+      if (!document.querySelector('[data-morii-math-style]')) {
+        const css = document.createElement('link');
+        css.rel = 'stylesheet';
+        css.href = script.dataset.mathCss;
+        css.dataset.moriiMathStyle = '';
+        document.head.append(css);
+      }
+      mathLoad = scriptLoad(script.dataset.math).finally(() => { mathLoad = undefined; });
+    }
+    return mathLoad;
+  };
   const renderMath = async () => {
     const formulas = [...article.querySelectorAll('.morii-math:not([data-rendered])')];
     if (!formulas.length) return;
     try {
-      if (!window.katex?.render) {
-        if (!document.querySelector('[data-morii-math-style]')) { const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = script.dataset.mathCss; css.dataset.moriiMathStyle = ''; document.head.append(css); }
-        await scriptLoad(script.dataset.math);
-      }
+      await loadMath();
       for (const element of formulas) {
-        try { window.katex.render(element.textContent, element, { displayMode: element.dataset.display !== 'false', throwOnError: true, trust: false, maxExpand: 1000 }); element.dataset.rendered = 'true'; }
+        if (!element.isConnected || element.dataset.rendered) continue;
+        try {
+          window.katex.render(element.textContent, element, { displayMode: element.dataset.display !== 'false', throwOnError: true, trust: false, maxExpand: 1000 });
+          element.dataset.rendered = 'true';
+          if (element.nextElementSibling?.matches('.enhancement-retry')) element.nextElementSibling.remove();
+        }
         catch { error(element, renderMath); }
       }
-    } catch { formulas.forEach(element => error(element, renderMath)); }
+    } catch { formulas.filter(element => element.isConnected).forEach(element => error(element, renderMath)); }
   };
   const render = () => { if (script.dataset.mermaid) renderDiagrams(); if (script.dataset.math) renderMath(); };
   render();

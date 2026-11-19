@@ -1,0 +1,17 @@
+- var archiveMonths = morii_archive_months()
+if archiveMonths.length
+  - var monthLabel = new Intl.DateTimeFormat(morii_locale(), { month: 'short', timeZone: 'UTC' })
+  details.archive-months(open=!!page.month)
+    summary= morii_t('按月份查找')
+    nav(aria-label=morii_t('月份归档'))
+      each group, index in archiveMonths
+        - var currentYear = Number(page.year) === Number(group.year)
+        details.archive-months__year(open=currentYear || (!page.year && index === 0))
+          summary= group.year
+          ul
+            each entry in group.months
+              - var activeMonth = currentYear && Number(page.month) === entry.month && !page.day
+              li
+                a(href=url_for(entry.path) aria-current=activeMonth ? 'date' : null)
+                  span= monthLabel.format(Date.UTC(2000, entry.month - 1))
+                  small= morii_t('{0} 篇文章', entry.count)

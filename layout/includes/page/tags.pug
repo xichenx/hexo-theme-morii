@@ -1,0 +1,14 @@
+- var directoryTags = morii_tag_directory(site.tags)
+if directoryTags.length
+  .tag-directory
+    if directoryTags.length > 1
+      label.tag-order(hidden)
+        span= morii_t("标签排序")
+        select(data-tag-order)
+          option(value='count')= morii_t("按文章数")
+          option(value='name')= morii_t("按名称")
+    .pill-cloud.taxonomy-tags(data-tag-list)
+      each tag in directoryTags
+        a(href=url_for(tag.path) data-tag-name-order=tag.nameOrder) # #{tag.name} #[small=tag.count]
+else
+  p.empty-state= morii_t("暂无标签")

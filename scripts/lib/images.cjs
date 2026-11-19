@@ -2,6 +2,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { createHash, randomUUID } = require('node:crypto');
+const { Parser } = require('htmlparser2');
 const safeURL = value => {
   if (typeof value !== 'string' || !value.trim() || /[\\\u0000-\u0020]/.test(value) || value.startsWith('//')) return '';
   if (/^[a-z][\w+.-]*:/i.test(value)) { try { if (!/^https?:$/.test(new URL(value).protocol)) return ''; } catch { return ''; } }
@@ -57,4 +58,40 @@ async function prepare(file, settings, sharp, cacheDirectory) {
   }
   return { width, height, color, variants };
 }
-module.exports = { safeURL, localFile, prepare };
+function lazyArticleImages(html) {
+  const insertions = [];
+  let hasFirstImage = false;
+  let inertDepth = 0;
+  const inertTags = new Set(['template', 'noscript', 'script', 'style', 'textarea', 'xmp', 'iframe', 'noembed', 'noframes', 'plaintext', 'svg', 'math']);
+  const parser = new Parser({
+    onopentag(tag, attrs) {
+      if (inertTags.has(tag)) inertDepth++;
+      if (inertDepth || tag !== 'img') return;
+      const src = attrs.src?.trim();
+      if (!attrs.srcset?.trim() && (!src || /^data:/i.test(src))) return;
+      if (!hasFirstImage) {
+        hasFirstImage = true;
+        return;
+      }
+      if (Object.hasOwn(attrs, 'loading') || attrs.fetchpriority?.toLowerCase() === 'high') return;
+      // Insert after the tag name so srcset, quotes and self-closing syntax remain intact.
+      insertions.push(parser.startIndex + '<img'.length);
+    },
+    onclosetag(tag) {
+      if (inertTags.has(tag)) inertDepth--;
+    }
+  });
+  parser.end(html);
+  if (!insertions.length) return html;
+
+  let start = 0;
+  const parts = [];
+  for (const end of insertions) {
+    parts.push(html.slice(start, end), ' loading="lazy"');
+    start = end;
+  }
+  parts.push(html.slice(start));
+  return parts.join('');
+}
+
+module.exports = { safeURL, localFile, prepare, lazyArticleImages };

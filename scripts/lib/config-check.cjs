@@ -1,4 +1,5 @@
 'use strict';
+const { footerNav } = require('./footer-nav.cjs');
 function inspect(config, site = {}, knownKeys) {
   const issues = [];
   const add = (level, field, message) => issues.push({ level, field, message });
@@ -7,7 +8,7 @@ function inspect(config, site = {}, knownKeys) {
   if (knownKeys) for (const key of Object.keys(config)) if (!knownKeys.includes(key)) add('warning', key, '未知顶层配置，请检查是否拼写错误。');
   const language = Array.isArray(site.language) ? site.language[0] : site.language;
   if (language && !['en', 'zh-CN', 'zh-TW'].includes(language)) add('warning', 'language', '建议使用 en、zh-CN 或 zh-TW，其他语言会使用兼容或回退规则。');
-  for (const field of ['motion.enable', 'series.enable', 'images.responsive', 'images.cover_tone', 'search.inverted', 'search.worker', 'performance.diagnostics', 'cinema.enable', 'music.meting.enable', 'comments.enable', 'article.enhancements.mermaid', 'article.enhancements.math']) {
+  for (const field of ['motion.enable', 'series.enable', 'images.responsive', 'images.cover_tone', 'images.lazy_article', 'search.inverted', 'search.worker', 'performance.diagnostics', 'cinema.enable', 'music.meting.enable', 'comments.enable', 'article.enhancements.mermaid', 'article.enhancements.math', 'article.copyright.enable', 'article.edit.enable', 'article.code.word_wrap']) {
     if (get(field) != null && typeof get(field) !== 'boolean') add('error', field, '必须为 true 或 false，不能使用带引号的字符串。');
   }
   for (const [field, allowed] of Object.entries({ 'appearance.layouts.home': ['featured', 'grid'], 'appearance.layouts.categories': ['atlas', 'directory', 'cards'], 'appearance.layouts.category': ['list', 'cards'], 'appearance.layouts.archives': ['timeline', 'grouped'], 'comments.provider': ['twikoo', 'waline'] })) {
@@ -36,6 +37,15 @@ function inspect(config, site = {}, knownKeys) {
     if (config.clock.timezone) try { new Intl.DateTimeFormat('en', { timeZone: config.clock.timezone }); } catch { add('error', 'clock.timezone', '填写有效时区，如 Asia/Shanghai。'); }
   }
   const start = config.footer?.runtime?.start;
+  footerNav(config.footer?.nav, (field, message) => add('error', field, message));
+  const { httpURL } = require('./article-attribution.cjs');
+  for (const field of ['article.copyright.author_url', 'article.copyright.license_url']) {
+    if (get(field) && !httpURL(get(field))) add('error', field, '必须为不含凭据的完整 HTTP(S) 地址。');
+  }
+  if (config.article?.edit?.enable === true) {
+    const template = config.article.edit.url;
+    if (typeof template !== 'string' || !template.includes('{path}') || !httpURL(template.replaceAll('{path}', '_posts/example.md'))) add('error', 'article.edit.url', '填写包含 {path} 占位符的完整 HTTP(S) 编辑地址。');
+  }
   for (const [field, allowed] of [['style', ['classic', 'mac', 'minimal']], ['theme', ['auto', 'light', 'dark']]]) {
     if (config.article?.code?.[field] != null && !allowed.includes(config.article.code[field])) add('error', 'article.code.' + field, `可选值：${allowed.join(', ')}。`);
   }

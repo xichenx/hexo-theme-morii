@@ -11,6 +11,8 @@ block content
     .content-grid
       section.posts-column
         include includes/category-nav.pug
+        if is_archive()
+          include includes/archive-months.pug
         if page.posts && page.posts.length
           if is_archive()
             if morii_layout('archives') === 'grouped'

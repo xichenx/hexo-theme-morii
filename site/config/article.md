@@ -86,6 +86,7 @@ article:
 | `article.code.style` | `classic` | 外观：`classic`、`mac`、`minimal` |
 | `article.code.theme` | `dark` | 配色：`dark`、`light`、`auto`；`auto` 跟随站点深浅模式 |
 | `article.code.lines` | `18` | 代码折叠行数阈值，范围 5–100，建议从默认值开始 |
+| `article.code.word_wrap` | `false` | 默认自动换行；访客仍可按代码块切换 |
 
 例如只想关闭打印功能，修改 `article.print.enable` 即可，不需要关闭全部阅读工具。`reading_settings` 和 `navigation` 直接接受布尔值，**不要在它们下面再套一层 `enable`**。
 
@@ -109,6 +110,8 @@ reading_list:
 目录从正文标题生成。正文使用 `## 二级标题`、`### 三级标题`，不要只是加粗文字。文章标题已经由 Front Matter 的 `title` 提供，正文一般从 `##` 开始。
 
 当前主题没有 `article.toc.enable` 这样的配置项，不要凭空添加。手机和桌面上的目录位置不同，需要分别检查。
+
+文章有 10 个及以上章节时，目录会显示“筛选章节”输入框。输入标题里的关键词即可缩小范围，多个关键词用空格隔开。点击结果跳转到正文，也可以在输入框按向下方向键选中首个结果，再按回车跳转。清空输入恢复完整目录。
 
 ## 6. 怎么验证这些功能？
 
@@ -164,6 +167,54 @@ console.log(theme);
 优先级为：单个代码块 > 单篇文章 > 全站配置。非法文章设置会提示并继承全站设置，非法全站字段回退对应默认值；代码块中的非法值忽略并继承文章设置。样式只接受表格中的名称，不执行自定义 CSS 或外部脚本。
 
 代码样式使用本地 CSS，只在文章页加载。无 JavaScript 时保留代码与配色；复制和折叠按钮需要 JavaScript。打印时隐藏工具栏并展开全部代码。
+
+### 代码自动换行
+
+设置 `article.code.word_wrap: true` 可默认开启自动换行；单篇文章可用 Front Matter 的 `code_word_wrap: true` 或 `false` 覆盖。工具栏的“自动换行”按钮只影响当前代码块，支持键盘操作，不会改变复制得到的原始代码。换行时暂时隐藏行号，避免折行后行号错位；关闭换行后恢复。换行和折叠可同时使用，折叠高度仍按预览行数限制；按钮中的总行数按原始代码计算。无 JavaScript 时保留原始代码展示。
+
+### 放大查看代码
+
+代码工具栏的“放大查看”会打开独立阅读窗口，完整显示当前代码块，并提供复制和自动换行。按 Esc 或用关闭按钮可返回原来的代码块，保留折叠状态。支持原生弹窗的浏览器会显示此入口。
+
+## 文章版权与源文件编辑
+
+参考 Butterfly 的文章归属与编辑入口设计，Morii 提供以下可选设置。合并到博客 `_config.morii.yml` 的同一个 `article:` 下：
+
+```yaml
+article:
+  copyright:
+    enable: true
+    author_url: https://example.com/about/
+    license: '你的许可协议名称'
+    license_url: https://example.com/license/
+  edit:
+    enable: true
+    url: https://github.com/your-name/blog/edit/main/source/{path}
+```
+
+两项默认关闭。请自行决定许可协议并填写自己的地址。版权卡片显示作者、原文链接和已填写的协议；协议地址留空时显示纯文本。作者优先使用文章 `author`，否则使用博客 `_config.yml` 的 `author`。原文链接使用站点 `url`、`root` 和文章固定链接，请先正确配置站点地址。卡片在无 JavaScript 和打印时也可显示。
+
+编辑地址中的 `{path}` 自动替换为 `source/` 下的真实文件路径（如 `_posts/中文文章.md`），各路径片段会进行 URL 编码，不受文章 `permalink` 影响。请将示例中的账号、仓库和分支替换为实际博客源码仓库；点击后跳转仓库平台，由平台处理登录与编辑权限。未配置占位符、源文件路径缺失或地址无效时隐藏入口。运行 `hexo morii:check` 可检查全局配置。
+
+单篇文章可关闭相应功能：
+
+```yaml
+copyright: false
+edit: false
+```
+
+转载或特约文章可覆盖版权卡片字段：
+
+```yaml
+author: 特约作者
+copyright:
+  author: 原作者
+  author_url: https://example.com/author/
+  license: 单篇许可名称
+  license_url: https://example.com/license/
+```
+
+单篇覆盖不会开启全局已关闭的版权卡片。以上文本均作为纯文本输出；作者、许可和编辑链接仅接受不含凭据的完整 HTTP(S) 地址。
 
 提示块、代码文件名与行高亮、Mermaid 及数学公式的用法见[技术文章增强](/config/iteration#技术文章)。
 

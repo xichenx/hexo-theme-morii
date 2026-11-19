@@ -56,7 +56,8 @@ block content
         summary #{morii_t("本文目录")}
         include includes/toc.pug
       - var codeStyle = morii_code_style(page)
-      .article-body(data-code-style=codeStyle.style data-code-theme=codeStyle.theme data-code-collapse=(!theme.article || !theme.article.code || theme.article.code.collapse !== false) ? 'true' : 'false' data-code-lines=(theme.article && theme.article.code && theme.article.code.lines) || 18)!= page.content
+      - var codeWrap = typeof page.code_word_wrap === 'boolean' ? page.code_word_wrap : !!(theme.article && theme.article.code && theme.article.code.word_wrap === true)
+      .article-body(data-code-style=codeStyle.style data-code-theme=codeStyle.theme data-code-word-wrap=String(codeWrap) data-code-collapse=(!theme.article || !theme.article.code || theme.article.code.collapse !== false) ? 'true' : 'false' data-code-lines=(theme.article && theme.article.code && theme.article.code.lines) || 18)!= morii_article_images(page)
       if page.tags && page.tags.length
         .article-tags
           each tag in page.tags.toArray()
@@ -64,7 +65,10 @@ block content
       .article-end
         span ✦
         p #{morii_t("感谢读到这里")}
+      include includes/article-attribution.pug
       .article-tools
+        if attribution.editURL
+          a.button.service-button.article-edit(href=attribution.editURL target='_blank' rel='noopener noreferrer')= morii_t('编辑此页')
         if !theme.article || !theme.article.share || theme.article.share.enable !== false
           button.button.service-button(type='button' data-share-article aria-haspopup='dialog' aria-controls='article-share-dialog' hidden) #{morii_t("分享文章 ↗")}
         button.button.service-button#copy-article-link(type='button') #{morii_t("复制文章链接 ↗")}

@@ -2,16 +2,21 @@ extends includes/layout.pug
 include includes/mixins.pug
 
 block content
+  - var directoryTopics = morii_category_directory(site.categories)
+  - var hierarchy = morii_category_hierarchy(directoryTopics, page)
   if morii_layout('category') === 'cards'
     .wrap.listing-page
       .page-intro(data-intro-word='CATEGORY' data-intro-tone='taxonomy')
         include includes/intro-atmosphere.pug
         span.section-kicker CATEGORY
+        if hierarchy.ancestors.length
+          include includes/category-breadcrumb.pug
         h1= morii_page_title(page)
         p #{morii_t("这个主题下的所有文章。")}
       .content-grid
         section.posts-column
           include includes/category-nav.pug
+          include includes/category-children.pug
           if page.posts && page.posts.length
             .post-grid
               each post, index in page.posts.toArray()

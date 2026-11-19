@@ -3,6 +3,7 @@ title: 欢迎使用 Morii
 date: 2026-10-15 12:00:00
 categories:
   - 主题使用
+  - 入门
 tags:
   - 开始写作
 cover: /images/covers/welcome.jpg

@@ -1,3 +1,8 @@
+.toc-filter(data-toc-filter hidden)
+  label
+    span.sr-only= morii_t('筛选章节')
+    input(type='search' data-toc-query placeholder=morii_t('筛选章节') autocomplete='off')
+  p.toc-filter__status(role='status' hidden)= morii_t('没有匹配的章节')
 .toc-content
   each heading in morii_toc(page.content)
     a(href='#' + heading.id class=heading.level > 2 ? 'toc-sub' : '')= heading.text

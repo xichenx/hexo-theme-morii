@@ -51,7 +51,9 @@
   },
   "dependencies": {
     "hexo-util": "^3.3.0",
-    "js-yaml": "^4.3.2"
+    "htmlparser2": "^9.1.0",
+    "js-yaml": "^4.3.2",
+    "postcss": "^8.5.31"
   },
   "peerDependencies": {
     "hexo": ">=8.0.0",

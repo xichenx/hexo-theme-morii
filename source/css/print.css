@@ -48,6 +48,8 @@ body.is-reading .outdated-notice p { color: #555; }
 body.is-reading .print-source { display: block; margin-top: 28px; border-top: 1px solid #ccc; padding-top: 12px; font-size: 9pt; color: #555; overflow-wrap: anywhere; }
 body.is-reading .print-source p { margin: 5px 0; }
 body.is-reading .print-source a { color: #222; }
+body.is-reading .article-copyright { margin:20px 0;break-inside:avoid;color:#111;background:#fff;border-color:#ccc;font-size:9pt; }
+body.is-reading .article-copyright :is(a,dt) { color:#333; }
 @media print {
   #article-print-toolbar { display: none !important; }
   body.is-reading .reading-layout { max-width: none; padding: 0; }

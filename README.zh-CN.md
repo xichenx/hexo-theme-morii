@@ -144,6 +144,8 @@ hexo server
 
 ## 配置
 
+文章页新增可选版权卡片、源文件编辑入口和逐代码块自动换行，参考 Butterfly 的相应功能。配置与单篇覆盖方法见[文章版权与源文件编辑](site/config/article.md#文章版权与源文件编辑)；版权与编辑入口默认关闭。
+
 主题设置在 Git 安装的 `themes/morii/_config.yml` 或 npm 安装的 `node_modules/hexo-theme-morii/_config.yml`，也可通过站点根目录的 `_config.morii.yml` 覆盖。
 
 `logo` 控制顶部导航栏图标，`favicon` 控制浏览器标签页图标，两者可以分别替换，支持本站路径或完整图片网址。例如：

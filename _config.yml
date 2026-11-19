@@ -28,6 +28,7 @@ github_calendar:
 favicon: /icons/brand/morii-orbit-favicon.png
 logo: /icons/brand/morii-orbit-nav.png
 footer:
+  nav: [] # 可配置分组导航，留空时使用 explore 中的页脚快捷链接
   runtime:
     enable: false
     # 启用后填写自己的上线时间和时区。
@@ -101,10 +102,20 @@ article:
   related:
     enable: true
     limit: 3
+  copyright:
+    enable: false # 自行选择许可协议后开启；单篇 copyright: false 可隐藏
+    author_url: ''
+    license: ''
+    license_url: ''
+  edit:
+    enable: false
+    # {path} 替换为 source/ 下的源文件路径，如 _posts/hello.md。
+    url: '' # 例如 https://github.com/user/blog/edit/main/source/{path}
   code:
     style: classic # classic / mac / minimal
     theme: dark    # dark / light / auto（跟随站点深浅模式）
     collapse: true
+    word_wrap: false # 默认保留横向滚动；每个代码块可独立切换换行
     # 超过此行数的代码默认收起；复制始终包含完整代码。
     lines: 18
 sidebar:
@@ -175,6 +186,7 @@ series:
   enable: true # 根据文章 series / series_order 自动生成 /series/ 专题页
 
 images:
+  lazy_article: true # 正文首张图片保持默认加载，其余图片按需加载
   responsive: true  # 使用可选 sharp 为本地封面生成 WebP 候选
   widths: [480, 800, 1200]
   quality: 78

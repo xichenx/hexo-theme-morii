@@ -3,6 +3,23 @@ tagline: 用卡片，收藏技术与生活。
 intro: 这里是 Morii 主题的独立演示站，展示文章、卡片与音乐体验。
 avatar: /icons/brand/morii-logo.png
 footer:
+  nav:
+    - title: { zh-CN: 阅读, zh-TW: 閱讀, en: Reading }
+      links:
+        - { name: 文章, path: /archives/ }
+        - { name: 专题与系列, path: /series/ }
+        - { name: 稍后阅读, path: /reading-list/ }
+    - title: { zh-CN: 发现, zh-TW: 探索, en: Discover }
+      links:
+        - { name: 音乐馆, path: /music/ }
+        - { name: 电影院, path: /cinema/ }
+        - { name: 朋友圈, path: /fcircle/ }
+        - { name: 留言板, path: /comments/ }
+    - title: { zh-CN: 关于, zh-TW: 關於, en: About }
+      links:
+        - { name: 关于, path: /about/ }
+        - { name: 友链, path: /link/ }
+        - { name: GitHub, path: 'https://github.com/xichenx/hexo-theme-morii' }
   runtime:
     enable: false
   filing:

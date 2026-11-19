@@ -14,6 +14,38 @@
   updateOutdatedNotice();
   window.addEventListener('pageshow', updateOutdatedNotice);
   const tocContainers = [...document.querySelectorAll('.toc-content')];
+  const tocFilters = tocContainers.flatMap(toc => {
+    const controls = toc.previousElementSibling;
+    const input = controls?.querySelector('[data-toc-query]');
+    if (!input) return [];
+    const status = controls.querySelector('.toc-filter__status');
+    const normalize = value => value.normalize('NFKC').toLowerCase();
+    const apply = () => {
+      const links = [...toc.querySelectorAll('a')];
+      controls.hidden = links.length < 10;
+      const terms = controls.hidden ? [] : normalize(input.value).trim().split(/\s+/).filter(Boolean);
+      toc.classList.toggle('is-filtered', terms.length > 0);
+      let matches = 0;
+      for (const link of links) {
+        const title = normalize(link.textContent);
+        link.hidden = !terms.every(term => title.includes(term));
+        if (!link.hidden) matches++;
+      }
+      status.hidden = !terms.length || matches > 0;
+    };
+    input.addEventListener('input', () => {
+      apply();
+      toc.scrollTop = 0;
+    });
+    input.addEventListener('keydown', event => {
+      if (event.isComposing || event.key !== 'ArrowDown') return;
+      const first = toc.querySelector('a:not([hidden])');
+      if (!first) return;
+      event.preventDefault();
+      first.focus();
+    });
+    return [apply];
+  });
   const progress = document.querySelector('.reading-progress');
   const progressBar = document.querySelector('.reading-progress__bar');
   const announcement = document.getElementById('theme-announcement');
@@ -30,7 +62,7 @@
       if (document.documentElement.dataset.printPreview === 'true' || document.querySelector('dialog[open]')) return;
       tocDialog.showModal();
       const current = tocDialog.querySelector('[aria-current]');
-      current?.scrollIntoView?.({ block: 'nearest', behavior: 'instant' });
+      if (current && !current.hidden) current.scrollIntoView?.({ block: 'nearest', behavior: 'instant' });
     });
     document.getElementById('reading-toc-close')?.addEventListener('click', () => tocDialog.close());
     tocDialog.addEventListener('click', event => { if (event.target === tocDialog) tocDialog.close(); });
@@ -64,7 +96,7 @@
     // Keep a long desktop outline in view without moving the article itself.
     const desktopToc = document.querySelector('.reading-aside .toc-content');
     const currentLink = desktopToc?.querySelector('[aria-current]');
-    if (currentLink) {
+    if (currentLink && !desktopToc.classList.contains('is-filtered')) {
       const container = desktopToc.getBoundingClientRect();
       const current = currentLink.getBoundingClientRect();
       if (current.top < container.top || current.bottom > container.bottom) {
@@ -90,6 +122,55 @@
     }
   };
 
+  const addCodeViewer = (shell, tools, block) => {
+    if (typeof window.HTMLDialogElement?.prototype.showModal !== 'function') return;
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'code-view';
+    trigger.textContent = t("放大查看");
+    trigger.setAttribute('aria-haspopup', 'dialog');
+    tools.append(trigger);
+
+    trigger.addEventListener('click', () => {
+      if (document.querySelector('dialog[open]') || document.documentElement.dataset.printPreview === 'true') return;
+      const dialog = document.createElement('dialog');
+      dialog.className = 'code-dialog';
+      dialog.setAttribute('aria-label', t("代码阅读窗口"));
+      const close = document.createElement('button');
+      close.type = 'button';
+      close.className = 'code-dialog-close';
+      close.textContent = t("关闭代码阅读窗口");
+      close.autofocus = true;
+      const content = document.createElement('div');
+      content.className = 'code-dialog-content';
+      content.tabIndex = 0;
+      content.setAttribute('role', 'region');
+      content.setAttribute('aria-label', t("代码内容"));
+
+      const restore = () => {
+        if (!dialog.isConnected) return;
+        window.removeEventListener('beforeprint', print);
+        shell.prepend(tools, block);
+        dialog.remove();
+        shell.style.removeProperty('min-height');
+        trigger.focus({ preventScroll: true });
+        scheduleProgress();
+      };
+      const print = () => {
+        dialog.close();
+        restore();
+      };
+      dialog.addEventListener('close', restore, { once: true });
+      close.addEventListener('click', () => dialog.close());
+      shell.style.minHeight = `${shell.getBoundingClientRect().height}px`;
+      content.append(block);
+      dialog.append(close, tools, content);
+      shell.append(dialog);
+      dialog.showModal();
+      window.addEventListener('beforeprint', print, { once: true });
+    });
+  };
+
   const enhanceArticle = () => {
     headings = [...article.querySelectorAll('h1, h2, h3, h4, h5, h6')];
     const baseLevel = Math.min(...headings.map(heading => Number(heading.tagName.slice(1))));
@@ -113,6 +194,7 @@
       }));
     });
     tocLinks = tocContainers.flatMap(toc => [...toc.querySelectorAll('a')]);
+    tocFilters.forEach(apply => apply());
     tocLinks.forEach(link => link.addEventListener('click', () => {
       const mobile = link.closest('.mobile-toc');
       if (mobile) mobile.open = false;
@@ -141,12 +223,27 @@
       if (filename) { const label = document.createElement('strong'); label.className = 'code-filename'; label.textContent = filename; tools.append(label); }
       const button = document.createElement('button');
       button.type = 'button';
+      button.className = 'code-copy';
       button.textContent = t("复制代码");
       button.setAttribute('aria-label', t("复制代码"));
       button.addEventListener('click', () => {
         copyText(codeText(code), button);
       });
       tools.append(language, button);
+      const wrap = document.createElement('button');
+      wrap.type = 'button';
+      wrap.className = 'code-wrap';
+      wrap.textContent = t("自动换行");
+      const syncWrap = () => wrap.setAttribute('aria-pressed', String(shell.classList.contains('is-wrapped')));
+      shell.classList.toggle('is-wrapped', article.dataset.codeWordWrap === 'true');
+      syncWrap();
+      wrap.addEventListener('click', () => {
+        shell.classList.toggle('is-wrapped');
+        syncWrap();
+        scheduleProgress();
+      });
+      tools.append(wrap);
+      if (!block.classList.contains('mermaid') && languageClass !== 'language-mermaid') addCodeViewer(shell, tools, block);
       shell.append(tools, block);
       const lineCount = codeText(code).replace(/\n$/, '').split('\n').length;
       if (article.dataset.codeCollapse !== 'false' && lineCount > collapseLines) {

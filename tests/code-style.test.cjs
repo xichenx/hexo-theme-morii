@@ -32,12 +32,21 @@ test('style metadata does not change copied code, line marks, collapse behavior 
     assert.equal(shells.length, 2); assert.equal(shells[0].dataset.codeStyle, 'mac'); assert.equal(shells[0].dataset.codeTheme, 'light');
     assert.equal(shells[1].dataset.codeStyle, 'minimal'); assert.equal(shells[1].dataset.codeTheme, 'auto');
     assert.equal(shells[0].querySelector('.code-filename').textContent, 'app.js'); assert.ok(shells[0].querySelector('.line.marked'));
-    shells[0].querySelector('.code-tools button').click(); await new Promise(resolve => setImmediate(resolve)); assert.equal(copied[0], code + '\n');
     const toggle = shells[0].querySelector('.code-toggle'); assert.equal(toggle.getAttribute('aria-expanded'), 'false');
+    const wrap = shells[0].querySelector('.code-wrap');
+    assert.equal(wrap.getAttribute('aria-pressed'), 'false');
+    wrap.click(); assert.equal(wrap.getAttribute('aria-pressed'), 'true');
+    assert.ok(shells[0].classList.contains('is-wrapped'));
+    assert.equal(shells[1].querySelector('.code-wrap').getAttribute('aria-pressed'), 'false');
+    shells[0].querySelector('.code-copy').click(); await new Promise(resolve => setImmediate(resolve));
+    assert.equal(copied.at(-1), code + '\n');
+    wrap.click(); assert.equal(wrap.getAttribute('aria-pressed'), 'false');
     toggle.click(); assert.equal(toggle.getAttribute('aria-expanded'), 'true'); assert.ok(!shells[0].classList.contains('is-collapsed'));
+    w.document.querySelector('.article-body').dataset.codeWordWrap = 'true';
     const extra = w.document.createElement('pre'); extra.textContent = 'new code'; w.document.querySelector('.article-body').append(extra);
     w.dispatchEvent(new w.Event('hexo-blog-decrypt'));
     assert.equal(w.document.querySelectorAll('.code-shell').length, 3); assert.equal(extra.parentElement.dataset.codeStyle, 'minimal');
+    assert.equal(extra.parentElement.querySelector('.code-wrap').getAttribute('aria-pressed'), 'true');
     assert.equal(w.document.querySelector('.code-shell .code-shell'), null);
   } finally { dom.window.close(); }
 });

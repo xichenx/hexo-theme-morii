@@ -150,6 +150,8 @@ Language maps prefer the current language, then Simplified Chinese, English, and
 
 ## Configuration
 
+Articles support optional copyright cards, source edit links, and per-block line wrapping, inspired by Butterfly. Copyright and edit links are disabled by default. Set `article.copyright.enable` and your license fields, use `article.edit.url` with a `{path}` placeholder, and set `article.code.word_wrap` for the initial wrap state. Posts can opt out with `copyright: false` / `edit: false` or override wrapping with `code_word_wrap`. See the [article guide](site/config/article.md).
+
 Use the blog root's `_config.morii.yml` to override the theme settings. The complete defaults live in the theme's `_config.yml`.
 
 ### Branding and icons

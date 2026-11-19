@@ -1,0 +1,26 @@
+- var attribution = morii_article_attribution(page)
+if attribution.enabled
+  section.article-copyright(aria-label=morii_t('文章版权'))
+    h2= morii_t('文章版权')
+    dl
+      if attribution.author
+        div
+          dt= morii_t('文章作者')
+          dd
+            if attribution.authorURL
+              a(href=attribution.authorURL target='_blank' rel='noopener noreferrer')= attribution.author
+            else
+              span= attribution.author
+      div
+        dt= morii_t('原文链接')
+        dd
+          - var originalURL = full_url_for((page.path || '').replace(/index\.html$/, ''))
+          a(href=originalURL)= originalURL
+      if attribution.license
+        div
+          dt= morii_t('许可协议')
+          dd
+            if attribution.licenseURL
+              a(href=attribution.licenseURL target='_blank' rel='noopener noreferrer')= attribution.license
+            else
+              span= attribution.license
