@@ -10,6 +10,11 @@
 .friend-search-row input { flex: 1; font-size: 13px; }
 #friend-clear { border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); color: var(--accent); padding: 0 14px; white-space: nowrap; }
 .directory-filters button span { margin-left: 6px; opacity: .7; font-size: 11px; }
+.friend-toolbar-footer { display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:12px; }
+.friend-toolbar-footer #friend-search-status { margin:0; }
+#friend-random { min-height:40px; }
+#friend-random:disabled { opacity:.55;cursor:default; }
+#friend-random:focus-visible { outline:2px solid var(--accent);outline-offset:2px; }
 .friend-directory .friend-group { margin: 0 0 34px; }
 .friend-group .section-heading { margin-bottom: 16px; }
 .friend-group .section-heading h2 { display: flex; align-items: center; gap: 10px; font-size: 22px; }

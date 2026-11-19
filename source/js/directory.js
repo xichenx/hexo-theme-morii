@@ -4,7 +4,9 @@
   const input = document.getElementById('friend-search');
   const sections = [...document.querySelectorAll('[data-friend-section]')];
   const filters = [...document.querySelectorAll('[data-friend-group]')];
+  const random = document.getElementById('friend-random');
   let activeGroup = 'all';
+  let previousVisit;
   const filterFriends = () => {
     if (!directory || !input) return;
     const words = input.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
@@ -21,6 +23,7 @@
     });
     document.getElementById('friend-search-status').textContent = t("找到 {0} 个链接", count);
     document.getElementById('friend-empty').hidden = count > 0;
+    if (random) random.disabled = count === 0;
     const clear = document.getElementById('friend-clear');
     if (clear) clear.hidden = !input.value;
     sections.forEach(section => {
@@ -42,6 +45,19 @@
     filterFriends();
     input.focus();
   });
+  if (directory && random) {
+    random.hidden = false;
+    random.addEventListener('click', () => {
+      const links = directory.querySelectorAll('[data-friend-section]:not([hidden]) a[data-friend-search]:not([hidden])');
+      const unique = [...new Map([...links].map(link => [link.href, link])).values()];
+      const alternatives = unique.filter(link => link.href !== previousVisit);
+      const choices = alternatives.length ? alternatives : unique;
+      if (!choices.length) return;
+      const link = choices[Math.floor(Math.random() * choices.length)];
+      previousVisit = link.href;
+      link.click();
+    });
+  }
   const copy = document.getElementById('copy-site-card');
   copy?.addEventListener('click', async () => {
     const field = document.getElementById('site-link-data');

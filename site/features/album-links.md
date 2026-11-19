@@ -101,6 +101,8 @@ comments: false
 
 `class_name` 和 `class_desc` 控制分组标题与介绍；`link_list` 中每个 `- name` 开始一张友链卡片。`recommend` 是布尔值，不要写成字符串 `'true'`。缺少有效网址的条目会被忽略。
 
+友链页的「随机逛逛」会从当前分组和关键词筛选结果里随机选一个站点，在新标签页打开。有多个不同网址时会避免连续打开同一个站点。没有匹配结果时按钮不可用。
+
 ## 生成并检查
 
 在博客根目录运行 `hexo clean`、`hexo generate`，重新启动预览。分别打开 `/album/`、`/album/travel/` 和 `/link/`：相册卡片应能点进详情，照片应能加载，友链应能打开。确认后，再按[外观与导航](/features/customization)把首次配置中的 `menu: false` 改成完整菜单。

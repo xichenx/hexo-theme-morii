@@ -11,7 +11,9 @@
         button(type='button' data-friend-group='all' aria-pressed='true') #{morii_t("全部")} #[span=friendGroups.reduce(function(total, group) { return total + group.friends.length }, 0)]
         each group in friendGroups
           button(type='button' data-friend-group=group.id aria-pressed='false') #{group.title} #[span=group.friends.length]
-      p#friend-search-status(role='status' aria-live='polite') #{morii_t("共 {0} 个链接", friendGroups.reduce(function(total, group) { return total + group.friends.length }, 0))}
+      .friend-toolbar-footer
+        p#friend-search-status(role='status' aria-live='polite') #{morii_t("共 {0} 个链接", friendGroups.reduce(function(total, group) { return total + group.friends.length }, 0))}
+        button.button.service-button#friend-random(type='button' aria-label=morii_t("随机逛逛（在新标签页打开）") hidden) #{morii_t("随机逛逛")}
     each group in friendGroups
       section.data-section.friend-group(id=group.id data-friend-section=group.id)
         .section-heading

@@ -20,6 +20,15 @@ const options = {
     github_calendar: { enable: false }, comments: { enable: false }, friends_feed: { endpoint: '' }
   },
   sourceOverrides: {
+    '_data/link.yml': yaml.dump([
+      { class_name: '技术', link_list: [
+        { name: 'Alpha', link: 'https://alpha.friend.test/' },
+        { name: 'Beta', link: 'https://beta.friend.test/' }
+      ] },
+      { class_name: '生活', link_list: [
+        { name: 'Gamma', link: 'https://gamma.friend.test/' }
+      ] }
+    ]),
     '_posts/search-matches.md': '---\ntitle: Search matches fixture\ndate: 2020-02-01 00:00:00\npermalink: posts/search-matches/\n---\n\nOverview.\n\n<!-- more -->\n\norioncache ' + 'Ordinary prose. '.repeat(22) + '\n\nnebularender\n',
     '_posts/layout-stress.md': longArticle,
     '_posts/code-styles.md': codeArticle,
