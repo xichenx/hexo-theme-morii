@@ -20,6 +20,13 @@ const options = {
     github_calendar: { enable: false }, comments: { enable: false }, friends_feed: { endpoint: 'https://feed.example.test/articles?source=fixture', page_size: 2 }
   },
   sourceOverrides: {
+    '_data/essay.yml': yaml.dump([
+      { home_essay: true, essay_list: [
+        { content: 'October note', date: new Date('2026-10-15T00:00:00Z') },
+        { content: 'September note', date: '2026/9/14 10:00' }
+      ] },
+      { essay_list: [{ content: 'Undated note' }] }
+    ]),
     '_data/link.yml': yaml.dump([
       { class_name: '技术', link_list: [
         { name: 'Alpha', link: 'https://alpha.friend.test/' },

@@ -1,0 +1,26 @@
+if site.data.essay
+  .moment-filter(hidden data-moment-filter data-count-label=morii_t("显示 {0} 条即刻") data-undated-label=morii_t("未注明日期"))
+    label(for='moment-month')= morii_t("按月份查找")
+    select#moment-month
+      option(value='')= morii_t("全部月份")
+    span(role='status')
+  each group, groupIndex in site.data.essay
+    .essay-grid(data-moment-group)
+      each note, noteIndex in (group.essay_list || []).slice(0, group.limit || 100)
+        article.essay-card.panel(id='moment-' + (groupIndex + 1) + '-' + (noteIndex + 1) data-moment-month=morii_moment_month(note.date))
+          .essay-card__top #[span #{morii_t("✦ 即刻")}] #[time=note.date]
+          p= note.content
+          if note.image && note.image.length
+            .essay-images
+              each img in note.image.slice(0, 3)
+                a(href=img target='_blank' rel='noopener noreferrer')
+                  img(src=img alt=morii_t("短文配图") loading='lazy')
+          if note.link
+            a.text-link(href=note.link) #{morii_t("查看链接 →")}
+          if note.video && note.video.length
+            .essay-videos
+              each video in note.video
+                if morii_safe_url(video) && video.startsWith('https://player.bilibili.com/')
+                  iframe(src=video title=note.content loading='lazy' allowfullscreen referrerpolicy='no-referrer')
+                else if morii_safe_url(video)
+                  video(controls preload='none' src=video aria-label=note.content)

@@ -148,6 +148,8 @@ comments: false
 
 `home_essay: true` 会让该组短文也能出现在首页即刻速览。日期请改成你发布短文的实际日期。
 
+短文分属不同月份时，即刻页会提供「按月份查找」入口，显示当前筛选的条数。日期推荐使用 `YYYY-MM-DD`，也支持 `YYYY/MM/DD`。没有可识别月份的记录可在「未注明日期」或「全部月份」中查看。已有单条即刻链接仍可直接打开，关闭 JavaScript 时可以浏览全部记录。
+
 ## 4. 重新生成并检查页面
 
 运行 `hexo clean`、`hexo generate`，然后重启 `hexo server`。先**直接访问** `/categories/`、`/tags/`、`/about/`、`/essay/`，确认不再是 404。首页固定的“关于我”“看看即刻”和侧栏入口此时也应能打开。接着按[相册与友链](/features/album-links)建立其余页面，再按[外观与导航](/features/customization)开启顶部菜单。

@@ -227,6 +227,8 @@ html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || them
       script(src=morii_asset('/js/directory.js') defer)
     if page.type === 'tags' && site.tags.length > 1
       script(src=morii_asset('/js/tag-order.js') defer)
+    if page.type === 'essay' && site.data.essay
+      script(src=morii_asset('/js/moment-filter.js') defer)
     if page.path && page.path.startsWith('air-conditioner/')
       script(src=morii_asset('/js/air-conditioner.js') defer)
     if is_post()

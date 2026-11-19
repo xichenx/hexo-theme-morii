@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { JSDOM } = require('jsdom');
 const { buildDemo } = require('../tools/demo.cjs');
-const pages = ['index.html', 'page/2/index.html', 'posts/welcome/index.html', 'archives/index.html', 'categories/index.html', 'categories/主题使用/index.html', 'tags/index.html', 'about/index.html', 'link/index.html', 'album/index.html', 'album/morii/index.html', 'music/index.html', 'cinema/index.html', 'reading-list/index.html', '404.html'];
+const pages = ['index.html', 'page/2/index.html', 'posts/welcome/index.html', 'archives/index.html', 'categories/index.html', 'categories/主题使用/index.html', 'tags/index.html', 'about/index.html', 'link/index.html', 'essay/index.html', 'album/index.html', 'album/morii/index.html', 'music/index.html', 'cinema/index.html', 'reading-list/index.html', '404.html'];
 
 test('theme builds independently at both domain root and a Pages subdirectory', async t => {
   for (const prefix of ['/', '/hexo-theme-morii/']) await t.test(prefix, async () => {
@@ -14,6 +14,13 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       assert.ok(fs.existsSync(path.join(output, file)), `Generated ${file}`);
       const dom = new JSDOM(fs.readFileSync(path.join(output, file), 'utf8'), { url: `https://example.test${prefix}${file}` });
       const document = dom.window.document;
+      if (file === 'essay/index.html') {
+        assert.equal(document.querySelector('[data-moment-filter]').hidden, true);
+        const cards = [...document.querySelectorAll('.essay-card')];
+        assert.deepEqual(cards.map(card => [card.id, card.dataset.momentMonth, card.hidden]), [
+          ['moment-1-1', '2026-10', false], ['moment-1-2', '2026-09', false]
+        ]);
+      }
       const codeStyle = document.querySelector('link[href*="/css/code."]');
       assert.equal(!!codeStyle, file.startsWith('posts/'), `${file}: code styles load only on article pages`);
       if (file === 'posts/welcome/index.html') {

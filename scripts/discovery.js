@@ -4,6 +4,12 @@ const { stripHTML, unescapeHTML } = require('hexo-util');
 const list = value => Array.isArray(value) ? value : value?.toArray?.() || [];
 const plain = value => typeof value === 'string' ? unescapeHTML(stripHTML(value.replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, ' '))).replace(/\s+/g, ' ').trim() : '';
 
+hexo.extend.helper.register('morii_moment_month', date => {
+  const text = date instanceof Date && Number.isFinite(date.getTime()) ? date.toISOString() : typeof date === 'string' ? date.trim() : '';
+  const match = /^(\d{4})[-/.](0?[1-9]|1[0-2])(?=[-/.]|$)/.exec(text);
+  return match ? match[1] + '-' + match[2].padStart(2, '0') : '';
+});
+
 hexo.extend.helper.register('morii_home_moments', data => {
   const configured = Number(hexo.theme.config.home?.moments?.limit);
   const limit = Number.isFinite(configured) && configured > 0 ? Math.max(1, Math.min(10, Math.floor(configured))) : 5;

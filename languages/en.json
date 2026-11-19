@@ -669,5 +669,8 @@
   "随机逛逛": "Visit a random site",
   "随机逛逛（在新标签页打开）": "Visit a random site (opens in a new tab)",
   "朋友圈分页": "Friends feed pagination",
-  "本页 {0} 篇文章": "Posts on this page: {0}"
+  "本页 {0} 篇文章": "Posts on this page: {0}",
+  "显示 {0} 条即刻": "Moments shown: {0}",
+  "未注明日期": "Undated",
+  "全部月份": "All months"
 }
