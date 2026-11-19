@@ -96,7 +96,12 @@ avatarSkills:
     - 阅读
 careers:
   list:
-    - desc: 2026：开始记录自己的学习过程
+    - date: '2026-10'
+      title: 开始记录学习过程
+      desc: 把每周的学习笔记整理成文章。
+      url: /archives/
+    - date: 持续更新
+      desc: 继续写作和记录。
 music:
   music_title: 喜欢安静的纯音乐
 like:
@@ -111,9 +116,13 @@ like:
 | `subtitle` | 关于页补充介绍 |
 | `maxim.maxim_top` / `maxim_bottom` | 两段拼接为一句格言 |
 | `avatarSkills.left` / `right` | 合并展示的技能文字列表 |
-| `careers.list[].desc` | 经历说明列表 |
+| `careers.list[].date` | 月份、具体日期或「2024–至今」这样的时间说明 |
+| `careers.list[].title` / `desc` | 经历标题和说明，只填其中一项也可以 |
+| `careers.list[].url` | 可选入口，支持以 `/` 开头的站内路径或完整 HTTP(S) 地址 |
 | `music.music_title` | 音乐偏好文字，不是播放器歌单配置 |
 | `like.like_title` / `like_bottom` | 兴趣标题与说明 |
+
+时间线按数据文件中的顺序展示，原有只填 `desc` 的条目可直接使用。建议把具体日期写成带引号的 `YYYY-MM` 或 `YYYY-MM-DD`，时间范围可直接写成文字。
 
 兴趣与音乐偏好区域还受主题配置 `about.show_interests` 控制。想隐藏它，在 `_config.morii.yml` 中设置：
 

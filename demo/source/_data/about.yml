@@ -1,0 +1,11 @@
+careers:
+  list:
+    - date: '2026-10-15'
+      title: 写下第一篇主题笔记
+      desc: 演示如何链接到站内文章。
+      url: /posts/welcome/
+    - date: '2026-10'
+      title: 整理阅读与写作工具
+      desc: 将常用入口集中到一个地方。
+    - date: 持续更新
+      desc: 记录写作、代码和生活里的发现。

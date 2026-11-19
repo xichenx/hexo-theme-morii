@@ -48,9 +48,22 @@
     .about-career.panel
       span.section-kicker MY JOURNEY
       h2 #{morii_t("一路走来")}
-      ol.about-journey
+      ol.about-journey(role='list')
         each career in profile.careers
-          li= career
+          li
+            if career.datetime
+              time.about-journey-date(datetime=career.datetime)= career.date
+            else if career.date
+              span.about-journey-date= career.date
+            - var careerLabel = career.title || career.description
+            if career.link
+              a(href=career.link.local ? url_for(career.link.path) : career.link.path)= careerLabel
+            else if career.title
+              strong= careerLabel
+            else
+              p= careerLabel
+            if career.title && career.description
+              p= career.description
   if theme.about && theme.about.show_interests && (profile.music || profile.interest)
     .about-interests.panel
       span.section-kicker BEYOND THE SCREEN

@@ -19,6 +19,7 @@ const PAGES = [
   'fcircle/index.html',
   'essay/index.html',
   'comments/index.html',
+  'about/index.html',
   'music/index.html',
   'cinema/index.html',
   'series/index.html',

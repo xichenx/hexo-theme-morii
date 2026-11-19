@@ -1,4 +1,5 @@
 'use strict';
+const { navigationTarget } = require('./navigation-url.cjs');
 
 const locales = ['zh-CN', 'zh-TW', 'en'];
 const text = value => typeof value === 'string' ? value.trim() : '';
@@ -7,22 +8,6 @@ const label = value => {
   const entries = locales.flatMap(locale => text(value[locale]) ? [[locale, text(value[locale])]] : []);
   return entries.length ? Object.fromEntries(entries) : '';
 };
-
-function destination(value) {
-  const path = text(value);
-  if (/[\\\u0000-\u001f\u007f]/.test(path)) return;
-  if (/^\/(?!\/)/.test(path)) {
-    const pathname = path.split(/[?#]/, 1)[0];
-    // Reject dot segments so configured links cannot escape Hexo's deployment root.
-    if (!pathname.split('/').some(segment => /^\.{1,2}$/.test(segment.replace(/%2e/gi, '.')))) {
-      return { path, local: true };
-    }
-    return;
-  }
-  if (!/^https?:\/\//i.test(path) || !URL.canParse(path)) return;
-  const url = new URL(path);
-  if (!url.username && !url.password) return { path: url.href, local: false };
-}
 
 function footerNav(groups, issue = () => {}) {
   if (groups == null || groups === false) return [];
@@ -40,7 +25,7 @@ function footerNav(groups, issue = () => {}) {
     }
     const links = group.links.flatMap((entry, linkIndex) => {
       const name = label(entry?.name);
-      const target = destination(entry?.path);
+      const target = navigationTarget(entry?.path);
       const linkKey = `${key}.links[${linkIndex}]`;
       if (!name) issue(linkKey + '.name', '填写链接名称或多语言名称。');
       if (!target) issue(linkKey + '.path', '填写以 / 开头的站内路径或不含凭据的 HTTP(S) 链接。');
