@@ -10,6 +10,8 @@
   const status = document.getElementById('search-status');
   const empty = dialog.querySelector('.search-empty');
   const pageSize = Math.max(5, Math.min(30, Number(dialog.dataset.pageSize) || 10));
+  const configuredSnippets = Number(dialog.dataset.snippetsPerArticle);
+  const snippetLimit = Number.isInteger(configuredSnippets) && configuredSnippets >= 1 && configuredSnippets <= 3 ? configuredSnippets : 2;
   let entries = [...results.querySelectorAll('li')].map(item => ({
     title: item.querySelector('strong')?.textContent || '',
     url: item.querySelector('a')?.href || '',
@@ -107,23 +109,42 @@
   let segmenter;
   try { segmenter = new Intl.Segmenter(window.MoriiI18n?.locale || 'zh-CN', { granularity: 'word' }); } catch { /* Exact words remain available. */ }
   const words = () => [...new Set(input.value.trim().toLowerCase().split(/\s+/).flatMap(word => segmenter ? [...segmenter.segment(word)].filter(part => part.isWordLike).map(part => part.segment) : [word]).filter(Boolean))].slice(0, 20);
-  const highlight = (element, text, keywords) => {
-    const lower = text.toLowerCase();
+  const matchPattern = keywords => keywords.length ? new RegExp([...keywords]
+    .sort((a, b) => b.length - a.length)
+    .map(word => word.replace(/[.*+?^$()|[\]\\{}]/g, '\\$&')).join('|'), 'giu') : null;
+  const highlight = (element, text, pattern) => {
+    if (!pattern) { element.textContent = text; return; }
+    pattern.lastIndex = 0;
     let position = 0;
-    while (position < text.length) {
-      let start = text.length;
-      let length = 0;
-      keywords.forEach(word => {
-        const found = lower.indexOf(word, position);
-        if (found >= 0 && (found < start || (found === start && word.length > length))) { start = found; length = word.length; }
-      });
-      if (start > position) element.append(document.createTextNode(text.slice(position, start)));
-      if (!length) break;
+    for (const match of text.matchAll(pattern)) {
+      if (match.index > position) element.append(document.createTextNode(text.slice(position, match.index)));
       const mark = document.createElement('mark');
-      mark.textContent = text.slice(start, start + length);
+      mark.textContent = match[0];
       element.append(mark);
-      position = start + length;
+      position = match.index + match[0].length;
     }
+    if (position < text.length) element.append(document.createTextNode(text.slice(position)));
+  };
+  const snippets = (content, pattern, limit) => {
+    const excerpt = (start, end) => (start ? '…' : '') + content.slice(start, end) + (end < content.length ? '…' : '');
+    const previews = [];
+    const seen = new Set();
+    if (pattern) {
+      let previousEnd = 0;
+      for (let attempt = 0; attempt < 12 && previews.length < limit; attempt++) {
+        pattern.lastIndex = previousEnd;
+        const hit = pattern.exec(content);
+        if (!hit) break;
+        const start = Math.max(previousEnd, hit.index - 32);
+        const end = Math.min(content.length, Math.max(start + 150, hit.index + hit[0].length));
+        previousEnd = end;
+        const text = content.slice(start, end).trim();
+        if (seen.has(text)) continue;
+        seen.add(text);
+        previews.push(excerpt(start, end));
+      }
+    }
+    return previews.length ? previews : [excerpt(0, Math.min(content.length, 150))];
   };
   const legacyMatches = keywords => {
     return entries.map((entry, index) => {
@@ -143,6 +164,7 @@
   const draw = (matches, keywords) => {
     const focused = document.activeElement?.closest?.('#search-results a');
     const focusedUrl = focused?.href;
+    const pattern = matchPattern(keywords);
     results.replaceChildren(...matches.slice(0, visible).map(({ entry }) => {
       const item = document.createElement('li');
       const link = document.createElement('a');
@@ -150,22 +172,20 @@
       const icon = document.createElement('span'); icon.className = 'search-result-icon'; icon.textContent = entry.protected ? '⌑' : '≡'; icon.setAttribute('aria-hidden', 'true');
       const body = document.createElement('div'); body.className = 'search-result-content';
       const title = document.createElement('strong'); title.className = 'search-result-title';
-      highlight(title, entry.title, keywords);
-      const summary = document.createElement('p');
-      summary.className = 'search-result-summary';
-      if (entry.protected) summary.textContent = t("加密文章 · 输入密码后阅读全文");
-      else {
-        const content = entry.content || entry.summary || '';
-        const lower = content.toLowerCase();
-        const offsets = keywords.map(word => lower.indexOf(word)).filter(index => index >= 0);
-        const start = offsets.length ? Math.max(0, Math.min(...offsets) - 32) : 0;
-        const text = content.slice(start, start + 150);
-        highlight(summary, `${start ? '…' : ''}${text}${start + 150 < content.length ? '…' : ''}`, keywords);
+      highlight(title, entry.title, pattern);
+      const previews = entry.protected ? [t("加密文章 · 输入密码后阅读全文")] :
+        snippets(entry.content || entry.summary || '', pattern, scope === 'all' ? snippetLimit : 1);
+      body.append(title);
+      for (const preview of previews) {
+        const summary = document.createElement('p');
+        summary.className = 'search-result-summary';
+        highlight(summary, preview, entry.protected ? null : pattern);
+        body.append(summary);
       }
       const meta = document.createElement('small');
       meta.textContent = [entry.date, entry.protected ? t("加密文章") : entry.topics].filter(Boolean).join(' · ');
       const arrow = document.createElement('span'); arrow.className = 'search-result-arrow'; arrow.textContent = '↗'; arrow.setAttribute('aria-hidden', 'true');
-      body.append(title, summary, meta); link.append(icon, body, arrow);
+      body.append(meta); link.append(icon, body, arrow);
       item.append(link);
       return item;
     }));

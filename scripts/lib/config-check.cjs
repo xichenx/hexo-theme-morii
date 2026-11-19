@@ -24,6 +24,8 @@ function inspect(config, site = {}, knownKeys) {
   for (const field of ['friends_feed.endpoint', 'music.meting.api', 'github_calendar.api']) if (get(field) && !https(get(field))) add('error', field, '必须为完整 HTTP(S) 地址。');
   for (const field of ['accent', 'accent_dark']) if (get(field) != null && !/^#[\da-f]{6}$/i.test(get(field))) add('error', field, '使用六位十六进制颜色，如 #5568f6。');
   for (const field of ['search.page_size', 'search.shard_size']) if (get(field) != null && (!Number.isInteger(get(field)) || get(field) < 1)) add('error', field, '必须为正整数。');
+  const snippetLimit = config.search?.snippets_per_article;
+  if (snippetLimit != null && (!Number.isInteger(snippetLimit) || snippetLimit < 1 || snippetLimit > 3)) add('error', 'search.snippets_per_article', '填写 1–3 范围内的整数。');
   for (const field of ['menu', 'explore']) if (config[field] != null && config[field] !== false) {
     if (!Array.isArray(config[field])) add('error', field, '必须为导航列表。');
     else config[field].forEach((item, index) => { if (!item || typeof item.path !== 'string' || !item.path.trim() || /^(?:javascript:|data:|\/\/)/i.test(item.path) || /[\\\u0000-\u001f]/.test(item.path)) add('error', `${field}[${index}].path`, '填写站内路径或 HTTP(S) 链接。'); });

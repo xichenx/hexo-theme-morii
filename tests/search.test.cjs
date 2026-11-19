@@ -6,10 +6,11 @@ const path = require('node:path');
 const { JSDOM } = require('jsdom');
 const source = fs.readFileSync(path.join(__dirname, '../source/js/search.js'), 'utf8');
 const settle = () => new Promise(resolve => setImmediate(resolve));
-function fixture(fetcher) {
+function fixture(fetcher, snippetLimit) {
   const items = Array.from({ length: 7 }, (_, i) => `<li data-topics="Hexo"><a href="/post/${i}"><strong>笔记 ${i}</strong><p class="search-result-summary">主题配置方法 ${i}</p><small>2026.10.16</small></a></li>`).join('');
   const dom = new JSDOM(`<dialog id="search-dialog" open data-search-index="/morii-search.json" data-page-size="5"><input id="search-input"><button id="search-clear" hidden>清空</button><div class="search-scope"><button data-search-scope="all" aria-pressed="true">全部</button><button data-search-scope="title" aria-pressed="false">标题</button><button data-search-scope="topics" aria-pressed="false">分类</button></div><button data-search-term="Hexo">Hexo</button><div class="search-scroll"><strong id="search-results-heading"></strong><p id="search-status"></p><div class="search-empty" hidden></div><ul id="search-results">${items}</ul><button id="search-more" hidden>更多</button></div><p id="search-service-status"></p><button id="search-retry" hidden>重试</button></dialog>`, { url: 'https://example.test/', runScripts: 'outside-only', pretendToBeVisual: true });
   const w = dom.window; let fetches = 0;
+  if (snippetLimit != null) w.document.getElementById('search-dialog').dataset.snippetsPerArticle = snippetLimit;
   w.fetch = async () => { fetches++; return fetcher ? fetcher(fetches) : { ok: true, json: async () => [] }; };
   w.eval(source);
   const d = w.document;
@@ -21,6 +22,25 @@ test('initial results paginate and fallback search remains available before the 
   f.query('配置 3'); assert.equal(f.links().length, 1); assert.equal(f.d.querySelector('#search-clear').hidden, false);
   f.d.querySelector('#search-clear').click(); assert.equal(f.links().length, 5); assert.equal(f.d.activeElement.id, 'search-input');
   assert.equal(f.d.querySelector('#search-clear').hidden, true); f.dom.window.close();
+});
+test('full-text results preview separated hits under one link and honor the snippet limit', async () => {
+  const body = ['ORIONCACHE nearby orioncache', 'nebularender', 'stellarqueue'].join(' ' + 'filler '.repeat(35));
+  const entries = [{ title: 'Technical notes', url: '/notes/', content: body }];
+  for (const [limit, expected] of [[undefined, 2], [1, 1], [3, 3], [9, 2]]) {
+    const f = fixture(() => ({ ok: true, json: async () => entries }), limit);
+    try {
+      await f.open();
+      f.query('orioncache nebularender stellarqueue');
+      assert.equal(f.links().length, 1);
+      const snippets = [...f.links()[0].querySelectorAll('.search-result-summary')];
+      assert.equal(snippets.length, expected);
+      assert.deepEqual(snippets.map(node => [...node.querySelectorAll('mark')].map(mark => mark.textContent)),
+        [['ORIONCACHE', 'orioncache'], ['nebularender'], ['stellarqueue']].slice(0, expected));
+      assert.equal(new URL(f.links()[0].href).pathname, '/notes/');
+      f.query('');
+      assert.equal(f.links()[0].querySelectorAll('.search-result-summary').length, 1);
+    } finally { f.dom.window.close(); }
+  }
 });
 test('full-text search ranks title matches, filters by scope and resets scope for suggested tags', async () => {
   const entries = [

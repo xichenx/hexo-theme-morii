@@ -20,6 +20,7 @@ const options = {
     github_calendar: { enable: false }, comments: { enable: false }, friends_feed: { endpoint: '' }
   },
   sourceOverrides: {
+    '_posts/search-matches.md': '---\ntitle: Search matches fixture\ndate: 2020-02-01 00:00:00\npermalink: posts/search-matches/\n---\n\nOverview.\n\n<!-- more -->\n\norioncache ' + 'Ordinary prose. '.repeat(22) + '\n\nnebularender\n',
     '_posts/layout-stress.md': longArticle,
     '_posts/code-styles.md': codeArticle,
     '_posts/lazy-images.md': `---

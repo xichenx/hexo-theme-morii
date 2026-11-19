@@ -70,6 +70,7 @@ search:
   shard_size: 100 # 超过此篇数使用分片；标题/分类搜索无需下载全文分片
   content: true
   page_size: 10
+  snippets_per_article: 2 # 正文搜索每篇最多显示多少处命中片段（1–3）
 reading_list:
   enable: true
 quick_navigation:

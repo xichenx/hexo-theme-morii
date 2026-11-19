@@ -35,6 +35,7 @@
 .search-result-content { min-width: 0; }
 .search-dialog #search-results .search-result-title { display: block; color: var(--ink); font-size: 15px; font-weight: 750; line-height: 1.6; }
 .search-dialog #search-results .search-result-summary { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin: 5px 0 8px; color: var(--muted); font-size: 12px; line-height: 1.8; }
+.search-dialog #search-results .search-result-summary + .search-result-summary { margin-top:-2px; }
 .search-dialog #search-results small { display: block; color: var(--muted); white-space: normal; font-size: 10px; line-height: 1.6; }
 .search-result-arrow { color: var(--muted); margin-top: 3px; transition: color .18s; }
 .search-dialog #search-results a:is(:hover, :focus-visible) .search-result-arrow { color: var(--accent); }
