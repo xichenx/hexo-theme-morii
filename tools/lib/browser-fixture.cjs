@@ -17,9 +17,15 @@ const options = {
     },
     clock: { enable: true, city: '布局测试城市', latitude: 0, longitude: 0, timezone: 'UTC' },
     music: { meting: { enable: false }, tracks: [] },
-    github_calendar: { enable: false }, comments: { enable: false }, friends_feed: { endpoint: 'https://feed.example.test/articles?source=fixture', page_size: 2 }
+    github_calendar: { enable: false },
+    comments: { enable: true, env_id: 'https://comments.example.test/', script_url: '/test-comments.js', load_mode: 'manual' },
+    friends_feed: { endpoint: 'https://feed.example.test/articles?source=fixture', page_size: 2 }
   },
   sourceOverrides: {
+    ...Object.fromEntries(['manual', 'viewport', 'immediate'].map(mode => [
+      `comments/${mode}/index.md`,
+      `---\ntitle: 留言板 ${mode}\ncomments: true\n${mode === 'manual' ? '' : 'comments_load: ' + mode + '\n'}---\n\n<div style="height:2400px">欢迎留言。</div>\n`
+    ])),
     '_data/essay.yml': yaml.dump([
       { home_essay: true, essay_list: [
         { content: 'October note', date: new Date('2026-10-15T00:00:00Z') },

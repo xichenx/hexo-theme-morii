@@ -165,8 +165,20 @@
   };
   const whenVisible = (element, action) => {
     if (typeof IntersectionObserver !== 'function') { if (element === recent) action(); return; }
-    const observer = new IntersectionObserver(entries => { if (entries.some(entry => entry.isIntersecting)) { observer.disconnect(); action(); } }, { rootMargin: '180px' });
+    let active = true;
+    const stop = () => {
+      if (!active) return;
+      active = false;
+      observer.disconnect();
+    };
+    const observer = new IntersectionObserver(entries => {
+      if (active && entries.some(entry => entry.isIntersecting)) {
+        stop();
+        action();
+      }
+    }, { rootMargin: '180px' });
     observer.observe(element);
+    return stop;
   };
   if (recent) {
     let pending = false;
@@ -200,8 +212,11 @@
   const button = document.getElementById('comments-load');
   let loading = false;
   let loaded = false;
+  let stopObserving;
   const loadComments = async () => {
     if (loading || loaded) return;
+    stopObserving?.();
+    stopObserving = undefined;
     loading = true; button.disabled = true; service.setAttribute('aria-busy', 'true'); status.textContent = t("正在加载评论…");
     let initTimeout;
     try {
@@ -223,5 +238,7 @@
       console.warn('[Morii comments]', error); button.textContent = t("重新加载评论");
     } finally { clearTimeout(initTimeout); loading = false; button.disabled = false; service.setAttribute('aria-busy', 'false'); }
   };
-  button.addEventListener('click', loadComments); whenVisible(service, loadComments);
+  button.addEventListener('click', loadComments);
+  if (service.dataset.loadMode === 'immediate') loadComments();
+  else if (service.dataset.loadMode !== 'manual') stopObserving = whenVisible(service, loadComments);
 })();

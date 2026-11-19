@@ -21,6 +21,8 @@ function inspect(config, site = {}, knownKeys) {
     else if (config.comments.provider === 'waline' && !https(value)) add('error', field, '必须为完整 HTTP(S) 地址。');
     if (config.comments.script_url && !https(config.comments.script_url) && !/^\/(?!\/)/.test(config.comments.script_url)) add('error', 'comments.script_url', '必须为 HTTP(S) 地址或站内绝对路径。');
   }
+  const commentMode = config.comments?.load_mode;
+  if (commentMode != null && !['viewport', 'immediate', 'manual'].includes(commentMode)) add('error', 'comments.load_mode', '可选值：viewport, immediate, manual。');
   for (const field of ['friends_feed.endpoint', 'music.meting.api', 'github_calendar.api']) if (get(field) && !https(get(field))) add('error', field, '必须为完整 HTTP(S) 地址。');
   for (const field of ['accent', 'accent_dark']) if (get(field) != null && !/^#[\da-f]{6}$/i.test(get(field))) add('error', field, '使用六位十六进制颜色，如 #5568f6。');
   for (const field of ['search.page_size', 'search.shard_size']) if (get(field) != null && (!Number.isInteger(get(field)) || get(field) < 1)) add('error', field, '必须为正整数。');

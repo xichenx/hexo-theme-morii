@@ -165,6 +165,7 @@ featured: []
 comments:
   enable: false
   provider: twikoo # twikoo / waline
+  load_mode: viewport # viewport / immediate / manual；可用页面的 comments_load 覆盖
   server_url: ''  # 使用 Waline 时填写服务端地址
   style_url: ''   # Waline 样式地址，可自托管
   recent:

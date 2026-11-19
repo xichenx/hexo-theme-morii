@@ -51,3 +51,33 @@ test('recent comments use text nodes and reject off-site comment paths', async (
   assert.equal(w.document.querySelectorAll('[data-recent-list] li').length, 1); assert.equal(w.document.querySelector('[data-recent-list] img, [data-recent-list] script'), null);
   dom.window.close();
 });
+
+test('a manual attempt stops the viewport observer and a failed load can still be retried', async () => {
+  const dom = new JSDOM('<div id="comment-service" data-load-mode="viewport" data-env="https://comments.example/"><p class="comment-status"></p><button id="comments-load"></button><div id="twikoo"></div></div>', { runScripts: 'outside-only', url: 'https://blog.example/comments/' });
+  const w = dom.window;
+  let intersection;
+  let disconnected = 0;
+  let calls = 0;
+  w.IntersectionObserver = class {
+    constructor(callback) { intersection = callback; }
+    observe() {}
+    disconnect() { disconnected++; }
+  };
+  w.console.warn = () => {};
+  w.twikoo = { init: async () => { if (++calls === 1) throw new Error('Fixture rejected'); } };
+  try {
+    w.eval(fs.readFileSync(path.join(__dirname, '../source/js/services.js'), 'utf8'));
+    const button = w.document.getElementById('comments-load');
+    button.click();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(disconnected, 1);
+    assert.equal(button.hidden, false);
+    intersection([{ isIntersecting: true }]);
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(calls, 1);
+    button.click();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(calls, 2);
+    assert.equal(button.hidden, true);
+  } finally { dom.window.close(); }
+});

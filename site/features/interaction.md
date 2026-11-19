@@ -92,17 +92,17 @@ comments:
   env_id: https://twikoo.example.com
 ```
 
-`env_id` 具体格式取决于你部署 Twikoo 的方式，按 [Twikoo 前端配置说明](https://twikoo.js.org/frontend.html)填写。Morii 的页面会显示“加载评论”按钮，由访客点击后加载评论脚本。若某篇文章不想显示评论，可在文章 Front Matter 添加 `comments: false`。如果还没准备好后端，保持 `comments.enable: false`。
+`env_id` 具体格式取决于你部署 Twikoo 的方式，按 [Twikoo 前端配置说明](https://twikoo.js.org/frontend.html)填写。评论区默认在接近视口时加载，访客也可以点击「加载评论」提前加载。若某篇文章不想显示评论，可在文章 Front Matter 添加 `comments: false`。如果还没准备好后端，保持 `comments.enable: false`。
 
 ### 按这个顺序接入
 
 1. 先完成自己的 Twikoo 后端部署，取得环境标识或服务地址。
 2. 把示例的 `https://twikoo.example.com` 换成真实值。它是占位地址，不能直接使用。
-3. 保持 `provider: twikoo`；当前主题没有其他评论提供方的适配。
+3. 使用 Twikoo 时保持 `provider: twikoo`。使用 Waline 时参阅[增强配置说明](/config/iteration)。
 4. 在一篇文章中删除 `comments: false` 或改为 `comments: true`。
 5. 重新生成，打开**这篇文章**，点击“加载评论”，确认表单能正常出现。
 
-不要把管理密码、访问密钥写进 `env_id`，该值会出现在网页里。评论区是按需加载的，没有点击按钮就没显示表单属于正常行为。
+不要把管理密码、访问密钥写进 `env_id`，该值会出现在网页里。如果评论区尚未加载，可点击「加载评论」。
 
 | 现象 | 检查方法 |
 | --- | --- |
@@ -126,10 +126,19 @@ hexo new page comments
 ---
 title: 留言板
 comments: true
+comments_load: immediate
 ---
 
 欢迎留言，分享你的想法。
 ```
+
+用 `comments.load_mode` 设置全站默认加载方式。页面或文章可用 Front Matter 的 `comments_load` 覆盖，对 Twikoo 和 Waline 均有效。
+
+- `viewport`（默认）在评论区接近视口时加载。浏览器不支持视口检测时，保留手动按钮。
+- `immediate` 在页面打开后加载，适合留言板。
+- `manual` 等访客点击「加载评论」后再请求评论组件。
+
+加载失败后可以点击重试。全局评论关闭或页面为 `comments: false` 时，不会显示评论区。
 
 直接访问 `/comments/` 检查，确认正常后再把链接加入[菜单或探索入口](/features/customization)。创建文件和添加菜单是两个步骤。
 
