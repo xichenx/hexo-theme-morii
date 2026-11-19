@@ -667,5 +667,7 @@
   "按名称": "Name",
   "暂无标签": "No tags yet",
   "随机逛逛": "Visit a random site",
-  "随机逛逛（在新标签页打开）": "Visit a random site (opens in a new tab)"
+  "随机逛逛（在新标签页打开）": "Visit a random site (opens in a new tab)",
+  "朋友圈分页": "Friends feed pagination",
+  "本页 {0} 篇文章": "Posts on this page: {0}"
 }

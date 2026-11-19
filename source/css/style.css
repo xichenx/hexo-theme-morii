@@ -1527,6 +1527,11 @@ a.footer-filing__item:focus-visible { outline: 2px solid var(--accent); outline-
 .feed-card h3 a:hover { color: var(--accent); }
 .feed-card time { color: var(--muted); font-size: 11px; margin-top: auto; }
 .feed-actions { display: flex; justify-content: center; gap: 10px; margin-top: 23px; }
+.feed-actions,.feed-pagination { flex-wrap:wrap; }
+.feed-pagination { display:flex;align-items:center;justify-content:center;gap:10px 16px; }
+.feed-pagination button:disabled { opacity:.55;cursor:default; }
+#feed-page { color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums; }
+#feed-heading { scroll-margin-top:100px; }
 .music-hero { display: grid; grid-template-columns: 260px minmax(0, 1fr); align-items: center; gap: 50px; padding: 45px 55px; margin: 26px 0; overflow: hidden; }
 .music-artwork { aspect-ratio: 1; display: grid; place-items: center; border-radius: 28px; background: linear-gradient(135deg, #e8dcff, #c8d8ff); }
 .vinyl-record { width: 84%; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; background: repeating-radial-gradient(circle, #222736 0 2px, #343a4c 3px 4px); box-shadow: 0 16px 30px #23335b33; }

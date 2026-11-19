@@ -16,6 +16,7 @@ const PAGES = [
   'album/index.html',
   'album/morii/index.html',
   'link/index.html',
+  'fcircle/index.html',
   'music/index.html',
   'cinema/index.html',
   'series/index.html',

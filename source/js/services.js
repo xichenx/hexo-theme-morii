@@ -11,17 +11,25 @@
   if (feed) {
     const grid = feed.querySelector('.feed-grid');
     const status = feed.querySelector('.feed-status');
+    const heading = document.getElementById('feed-heading');
+    const pagination = feed.querySelector('.feed-pagination');
+    const pageLabel = document.getElementById('feed-page');
+    const previous = document.getElementById('feed-prev');
     const more = document.getElementById('feed-more');
     const retry = document.getElementById('feed-retry');
     const pageSize = Math.min(50, Math.max(1, Number(feed.dataset.pageSize) || 12));
     const endpoint = safeUrl(feed.dataset.feedEndpoint);
     const seen = new Set();
-    let offset = 0;
+    const pages = [];
+    let currentPage = 0;
+    let nextOffset = 0;
+    let failedPage;
+    let hasMore = true;
     let loading = false;
 
-    const renderEntry = entry => {
+    const createCard = entry => {
       const url = safeUrl(entry.link || entry.url);
-      if (!url || !entry.title || seen.has(url)) return;
+      if (!url || typeof entry.title !== 'string' || !entry.title.trim() || seen.has(url)) return;
       seen.add(url);
       const card = document.createElement('article');
       card.className = 'feed-card panel';
@@ -37,7 +45,7 @@
         meta.append(image);
       }
       const author = document.createElement('span');
-      author.textContent = entry.author || entry.name || t("朋友的博客");
+      author.textContent = [entry.author, entry.name].find(value => typeof value === 'string' && value.trim()) || t("朋友的博客");
       meta.append(author);
       const title = document.createElement('h3');
       const link = document.createElement('a');
@@ -47,55 +55,88 @@
       link.textContent = entry.title;
       title.append(link);
       const time = document.createElement('time');
-      const rawDate = String(entry.created || entry.date || entry.updated || '');
+      const rawDate = [entry.created, entry.date, entry.updated].find(value => typeof value === 'string' && value.trim()) || '';
       const parsed = new Date(rawDate);
       if (!Number.isNaN(parsed.getTime())) {
         time.dateTime = parsed.toISOString();
         time.textContent = parsed.toLocaleDateString((window.MoriiI18n?.locale || 'zh-CN'));
       }
       card.append(meta, title, time);
-      grid.append(card);
+      return card;
     };
 
-    const loadFeed = async () => {
+    const canAdvance = () => currentPage + 1 < pages.length || hasMore;
+    const syncPagination = () => {
+      pagination.hidden = !pages.length;
+      pageLabel.textContent = t("第 {0} 页", currentPage + 1);
+      previous.disabled = loading || currentPage === 0;
+      more.disabled = loading || failedPage != null || !canAdvance();
+      retry.hidden = failedPage == null || loading;
+    };
+    const showPage = (index, moveFocus) => {
+      currentPage = index;
+      failedPage = undefined;
+      grid.replaceChildren(...pages[index]);
+      status.textContent = t("本页 {0} 篇文章", pages[index].length) + (canAdvance() ? '' : t(" · 已经到底了"));
+      if (moveFocus) {
+        heading.focus({ preventScroll: true });
+        heading.scrollIntoView?.({ block: 'start', behavior: 'instant' });
+      }
+    };
+    const loadFeed = async (index, moveFocus = false) => {
       if (loading || !endpoint) return;
       loading = true;
-      more.disabled = true;
-      retry.hidden = true;
+      syncPagination();
       grid.setAttribute('aria-busy', 'true');
-      status.textContent = offset ? t("正在加载更多文章…") : t("正在寻找朋友们的新鲜事…");
+      status.textContent = index ? t("正在加载更多文章…") : t("正在寻找朋友们的新鲜事…");
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
       try {
         const url = new URL(endpoint);
-        url.searchParams.set('start', String(offset));
-        url.searchParams.set('end', String(offset + pageSize));
+        url.searchParams.set('start', String(nextOffset));
+        url.searchParams.set('end', String(nextOffset + pageSize));
         const response = await fetch(url.href, { signal: controller.signal, credentials: 'omit', referrerPolicy: 'no-referrer' });
         if (!response.ok) throw new Error('Feed unavailable');
         const payload = await response.json();
         const items = Array.isArray(payload) ? payload : payload.article_data ?? payload.items ?? payload.data?.article_data ?? payload.data;
         if (!items || typeof items !== 'object') throw new Error('Unexpected feed response');
         const entries = Array.isArray(items) ? items : Object.values(items);
-        const previousCount = seen.size;
-        entries.filter(item => item && typeof item === 'object').forEach(renderEntry);
-        offset += entries.length;
-        const hasMore = entries.length >= pageSize && seen.size > previousCount;
-        more.hidden = !hasMore;
-        status.textContent = seen.size ? t("已收集 {0} 篇朋友的文章{1}", seen.size, hasMore ? '' : t(" · 已经到底了")) : t("朋友们还没有新的文章，先去他们的博客坐坐吧。");
+        const cards = entries.filter(item => item && typeof item === 'object').map(createCard).filter(Boolean);
+        nextOffset += entries.length;
+        hasMore = entries.length >= pageSize && cards.length > 0;
+        failedPage = undefined;
+        if (cards.length) {
+          pages.push(cards);
+          showPage(index, moveFocus);
+        } else if (pages.length) {
+          showPage(currentPage, moveFocus);
+        } else {
+          status.textContent = t("朋友们还没有新的文章，先去他们的博客坐坐吧。");
+        }
       } catch {
-        status.textContent = seen.size ? t("更多文章暂时加载失败，已加载的内容仍可阅读。") : t("暂时连不上朋友圈，稍后重试，或从下方友链继续逛逛。");
-        retry.hidden = false;
-        more.hidden = true;
+        failedPage = index;
+        status.textContent = pages.length ? t("更多文章暂时加载失败，已加载的内容仍可阅读。") : t("暂时连不上朋友圈，稍后重试，或从下方友链继续逛逛。");
       } finally {
         clearTimeout(timeout);
         loading = false;
-        more.disabled = false;
+        syncPagination();
         grid.setAttribute('aria-busy', 'false');
+        if (failedPage != null && moveFocus) retry.focus({ preventScroll: true });
       }
     };
-    more.addEventListener('click', loadFeed);
-    retry.addEventListener('click', loadFeed);
-    if (endpoint) loadFeed();
+    const goToPage = index => {
+      if (loading || index < 0) return;
+      if (index < pages.length) {
+        showPage(index, true);
+        syncPagination();
+      } else if (canAdvance()) {
+        loadFeed(index, true);
+      }
+    };
+    previous.addEventListener('click', () => goToPage(currentPage - 1));
+    more.addEventListener('click', () => goToPage(currentPage + 1));
+    retry.addEventListener('click', () => { if (failedPage != null) loadFeed(failedPage, true); });
+    if (endpoint) loadFeed(0);
     else {
       grid.setAttribute('aria-busy', 'false');
       status.textContent = t("先去朋友们的博客坐坐，动态会在接入后显示在这里。");

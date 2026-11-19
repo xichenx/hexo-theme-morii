@@ -17,7 +17,7 @@ const options = {
     },
     clock: { enable: true, city: '布局测试城市', latitude: 0, longitude: 0, timezone: 'UTC' },
     music: { meting: { enable: false }, tracks: [] },
-    github_calendar: { enable: false }, comments: { enable: false }, friends_feed: { endpoint: '' }
+    github_calendar: { enable: false }, comments: { enable: false }, friends_feed: { endpoint: 'https://feed.example.test/articles?source=fixture', page_size: 2 }
   },
   sourceOverrides: {
     '_data/link.yml': yaml.dump([

@@ -2,13 +2,16 @@ section.feed-section(data-feed-endpoint=morii_safe_url(theme.friends_feed && the
   .section-heading
     div
       span.section-kicker FRIENDS JOURNAL
-      h2 #{morii_t("朋友们的最新文章")}
+      h2#feed-heading(tabindex='-1') #{morii_t("朋友们的最新文章")}
     if morii_has_page('/link/')
       a.text-link(href=url_for('/link/')) #{morii_t("友人帐 →")}
   p.feed-status(role='status' aria-live='polite') #{morii_t("正在寻找朋友们的新鲜事…")}
-  .feed-grid(aria-busy='true')
+  .feed-grid#feed-grid(aria-busy='true')
   .feed-actions
-    button.button.service-button#feed-more(type='button' hidden) #{morii_t("加载更多")}
+    nav.feed-pagination(aria-label=morii_t("朋友圈分页") hidden)
+      button.button.service-button#feed-prev(type='button' aria-controls='feed-grid' disabled) #{morii_t("上一页")}
+      span#feed-page(aria-current='page')
+      button.button.service-button#feed-more(type='button' aria-controls='feed-grid' disabled) #{morii_t("下一页")}
     button.button.service-button#feed-retry(type='button' hidden) #{morii_t("重新加载")}
   noscript
     p #{morii_t("开启 JavaScript 后可以查看最新文章，或直接浏览下方友链。")}
