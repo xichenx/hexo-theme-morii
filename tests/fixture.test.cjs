@@ -19,8 +19,13 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
         assert.equal(backToTop.textContent.trim(), '↑');
         assert.equal(backToTop.hasAttribute('data-back-top-percent'), false);
         const promo = document.querySelector('.theme-promo');
-        assert.equal(promo.querySelector('h2').textContent, 'Morii');
-        assert.equal(promo.querySelector('img').getAttribute('src'), `${prefix}icons/brand/morii-orbit-nav.png`);
+        const wordmark = promo.querySelector('h2 img');
+        assert.equal(wordmark.alt, 'Morii');
+        assert.equal(wordmark.getAttribute('src'), `${prefix}icons/brand/morii-promo-wordmark.webp`);
+        assert.equal(promo.querySelector('.theme-promo__cover').getAttribute('href'), 'https://github.com/xichenx/hexo-theme-morii#quick-start');
+        assert.equal(promo.querySelector('.theme-promo__secondary').getAttribute('href'), 'https://github.com/xichenx/hexo-theme-morii');
+        assert.equal(document.querySelector('[data-random]').dataset.randomAutoplay, 'on');
+        assert.equal(document.querySelectorAll('[data-random] button').length, 1);
         assert.equal(document.querySelector('.hero-mini--quote, .hero-mini--stats'), null);
       }
       if (file === 'page/2/index.html') assert.equal(document.querySelector('.theme-promo'), null);
@@ -222,9 +227,11 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
     const themePromo = monthly ? { enable: false, journal_below: true } : {
       docs_url: '/about/', repository_url: 'javascript:invalid', journal_below: true
     };
-    const output = await buildDemo({ root: '/theme/', url: 'https://example.test', siteOverrides: { archive_dir: 'history', archive_generator: { monthly }, category_generator: { per_page: 1 } }, themeOverrides: { footer: { nav: false }, appearance: { layouts, effects: { enable: false } }, home: { theme_promo: themePromo } } });
+    const output = await buildDemo({ root: '/theme/', url: 'https://example.test', siteOverrides: { archive_dir: 'history', archive_generator: { monthly }, category_generator: { per_page: 1 } }, themeOverrides: { footer: { nav: false }, appearance: { layouts, effects: { enable: false } }, home: { theme_promo: themePromo, random: { autoplay: false } } } });
     const documentFor = file => new JSDOM(fs.readFileSync(path.join(output, file, 'index.html'), 'utf8')).window.document;
     const home = documentFor('');
+    assert.equal(home.querySelector('[data-random]').dataset.randomAutoplay, 'off');
+    assert.ok(home.querySelector('[data-random-refresh]'));
     if (monthly) {
       assert.equal(home.querySelector('.theme-promo'), null);
       assert.equal(home.querySelector('.hero__journal'), null);

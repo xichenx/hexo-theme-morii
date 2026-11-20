@@ -65,6 +65,7 @@ home:
     limit: 5
   random:
     enable: true
+    autoplay: true # 随便逛逛自动换文，关闭后仍可手动换一篇
   selected_limit: 3
   # 可填写文章标题或文章路径，顺序即展示顺序。
   selected_posts: []

@@ -36,17 +36,19 @@ block content
         .hero__signature= siteIdentity.brand
       if themePromo
         section.theme-promo(aria-labelledby='theme-promo-title')
-          .theme-promo__art(aria-hidden='true')
-            img(src=url_for('/icons/brand/morii-orbit-nav.png') alt='' width='112' height='112' decoding='async')
-          .theme-promo__body
-            span.section-kicker #{morii_t("开源 Hexo 主题")}
-            h2#theme-promo-title Morii
-            p #{morii_t("卡片式布局，配备站内搜索、阅读工具和音乐馆。")}
-            .theme-promo__actions
-              if themePromo.docs
-                a.button.theme-promo__primary(href=themePromo.docs) #{morii_t("安装指南")} #[span(aria-hidden='true') ↗]
-              if themePromo.source
-                a.button(href=themePromo.source) #{morii_t("GitHub 源码")} #[span(aria-hidden='true') ↗]
+          .theme-promo__wordmark
+            h2#theme-promo-title
+              img(src=url_for('/icons/brand/morii-promo-wordmark.webp') alt='Morii' width='800' height='400' decoding='async')
+            if !theme.motion || theme.motion.enable !== false
+              include includes/promo-ink.pug
+          .theme-promo__footer
+            span #{morii_t("开源 Hexo 主题")}
+            if themePromo.docs || themePromo.source
+              .theme-promo__actions
+                if themePromo.source
+                  a.button(class=themePromo.docs ? 'theme-promo__secondary' : 'theme-promo__cover' href=themePromo.source) #{morii_t("GitHub 源码")} #[span(aria-hidden='true') ↗]
+                if themePromo.docs
+                  a.button.theme-promo__cover(href=themePromo.docs) #{morii_t("安装指南")} #[span(aria-hidden='true') ↗]
         if themePromo.journalBelow
           .hero__journal
             +homeJournal()

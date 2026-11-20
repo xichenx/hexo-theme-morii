@@ -1,5 +1,6 @@
 'use strict';
 const { test, expect } = require('@playwright/test');
+const { prefix } = require('../../tools/lib/browser-fixture.cjs');
 const { installHooks, ready, noOverflow } = require('./helpers.cjs');
 installHooks(test);
 test.use({ reducedMotion: 'no-preference' });
@@ -12,7 +13,6 @@ test('discovery card controls fit mobile widths and moment paging stays usable',
   const previous = moments.getByRole('button', { name: '上一条即刻' });
   const next = moments.getByRole('button', { name: '下一条即刻' });
   const date = moments.locator('.moment-item:visible time');
-  const playback = random.locator('[data-random-autoplay]');
   const refresh = random.locator('[data-random-refresh]');
   const count = moments.locator('[data-moment-count]');
 
@@ -22,14 +22,13 @@ test('discovery card controls fit mobile widths and moment paging stays usable',
   await previous.click();
   await expect(count).toHaveText('1 / 2');
   await expect(moments.locator('.moment-item:visible')).toContainText('October note');
-  await playback.click();
-  await expect(playback).toHaveText('继续轮播');
+  await expect(random.getByRole('button')).toHaveCount(1);
 
   if (viewport.width <= 580) {
     await expect(discovery).toHaveCSS('row-gap', '12px');
     for (const width of [viewport.width, 320]) {
       await page.setViewportSize({ width, height: viewport.height });
-      for (const control of [previous, next, playback, refresh]) {
+      for (const control of [previous, next, refresh]) {
         expect((await control.boundingBox()).height).toBeGreaterThanOrEqual(44);
       }
       const dateBox = await date.boundingBox();
@@ -40,8 +39,6 @@ test('discovery card controls fit mobile widths and moment paging stays usable',
         const button = await previous.boundingBox();
         return Math.abs(time.y + time.height / 2 - button.y - button.height / 2);
       }).toBeLessThan(1);
-      const controls = await random.locator('.random-controls').boundingBox();
-      expect((await playback.boundingBox()).x).toBeCloseTo(controls.x, 0);
       await expect(page.locator('#back-to-top')).toBeVisible();
       const backToTop = await page.locator('#back-to-top').boundingBox();
       for (const control of [next, refresh]) {
@@ -63,14 +60,16 @@ test('random articles rotate in view, pause for interaction and respect reduced 
     const animate = Element.prototype.animate;
     window.discoverySlides = [];
     Element.prototype.animate = function (keyframes, options) {
-      if (this.matches('.random-result')) window.discoverySlides.push(keyframes.map(frame => frame.transform));
+      if (this.matches('.random-result')) window.discoverySlides.push({
+        frames: keyframes.map(({ transform, opacity }) => [transform, opacity]),
+        total: options.duration + (options.delay || 0)
+      });
       return animate.call(this, keyframes, options);
     };
   });
   await ready(page);
   const card = page.locator('[data-random]');
   const link = card.locator('[data-random-link]');
-  const playback = card.locator('[data-random-autoplay]');
   const manual = card.locator('[data-random-refresh]');
   await page.locator('.site-footer').scrollIntoViewIfNeeded();
   await expect(card).not.toBeInViewport();
@@ -86,7 +85,8 @@ test('random articles rotate in view, pause for interaction and respect reduced 
   await page.clock.fastForward(8000);
   await expect(link).not.toHaveAttribute('href', initial);
   expect(await page.evaluate(() => window.discoverySlides)).toEqual([
-    ['translateX(0)', 'translateX(-100%)'], ['translateX(100%)', 'translateX(0)']
+    { frames: [['translateX(0)', 1], ['translateX(-14px)', 0]], total: 140 },
+    { frames: [['translateX(18px)', 0], ['translateX(0)', 1]], total: 300 }
   ]);
   expect((await card.boundingBox()).height).toBeCloseTo(initialHeight, 1);
 
@@ -98,22 +98,16 @@ test('random articles rotate in view, pause for interaction and respect reduced 
     await page.mouse.move(1, 1);
   }
 
-  await playback.press('Enter');
-  await expect(playback).toHaveText('继续轮播');
-  await playback.evaluate(button => button.blur());
+  await manual.focus();
   const paused = await link.getAttribute('href');
   await page.clock.fastForward(8000);
   await expect(link).toHaveAttribute('href', paused);
-  await playback.press('Enter');
-  await expect(playback).toHaveText('暂停轮播');
-  await page.clock.fastForward(8000);
-  await expect(link).toHaveAttribute('href', paused);
-  await playback.evaluate(button => button.blur());
+  await manual.evaluate(button => button.blur());
+  await page.clock.runFor(100);
   await page.clock.fastForward(8000);
   await expect(link).not.toHaveAttribute('href', paused);
 
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await expect(playback).toBeHidden();
   const stopped = await link.getAttribute('href');
   await page.clock.fastForward(8000);
   await expect(link).toHaveAttribute('href', stopped);
@@ -121,4 +115,27 @@ test('random articles rotate in view, pause for interaction and respect reduced 
   await expect(link).not.toHaveAttribute('href', stopped);
   await expect(card.locator('.random-result--outgoing')).toHaveCount(0);
   await noOverflow(page);
+});
+
+test('turning autoplay off keeps manual article rotation', async ({ page }) => {
+  await page.clock.install();
+  await page.route(url => url.pathname === prefix, async route => {
+    const response = await route.fetch();
+    const body = (await response.text()).replace('data-random-autoplay="on"', 'data-random-autoplay="off"');
+    await route.fulfill({ response, body });
+  });
+  await ready(page);
+  const card = page.locator('[data-random]');
+  const link = card.locator('[data-random-link]');
+  await expect(card).toHaveAttribute('data-random-autoplay', 'off');
+  await card.scrollIntoViewIfNeeded();
+  await expect(card).toBeInViewport({ ratio: .35 });
+  await page.mouse.move(1, 1);
+  const initial = await link.getAttribute('href');
+  await page.clock.runFor(160);
+  await page.clock.fastForward(8000);
+  await expect(link).toHaveAttribute('href', initial);
+  await card.locator('[data-random-refresh]').click();
+  await expect(link).not.toHaveAttribute('href', initial);
+  await expect(card.locator('.random-result--outgoing')).toHaveCount(0);
 });

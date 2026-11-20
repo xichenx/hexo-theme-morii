@@ -32,7 +32,7 @@ html[data-motion=on] .navigation-card:hover{translate:0 -3px}
 html[data-motion=on] .post-card__media img{transition:transform .65s cubic-bezier(.22,1,.36,1)}
 }
 @keyframes morii-orbit{from{transform:translate(0,0) scale(1)}
-to{transform:translate(-14px,12px) scale(1.045)}
+to{transform:translate(-22px,18px) scale(1.07)}
 }
 @keyframes morii-dot{0%,100%{box-shadow:0 0 0 0 #bceeff00}
 50%{box-shadow:0 0 0 6px #bceeff22}

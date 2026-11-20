@@ -2,6 +2,10 @@
   const root = document.documentElement;
   const main = document.getElementById('main');
   if (!main) return;
+  const promo = main.querySelector('.theme-promo');
+  const inkEnd = promo?.querySelector('[data-ink-end]');
+  const finishWriting = () => promo?.removeAttribute('data-writing');
+  inkEnd?.addEventListener('animationend', finishWriting);
   const preference = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
   const selector = '.hero__main, .hero-mini, .theme-promo, .section-heading, .feature-card, .post-card, .profile-card, .side-card, .discovery-card, .selected-card, .friend-card, .feed-card, .photo-card, .taxonomy-card, .related-card, .archive-tree-item, .page-intro:not(.music-page-heading), .article-header';
   const seen = new WeakSet();
@@ -25,6 +29,7 @@
     } catch { /* Keep the normal, visible page if animation is unavailable. */ }
   };
   const stop = () => {
+    finishWriting();
     reveals?.disconnect(); ambient?.disconnect(); changes?.disconnect();
     reveals = ambient = changes = undefined;
     for (const element of active.keys()) cancel(element);
@@ -60,6 +65,7 @@
           });
           return;
         }
+        if (element === promo && inkEnd && !element.contains(document.activeElement)) element.setAttribute('data-writing', '');
         const order = groups.get(element.parentElement) || 0;
         groups.set(element.parentElement, order + 1);
         // Stagger siblings, not unrelated sections; no baseline CSS hides content.
@@ -78,7 +84,10 @@
   };
   const visibility = () => {
     root.toggleAttribute('data-motion-paused', document.hidden);
-    if (document.hidden) for (const element of active.keys()) cancel(element);
+    if (document.hidden) {
+      finishWriting();
+      for (const element of active.keys()) cancel(element);
+    }
   };
   // Keyboard users never wait for an entry animation to finish before seeing a focused control.
   main.addEventListener('focusin', event => {

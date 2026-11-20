@@ -3,7 +3,7 @@ extends includes/layout.pug
 block content
   - var articleCover = page.top_img === false ? null : page.top_img || page.cover
   - var heroCover = articleCover ? morii_cover(articleCover, page, 'hero') : null
-  header.article-header.post-hero(class=articleCover ? 'has-cover' : '' data-cover-frame=articleCover ? '' : null style=heroCover && heroCover.color && (!theme.images || theme.images.cover_tone !== false) ? '--cover-tone:' + heroCover.color : null)
+  header.article-header.post-hero(class=articleCover ? 'has-cover' : '' data-header-backdrop=articleCover ? 'inverse' : 'surface' data-cover-frame=articleCover ? '' : null style=heroCover && heroCover.color && (!theme.images || theme.images.cover_tone !== false) ? '--cover-tone:' + heroCover.color : null)
     if articleCover
       img.article-cover(src=heroCover.src srcset=heroCover.srcset sizes=heroCover.sizes width=heroCover.width height=heroCover.height alt='' aria-hidden='true' fetchpriority='high' decoding='async')
     .post-hero-inner

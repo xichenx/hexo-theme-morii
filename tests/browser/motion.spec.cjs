@@ -85,3 +85,20 @@ test('changing reduced motion cancels entrances and ambient movement', async ({ 
   await expect(page.locator('.navigation-card').first()).toHaveCSS('animation-name', 'none');
   await expect(page.locator('.navigation-card').first()).toBeVisible();
 });
+
+test('the Morii wordmark writes once and settles into the complete artwork', async ({ page }) => {
+  await ready(page);
+  const promo = page.getByRole('region', { name: 'Morii', exact: true });
+  const wordmark = promo.getByRole('heading', { name: 'Morii' });
+  await promo.scrollIntoViewIfNeeded();
+  await expect(promo).toHaveAttribute('data-writing', '');
+  await expect(wordmark).toHaveCSS('mask-image', /morii-promo-ink/);
+  await expect(promo.locator('[data-ink-end]')).toHaveCSS('animation-name', 'morii-write');
+  await expect(promo).not.toHaveAttribute('data-writing', '');
+  await expect(wordmark).toHaveCSS('mask-image', 'none');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.reload({ waitUntil: 'load' });
+  await promo.scrollIntoViewIfNeeded();
+  await expect(promo).not.toHaveAttribute('data-writing', '');
+  await expect(wordmark).toHaveCSS('mask-image', 'none');
+});

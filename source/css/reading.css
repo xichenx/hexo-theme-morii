@@ -1,18 +1,21 @@
 .reading-layout{--reading-sidebar-width:280px;grid-template-columns:minmax(0,1fr) var(--reading-sidebar-width);gap:24px;padding-top:24px}
 .header-post-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.article-header{position:relative;isolation:isolate;overflow:hidden;padding:32px 40px;background:linear-gradient(115deg,var(--surface-2),var(--surface))}
+.article-header{--hero-top:32px;position:relative;isolation:isolate;overflow:hidden;padding:calc(var(--hero-top) + var(--header-overlap,0px)) 40px 32px;background:linear-gradient(115deg,var(--surface-2),var(--surface))}
 .article-header.has-cover{
+  --hero-top:clamp(32px,4vw,56px);
   --hero-shade:color-mix(in srgb,#101827 82%,var(--cover-tone,#27365b));
   --hero-backdrop:radial-gradient(ellipse at 75% 0%,color-mix(in srgb,var(--cover-tone,#445b97) 40%,#25334e),var(--hero-shade) 72%);
-  min-height:clamp(280px,25vw,360px);display:flex;flex-direction:column;justify-content:center;
-  padding:clamp(32px,4vw,56px) max(var(--page-gutter),20px);background:var(--hero-backdrop);color:#fff
+  min-height:calc(clamp(280px,25vw,360px) + var(--header-overlap,0px));display:flex;flex-direction:column;justify-content:center;
+  padding:calc(var(--hero-top) + var(--header-overlap,0px)) max(var(--page-gutter),20px) var(--hero-top);background:var(--hero-backdrop);color:#fff
 }
 .article-header .article-cover{position:absolute;z-index:-2;inset:0;width:100%;height:100%;max-height:none;margin:0;border-radius:0;object-fit:cover;object-position:center 48%}
 .article-header.has-cover::after{
   content:"";position:absolute;z-index:-1;inset:0;background:
+    var(--cover-top-scrim),
     linear-gradient(90deg,var(--hero-shade),color-mix(in srgb,var(--hero-shade) 91%,transparent) 42%,transparent 84%),
     linear-gradient(0deg,color-mix(in srgb,var(--hero-shade) 56%,transparent),transparent 52%)
 }
+.article-header.has-cover{--cover-top-scrim:linear-gradient(#0c13299c var(--header-overlap,0px),transparent calc(var(--header-overlap,0px) + 42px))}
 .article-header.has-cover[data-image-state=loading]{background:var(--hero-backdrop);animation:none}
 .article-header.has-cover[data-image-state=error]::before{content:none}
 .article-header .article-kicker{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:20px;letter-spacing:.04em}
@@ -155,9 +158,9 @@
 .post-hero-inner{width:100%;min-width:0}
 .has-cover .post-hero-inner{width:min(52%,620px)}
 @media(max-width:720px){
-  .article-header.has-cover{min-height:300px;justify-content:flex-end;padding-block:132px 28px}
-  .article-header.has-cover::after{background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--hero-shade) 20%,transparent) 56px,var(--hero-shade) 142px)}
-  .article-header .article-cover{height:200px;object-position:center 45%}
+  .article-header.has-cover{--hero-top:132px;min-height:calc(300px + var(--header-overlap,0px));justify-content:flex-end;padding-block-end:28px}
+  .article-header.has-cover::after{background:var(--cover-top-scrim),linear-gradient(180deg,transparent,color-mix(in srgb,var(--hero-shade) 20%,transparent) calc(56px + var(--header-overlap,0px)),var(--hero-shade) calc(142px + var(--header-overlap,0px)))}
+  .article-header .article-cover{height:calc(200px + var(--header-overlap,0px));object-position:center 45%}
   .has-cover .post-hero-inner{width:100%}
 }
 .article-copyright{margin:24px clamp(20px,4vw,40px);padding:20px 24px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:14px;background:var(--surface-2);font-size:14px;line-height:1.7;overflow-wrap:anywhere}
@@ -168,7 +171,7 @@
 .article-copyright dd{margin:0;min-width:0}
 .article-copyright a{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
 @media(max-width:580px){.article-copyright{padding:18px}.article-copyright dl>div{grid-template-columns:1fr;gap:2px}}
-@media (max-width:600px){.article-header{padding:28px 20px}
+@media (max-width:600px){.article-header{--hero-top:28px;padding-inline:20px;padding-block-end:28px}
 .article-header h1{font-size:clamp(25px,7vw,32px);line-height:1.4}
 .article-breadcrumb [aria-current]{max-width:18ch}
 }

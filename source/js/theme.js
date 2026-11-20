@@ -77,6 +77,22 @@
   });
 
   const menu = document.querySelector('.site-nav');
+  const siteHeader = document.querySelector('.site-header');
+  if (siteHeader) {
+    const backdrop = document.querySelector('main [data-header-backdrop="inverse"]');
+    let headerFrame;
+    const updateHeader = () => {
+      headerFrame = undefined;
+      siteHeader.toggleAttribute('data-header-top', window.scrollY <= 8);
+      if (backdrop) siteHeader.toggleAttribute('data-header-past-backdrop', backdrop.getBoundingClientRect().bottom <= siteHeader.offsetHeight);
+    };
+    const scheduleHeader = () => { headerFrame ??= requestAnimationFrame(updateHeader); };
+    window.addEventListener('scroll', scheduleHeader, { passive: true });
+    window.addEventListener('resize', scheduleHeader);
+    window.addEventListener('pageshow', scheduleHeader);
+    if (backdrop && typeof ResizeObserver === 'function') new ResizeObserver(scheduleHeader).observe(backdrop);
+    updateHeader();
+  }
   const menuToggle = document.getElementById('menu-toggle');
   const closeMenu = (restoreFocus = false) => {
     const wasOpen = menu?.classList.contains('is-open');

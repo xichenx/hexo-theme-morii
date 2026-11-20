@@ -23,18 +23,15 @@
     const link = card.querySelector('[data-random-link]');
     const button = card.querySelector('[data-random-refresh]');
     if (!link || pool.length < 2 || !button) return;
-    const playback = card.querySelector('[data-random-autoplay]');
     const title = link.querySelector('[data-random-title]');
     const summary = link.querySelector('[data-random-summary]');
     const status = card.querySelector('[data-random-status]');
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const canObserve = typeof IntersectionObserver === 'function';
     const motionAllowed = () => !motion.matches && document.documentElement.dataset.motion !== 'off';
     button.parentElement.hidden = false;
     button.hidden = false;
     let remaining = [];
     let visible = false;
-    let paused = false;
     let hovered = window.matchMedia('(hover: hover)').matches && card.matches(':hover');
     let activePage = true;
     let timer;
@@ -51,11 +48,22 @@
         previous.setAttribute('aria-hidden', 'true');
         previous.append(...[...link.children].map(child => child.cloneNode(true)));
         link.before(previous);
-        const timing = { duration: 460, easing: 'cubic-bezier(.22,.7,.2,1)' };
-        const outgoing = previous.animate([{ transform: 'translateX(0)', opacity: 1 }, { transform: 'translateX(-100%)', opacity: .15 }], timing);
-        const incoming = link.animate([{ transform: 'translateX(100%)', opacity: .15 }, { transform: 'translateX(0)', opacity: 1 }], timing);
-        finish = () => { previous.remove(); outgoing.cancel(); incoming.cancel(); finish = null; };
-        incoming.finished.then(finish, () => {});
+        const outgoing = previous.animate(
+          [{ transform: 'translateX(0)', opacity: 1 }, { transform: 'translateX(-14px)', opacity: 0 }],
+          { duration: 140, easing: 'ease-out', fill: 'forwards' }
+        );
+        const incoming = link.animate(
+          [{ transform: 'translateX(18px)', opacity: 0 }, { transform: 'translateX(0)', opacity: 1 }],
+          { duration: 240, delay: 60, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'backwards' }
+        );
+        const cleanup = () => {
+          previous.remove();
+          outgoing.cancel();
+          incoming.cancel();
+          if (finish === cleanup) finish = null;
+        };
+        finish = cleanup;
+        incoming.finished.then(cleanup, () => {});
       }
       link.href = selected.href;
       title.textContent = selected.title;
@@ -63,7 +71,7 @@
       if (manual) status.textContent = t("为你找到：{0}", selected.title);
     };
 
-    const canAutoplay = () => activePage && visible && !paused && !hovered && !document.hidden && motionAllowed() && !card.contains(document.activeElement);
+    const canAutoplay = () => activePage && visible && !hovered && !document.hidden && motionAllowed() && !card.contains(document.activeElement);
     const schedule = () => {
       clearTimeout(timer);
       if (!canAutoplay()) return;
@@ -72,24 +80,16 @@
         schedule();
       }, 7500);
     };
-    const syncPlayback = () => {
-      playback.hidden = !canObserve || !motionAllowed();
-      playback.textContent = paused ? t("继续轮播") : t("暂停轮播");
-      schedule();
-    };
     button.addEventListener('click', () => { advance(true); schedule(); });
-    playback.addEventListener('click', () => { paused = !paused; syncPlayback(); });
+    motion.addEventListener('change', () => { if (!motionAllowed()) finish?.(); schedule(); });
+    window.addEventListener('pagehide', () => { activePage = false; finish?.(); schedule(); });
+    if (card.dataset.randomAutoplay !== 'on' || typeof IntersectionObserver !== 'function') return;
     card.addEventListener('pointerenter', event => { if (event.pointerType !== 'touch') { hovered = true; schedule(); } });
     card.addEventListener('pointerleave', () => { hovered = false; schedule(); });
     card.addEventListener('focusin', schedule);
     card.addEventListener('focusout', () => queueMicrotask(schedule));
     document.addEventListener('visibilitychange', schedule);
-    motion.addEventListener('change', () => { if (!motionAllowed()) finish?.(); syncPlayback(); });
-    window.addEventListener('pagehide', () => { activePage = false; finish?.(); schedule(); });
     window.addEventListener('pageshow', () => { activePage = true; schedule(); });
-    if (canObserve) {
-      new IntersectionObserver(([entry]) => { visible = entry.isIntersecting && entry.intersectionRatio >= .35; schedule(); }, { threshold: .35 }).observe(card);
-    }
-    syncPlayback();
+    new IntersectionObserver(([entry]) => { visible = entry.isIntersecting && entry.intersectionRatio >= .35; schedule(); }, { threshold: .35 }).observe(card);
   });
 })();

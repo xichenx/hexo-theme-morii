@@ -16,6 +16,8 @@ function inspect(config, site = {}, knownKeys) {
   for (const key of ['docs_url', 'repository_url']) {
     if (promo?.[key] && !navigationTarget(promo[key])) add('error', 'home.theme_promo.' + key, '填写站内路径或 HTTP(S) 链接。');
   }
+  const randomAutoplay = config.home?.random?.autoplay;
+  if (randomAutoplay != null && typeof randomAutoplay !== 'boolean') add('error', 'home.random.autoplay', '必须为 true 或 false。');
   if (language && !['en', 'zh-CN', 'zh-TW'].includes(language)) add('warning', 'language', '建议使用 en、zh-CN 或 zh-TW，其他语言会使用兼容或回退规则。');
   for (const field of ['appearance.back_to_top_percent', 'motion.enable', 'series.enable', 'images.responsive', 'images.cover_tone', 'images.lazy_article', 'images.article_captions', 'search.inverted', 'search.worker', 'performance.diagnostics', 'cinema.enable', 'music.meting.enable', 'comments.enable', 'article.nav_title', 'article.toc.enable', 'article.toc.scroll_percent', 'article.toc.style_simple', 'article.reward.enable', 'article.enhancements.mermaid', 'article.enhancements.math', 'article.copyright.enable', 'article.edit.enable', 'article.code.word_wrap', 'article.code.copy', 'article.code.language', 'article.code.viewer', 'article.code.start_collapsed']) {
     if (get(field) != null && typeof get(field) !== 'boolean') add('error', field, '必须为 true 或 false，不能使用带引号的字符串。');

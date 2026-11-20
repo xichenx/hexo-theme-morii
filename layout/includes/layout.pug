@@ -77,7 +77,7 @@ html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || them
     a.skip-link(href='#main') #{morii_t("跳转到正文")}
     include print-toolbar.pug
     .site-shell
-      header.site-header
+      header.site-header(data-header-top)
         .site-header__inner
           a.brand(href=url_for('/') aria-label=morii_t("返回首页"))
             span.brand__mark(class=theme.logo ? 'brand__mark--image' : '' aria-hidden='true')
