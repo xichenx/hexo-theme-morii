@@ -12,6 +12,7 @@ const options = {
   fixture: 'browser-layout', root: prefix,
   themeOverrides: {
     appearance: { back_to_top_percent: true },
+    home: { selected_posts: ['posts/welcome/', 'posts/cards/', 'posts/reading/'] },
     article: {
       code: { copy: false, language: false },
       nav_title: true,

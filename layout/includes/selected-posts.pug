@@ -12,7 +12,7 @@ if selectedPosts.length
           .selected-card__media(data-cover-frame=post.cover ? '' : null)
             if post.cover
               - var selectedCover = morii_cover(post.cover, post)
-              img(src=selectedCover.src srcset=selectedCover.srcset sizes=selectedCover.sizes width=selectedCover.width height=selectedCover.height alt='' loading='lazy' decoding='async')
+              img(src=selectedCover.src srcset=selectedCover.srcset sizes=selectedCover.srcset ? '90px' : null width=selectedCover.width height=selectedCover.height alt='' loading='lazy' decoding='async')
             else
               span(aria-hidden='true') ✦
           .selected-card__body

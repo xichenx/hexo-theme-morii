@@ -1717,8 +1717,6 @@ a.footer-filing__item:focus-visible { outline: 2px solid var(--accent); outline-
   .ac-scene { min-height: 460px; }
 }
 @media (max-width: 580px) {
-  .selected-card__body { display: flex; gap: 2px; align-items: start; }
-  .selected-card { min-height: 112px; }
   .pagination--numbered { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .pagination__items { display: none; }
   .pagination .pagination__step { height: 46px; font-size: 13px; }
