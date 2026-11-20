@@ -5,6 +5,7 @@ const { createHash } = require('node:crypto');
 let indexPath = '/morii-search.json';
 hexo.extend.helper.register('morii_search_index', () => indexPath);
 const { stripHTML, unescapeHTML } = require('hexo-util');
+const { stripInlineAnswers } = require('../scripts/lib/inline-answer.cjs');
 const list = value => Array.isArray(value) ? value : value?.toArray?.() || [];
 const plain = value => unescapeHTML(stripHTML(String(value || '')
   .replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, ' ')
@@ -25,7 +26,7 @@ hexo.extend.generator.register('morii-search-index', locals => {
     date: post.date?.format?.('YYYY.MM.DD') || '',
     updated: post.password ? undefined : (post.updated || post.date)?.toISOString?.() || undefined,
     protected: Boolean(post.password),
-    content: post.password ? '' : plain(`${post.description || ''} ${post.excerpt || ''} ${hexo.theme.config.search?.content === false ? '' : post.content || ''}`),
+    content: post.password ? '' : plain(stripInlineAnswers(`${post.description || ''} ${post.excerpt || ''} ${hexo.theme.config.search?.content === false ? '' : post.content || ''}`)),
     categories: post.password ? [] : list(post.categories).map(item => plain(item?.name)).filter(Boolean),
     topics: post.password ? '' : [...new Set([...list(post.categories), ...list(post.tags)].map(item => plain(item?.name)).filter(Boolean))].join(' ')
   }));

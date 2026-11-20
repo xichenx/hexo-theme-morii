@@ -20,7 +20,7 @@ const context = {
     }
   }
 };
-for (const filename of ['content-data', 'content-tags']) {
+for (const filename of ['content-data', 'content-tags', 'plain-text']) {
   vm.runInNewContext(fs.readFileSync(require.resolve(`../scripts/${filename}.js`), 'utf8'), { ...context });
 }
 
@@ -35,6 +35,21 @@ test('button links escape labels and reject destinations that bypass the site ro
   for (const url of ['javascript:alert(1)', '//example.test/', '/%2e%2e/outside/', 'https://user@example.test/']) {
     assert.equal(tags.btn([`${url}, 安全标签`]), '安全标签');
   }
+  dom.window.close();
+});
+
+test('inline answers escape text and stay out of generated excerpts', () => {
+  const markup = tags.hideInline.call({ lang: 'en' }, ['<b>藏起来</b>']);
+  const dom = new JSDOM(markup);
+  const document = dom.window.document;
+  assert.equal(document.querySelector('label').textContent.trim(), 'Show hidden text');
+  assert.equal(document.querySelector('.inline-answer').textContent.trim(), '<b>藏起来</b>');
+  assert.equal(document.querySelector('.inline-answer').children.length, 0);
+  assert.equal(document.querySelector('.inline-answer').hasAttribute('data-nosnippet'), true);
+  const post = { title: 'Question', excerpt: `before ${markup} after` };
+  assert.equal(helpers.morii_excerpt(post), 'before Show hidden text after');
+  assert.equal(helpers.morii_search_text(post), 'question before show hidden text after');
+  assert.equal(tags.hideInline(['', ',', '查看']), '');
   dom.window.close();
 });
 

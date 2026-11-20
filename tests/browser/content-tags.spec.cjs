@@ -35,3 +35,21 @@ test('inline friend cards show in a generated post without JavaScript', async ({
   await expect(hexo).toBeFocused();
   await noOverflow(page);
 });
+
+test('an inline answer can be revealed and hidden by keyboard without JavaScript', async ({ page }) => {
+  await ready(page, 'posts/reading/');
+  const toggle = page.getByRole('checkbox', { name: '查看答案' });
+  const answer = page.locator('.inline-answer');
+  await expect(answer).toBeHidden();
+  await expect(toggle.locator('xpath=ancestor::p')).toContainText('哪条命令');
+
+  await toggle.press('Space');
+  await expect(toggle).toBeChecked();
+  await expect(answer).toBeVisible();
+  await expect(answer).toHaveText('hexo generate');
+  await noOverflow(page);
+
+  await toggle.press('Space');
+  await expect(toggle).not.toBeChecked();
+  await expect(answer).toBeHidden();
+});

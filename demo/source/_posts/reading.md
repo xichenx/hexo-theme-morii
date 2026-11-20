@@ -65,6 +65,8 @@ console.log(theme);
 
 识别主题图标 {% inlineImg /icons/brand/morii-logo.png 1.2em "Morii 图标" %}，再回顾阅读体验的更新。
 
+问：哪条命令会把 Hexo 文章生成静态文件？{% hideInline hexo generate, 查看答案 %}
+
 {% timeline 阅读体验, purple %}
 <!-- timeline 2026-10 -->
 整理 **阅读工具** 和代码块外观。

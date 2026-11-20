@@ -4,6 +4,7 @@ const { escapeHTML, url_for } = require('hexo-util');
 const { load, JSON_SCHEMA } = require('js-yaml');
 const { navigationTarget } = require('../scripts/lib/navigation-url.cjs');
 const { timelineDate } = require('../scripts/lib/timeline-date.cjs');
+const { forPage } = require('../scripts/lib/i18n.cjs');
 const markdown = text => hexo.render.renderSync({ text, engine: 'markdown' });
 const siteURL = path => url_for.call({ config: hexo.config }, path);
 const unquote = value => value.replace(/^(["'])(.*)\1$/, '$2');
@@ -29,6 +30,13 @@ hexo.extend.tag.register('inlineImg', ([source = '', size = '', ...description])
   const amount = Number(length?.[1]);
   const height = Number.isFinite(amount) && amount > 0 ? ` style="--inline-image-height:${length[1]}${length[2] || 'px'}"` : '';
   return `<img class="content-inline-image" src="${src}" alt="${alt}"${height} decoding="async">`;
+});
+
+hexo.extend.tag.register('hideInline', function (args) {
+  const [answer = '', label = ''] = args.join(' ').split(',').map(part => unquote(part.trim()));
+  if (!answer) return '';
+  const caption = label || forPage(hexo, { page: this }).t('显示隐藏文字');
+  return `<label class="inline-reveal inline-label"><input type="checkbox" autocomplete="off"> ${escapeHTML(caption)}</label><span class="inline-answer" data-nosnippet> ${escapeHTML(answer)}</span>`;
 });
 
 hexo.extend.tag.register('timeline', (args, content) => {

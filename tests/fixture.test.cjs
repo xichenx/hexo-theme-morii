@@ -116,6 +116,9 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       dom.window.close();
     }
     const index = JSON.parse(fs.readFileSync(path.join(output, 'morii-search.json'), 'utf8'));
+    const reading = index.find(entry => entry.url === `${prefix}posts/reading/`);
+    assert.match(reading.content, /查看答案/);
+    assert.doesNotMatch(reading.content, /hexo generate/);
     const cinemaDom = new JSDOM(fs.readFileSync(path.join(output, 'cinema/index.html'), 'utf8'), { url: `https://example.test${prefix}cinema/`, runScripts: 'outside-only' });
     const cinema = cinemaDom.window.document;
     assert.match(cinema.querySelector('link[href*="/css/cinema."]').href, /cinema\.[a-f0-9]{12}\.css$/);
