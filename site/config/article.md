@@ -45,6 +45,7 @@ outdated: false
 | `outdated_position` | `top` 放在正文前，`bottom` 放在正文后 | 使用全站位置 |
 | `related_date_type` | 相关文章日期口径，可填 `created` 或 `updated` | 使用全站日期口径 |
 | `navigation_order` | 相邻文章翻页方向，可填 `newest_first` 或 `oldest_first` | 使用全站翻页方向 |
+| `sidebar_position` | 桌面阅读侧栏位置，可填 `left` 或 `right` | 使用全站侧栏位置 |
 
 例如要保留列表封面但隐藏文章顶部大图，可以同时写 `cover: /images/posts/first-post.jpg` 和 `top_img: false`。文章 `comments: true` 不会绕过全站 `comments.enable: false`。
 
@@ -55,6 +56,7 @@ outdated: false
 ```yaml
 article:
   nav_title: false
+  sidebar_position: right
   resume:
     enable: true
   share:
@@ -82,6 +84,7 @@ article:
 | 字段 | 默认值 | 功能与使用提示 |
 | --- | --- | --- |
 | `article.nav_title` | `false` | 设为 `true` 后，滚过正文标题时在顶部导航显示文章名，滚回后恢复站点名称 |
+| `article.sidebar_position` | `right` | 桌面阅读侧栏位置，设为 `left` 时放在正文左侧 |
 | `article.resume.enable` | `true` | 记录阅读位置，再次打开文章时可继续阅读 |
 | `article.share.enable` | `true` | 显示文章分享功能；关闭后仍保留“复制文章链接”按钮 |
 | `article.print.enable` | `true` | 显示打印 / 导出 PDF 工具，通过浏览器打印流程保存 |
@@ -103,6 +106,8 @@ article:
 例如只想关闭打印功能，修改 `article.print.enable` 即可，不需要关闭全部阅读工具。`reading_settings` 和 `navigation` 直接接受布尔值，**不要在它们下面再套一层 `enable`**。
 
 `article.navigation_order` 控制按发布日期生成的相邻文章链接。单篇可在 Front Matter 使用 `navigation_order` 覆盖，系列内的前后篇仍按系列章节顺序排列。
+
+`article.sidebar_position` 用于桌面文章页。单篇可在 Front Matter 使用 `sidebar_position` 覆盖。手机和专注阅读继续使用单栏布局。
 
 ## 3. 稍后阅读
 

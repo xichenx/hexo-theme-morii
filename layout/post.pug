@@ -33,7 +33,8 @@ block content
         span #{morii_t("更新于")} #[time(datetime=date_xml(page.updated || page.date))=date(page.updated || page.date, 'YYYY-MM-DD')]
         if morii_reading_time(page)
           span= morii_reading_time(page)
-  .wrap.reading-layout
+  - var sidebarPosition = [page.sidebar_position, theme.article && theme.article.sidebar_position].find(function(position) { return position === 'left' || position === 'right' })
+  .wrap.reading-layout(class=sidebarPosition === 'left' ? 'reading-layout--left' : null)
     article.article-card
       .article-toolbar
         if !theme.reading_list || theme.reading_list.enable !== false
