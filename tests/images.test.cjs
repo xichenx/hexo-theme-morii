@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { localFile, prepare, safeURL, lazyArticleImages } = require('../scripts/lib/images.cjs');
+const { localFile, prepare, safeURL, lazyArticleImages, captionArticleImages } = require('../scripts/lib/images.cjs');
 let sharp; try { sharp = require('sharp'); } catch {}
 
 test('local image lookup stays in the configured sources and never downloads remote resources', () => {
@@ -53,6 +53,26 @@ test('explicit remote candidates and reserved dimensions work without the option
   config.images.lazy_article = false;
   assert.equal(article({ content }), content);
   assert.equal(article({ content, lazy_images: true }), lazyArticleImages(content));
+  const captioned = '<img src="diagram.png" alt="Diagram">';
+  assert.equal(article({ content: captioned }), captioned);
+  assert.equal(article({ content: captioned, image_captions: true }), captionArticleImages(captioned));
+  config.images.article_captions = true;
+  assert.equal(article({ content: captioned }), captionArticleImages(captioned));
+  assert.equal(article({ content: captioned, image_captions: false }), captioned);
+  assert.equal(article({ content: captioned, password: true }), captioned);
+});
+
+test('captions use escaped title or alt and preserve responsive, linked and inline image markup', () => {
+  const linked = '<p id="diagram"><a href="/full.jpg"><picture><source srcset="/retina.jpg 2x"><img src="/preview.jpg" alt="Alt" title=" &lt;test&gt; &amp; preview "></picture></a></p>';
+  const raw = '<IMG src="/second.jpg" alt=" Second " />';
+  const unchanged = '<p>In text <img src="a.jpg" alt="Inline"></p><img src="icon.svg" class="content-inline-image" alt="Icon">' +
+    '<p><img src="a.jpg" alt="A"><img src="b.jpg" alt="B"></p><img src="decorative.png" alt="">' +
+    '<figure><img src="diagram.png" alt="Has caption"><figcaption>Original</figcaption></figure>' +
+    '<template><img src="hidden.jpg" alt="Template"></template><img hidden src="hidden.jpg" alt="Hidden">';
+  const output = captionArticleImages(linked + raw + unchanged);
+  assert.equal(output, '<figure class="article-figure">' + linked + '<figcaption>&lt;test&gt; &amp; preview</figcaption></figure>' +
+    '<figure class="article-figure">' + raw + '<figcaption>Second</figcaption></figure>' + unchanged);
+  assert.equal(captionArticleImages(output), output);
 });
 
 test('native lazy loading preserves the first image, explicit attributes and self-closing responsive markup', () => {

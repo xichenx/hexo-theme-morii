@@ -1,6 +1,6 @@
 'use strict';
 const path = require('node:path');
-const { safeURL, localFile, prepare, lazyArticleImages } = require('../scripts/lib/images.cjs');
+const { safeURL, localFile, prepare, lazyArticleImages, captionArticleImages } = require('../scripts/lib/images.cjs');
 let sharp;
 try { sharp = require('sharp'); } catch { /* Optional native dependency. */ }
 const prepared = new Map();
@@ -45,6 +45,10 @@ hexo.extend.helper.register('morii_cover', function (src, owner = {}, role = 'ca
 });
 hexo.extend.helper.register('morii_article_images', page => {
   const html = page.content || '';
-  const enabled = typeof page.lazy_images === 'boolean' ? page.lazy_images : hexo.theme.config.images?.lazy_article !== false;
-  return enabled && !page.password ? lazyArticleImages(html) : html;
+  if (page.password) return html;
+  const settings = hexo.theme.config.images || {};
+  const lazy = typeof page.lazy_images === 'boolean' ? page.lazy_images : settings.lazy_article !== false;
+  const captions = typeof page.image_captions === 'boolean' ? page.image_captions : settings.article_captions === true;
+  const content = lazy ? lazyArticleImages(html) : html;
+  return captions ? captionArticleImages(content) : content;
 });

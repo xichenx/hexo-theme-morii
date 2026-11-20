@@ -206,6 +206,7 @@ series:
 
 images:
   lazy_article: true # 正文首张图片保持默认加载，其余图片按需加载
+  article_captions: false # 从独立正文图片的 title 或 alt 生成图注
   responsive: true  # 使用可选 sharp 为本地封面生成 WebP 候选
   widths: [480, 800, 1200]
   quality: 78

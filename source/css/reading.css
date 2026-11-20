@@ -33,6 +33,10 @@
 .article-body{padding:30px 40px 36px;font-size:var(--reading-font-size, 17px);line-height:1.9;overflow-wrap:break-word}
 .article-body>:first-child{margin-top:0}
 .article-body p{margin:0 0 1.2em}
+.article-figure{margin:20px 0;text-align:center}
+.article-body .article-figure p{margin:0}
+.article-body .article-figure img{margin:0 auto}
+.article-figure figcaption{margin-top:8px;color:var(--muted);font-size:13px;line-height:1.5}
 .article-body :is(h1,h2,h3,h4,h5,h6){position:relative;line-height:1.5;letter-spacing:-.015em;scroll-margin-top:104px}
 .article-body h1{margin:1.8em 0 .8em;font-size:1.75em}
 .article-body h2{margin:2em 0 .9em;padding-bottom:.45em;border-bottom:1px solid var(--line);font-size:1.5em}

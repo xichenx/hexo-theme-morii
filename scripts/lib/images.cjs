@@ -2,7 +2,8 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { createHash, randomUUID } = require('node:crypto');
-const { Parser } = require('htmlparser2');
+const { Parser, parseDocument } = require('htmlparser2');
+const { escapeHTML } = require('hexo-util');
 const safeURL = value => {
   if (typeof value !== 'string' || !value.trim() || /[\\\u0000-\u0020]/.test(value) || value.startsWith('//')) return '';
   if (/^[a-z][\w+.-]*:/i.test(value)) { try { if (!/^https?:$/.test(new URL(value).protocol)) return ''; } catch { return ''; } }
@@ -94,4 +95,36 @@ function lazyArticleImages(html) {
   return parts.join('');
 }
 
-module.exports = { safeURL, localFile, prepare, lazyArticleImages };
+function standaloneImage(node) {
+  const attributes = node.attribs;
+  if (!attributes || Object.hasOwn(attributes, 'hidden') || attributes['aria-hidden'] === 'true') return null;
+  if (node.name === 'img') {
+    const inline = attributes.class?.split(/\s+/).includes('content-inline-image');
+    return !inline && (attributes.src?.trim() || attributes.srcset?.trim()) ? attributes : null;
+  }
+  if (!['p', 'a', 'picture'].includes(node.name)) return null;
+  const items = node.children.filter(child => child.type !== 'comment' &&
+    (child.type !== 'text' || child.data.trim()) && (node.name !== 'picture' || child.name !== 'source'));
+  return items.length === 1 ? standaloneImage(items[0]) : null;
+}
+
+function captionArticleImages(html) {
+  const document = parseDocument(html, { withStartIndices: true, withEndIndices: true });
+  const parts = [];
+  let start = 0;
+  for (const node of document.children) {
+    const image = standaloneImage(node);
+    const caption = image && (image.title?.trim() || image.alt?.trim());
+    if (!caption) continue;
+    const end = node.endIndex + 1;
+    const markup = html.slice(node.startIndex, end);
+    // Keep the original tags and attributes for responsive sources, links and custom loading.
+    if (node.name !== 'img' && !markup.toLowerCase().endsWith('</' + node.name + '>')) continue;
+    parts.push(html.slice(start, node.startIndex), '<figure class="article-figure">', markup,
+      '<figcaption>', escapeHTML(caption), '</figcaption></figure>');
+    start = end;
+  }
+  return parts.length ? parts.join('') + html.slice(start) : html;
+}
+
+module.exports = { safeURL, localFile, prepare, lazyArticleImages, captionArticleImages };

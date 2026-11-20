@@ -280,7 +280,7 @@ test('English and Traditional Chinese build at a subpath with cached locale asse
 test('optional enhancements and Waline produce configured assets and safe sharing metadata', async () => {
   const output = await buildDemo({ root: '/theme/', sourceOverrides: {
     'comments/index.md': '---\ntitle: 留言板\ncomments: true\n---\n欢迎留言。',
-    '_posts/formulas.md': '---\ntitle: Formulas and diagrams\ndate: 2026-10-16 12:00:00\npermalink: posts/formulas/\ntags: [Related fixture]\ntoc: true\ntoc_scroll_percent: true\nnavigation_order: newest_first\nsidebar_position: right\nmeta_date_type: created\n---\n\n## Examples\n\n{% math %}x^2{% endmath %}\n\n{% mermaid %}\ngraph TD; A-->B;\n{% endmermaid %}',
+    '_posts/formulas.md': '---\ntitle: Formulas and diagrams\ndate: 2026-10-16 12:00:00\npermalink: posts/formulas/\ntags: [Related fixture]\ntoc: true\ntoc_scroll_percent: true\nnavigation_order: newest_first\nsidebar_position: right\nmeta_date_type: created\nimage_captions: true\n---\n\n## Examples\n\n{% math %}x^2{% endmath %}\n\n{% mermaid %}\ngraph TD; A-->B;\n{% endmermaid %}\n\n![Sample diagram](/images/covers/welcome.jpg "Build output")',
     '_posts/related-maintained.md': '---\ntitle: Maintained tutorial\npermalink: posts/related-maintained/\ntags: [Related fixture]\ndate: 2020-01-01 12:00:00\nupdated: 2025-02-03 12:00:00\n---\nMaintained tutorial.',
     '_posts/related-recent.md': '---\ntitle: Published later\npermalink: posts/related-recent/\ntags: [Related fixture]\ndate: 2021-01-01 12:00:00\nupdated: 2024-02-03 12:00:00\nmeta_word_count: false\nmeta_reading_time: true\n---\nPublished later.'
   }, themeOverrides: {
@@ -308,6 +308,9 @@ test('optional enhancements and Waline produce configured assets and safe sharin
   assert.equal(d.querySelector('.article-navigation [rel="next"]').getAttribute('href'), '/theme/posts/formulas/');
   assert.equal(d.querySelector('link[rel="preconnect"]'), null, 'Enabling features alone does not emit a CDN hint');
   const technical = new JSDOM(fs.readFileSync(path.join(output, 'posts/formulas/index.html'), 'utf8'));
+  const illustration = technical.window.document.querySelector('.article-body .article-figure');
+  assert.equal(illustration.querySelector('figcaption').textContent, 'Build output');
+  assert.equal(illustration.querySelector('img').alt, 'Sample diagram');
   const overrideDates = technical.window.document.querySelectorAll('.article-header .article-meta time[datetime]');
   assert.equal(overrideDates.length, 1);
   assert.equal(overrideDates[0].parentElement.textContent, '发布于 2026-10-16');

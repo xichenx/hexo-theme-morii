@@ -19,6 +19,9 @@ test('body images load on scroll and in print preview, with image viewing availa
   await expect(page.locator('#image-dialog')).toBeHidden();
   const first = page.locator('.article-body img[alt="First"]');
   const later = page.locator('.article-body img[alt="Later"]');
+  const captions = page.locator('.article-body .article-figure figcaption');
+  await expect(captions).toHaveText(['First image caption', 'Later', 'Print']);
+  await expect(captions.first()).toBeVisible();
   await expect(first).not.toHaveAttribute('loading', 'lazy');
   await expect(later).toHaveAttribute('loading', 'lazy');
   expect(requested).toEqual(['first.svg']);

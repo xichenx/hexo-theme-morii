@@ -69,6 +69,12 @@ series:
 
 站点可在 `_config.morii.yml` 中设置 `images.lazy_article: false`。单篇文章可在 Front Matter 中用 `lazy_images: true` 或 `false` 覆盖全站设置。加密文章正文由加密插件负责。
 
+## 正文图片图注
+
+在 `_config.morii.yml` 中设为 `images.article_captions: true`，开放全站文章的自动图注。默认关闭。单篇文章可在 Front Matter 中用 `image_captions: true` 或 `false` 覆盖。
+
+单独成段的图片优先使用 `title`，其次使用 `alt`。例如 `![部署流程图](/images/deploy.png "从提交到部署")` 会在图片下方显示「从提交到部署」。混排在文字中的图片、手写的 `<figure>` 和加密文章会保留原样。
+
 ## 响应式封面
 
 ### 本地图片
