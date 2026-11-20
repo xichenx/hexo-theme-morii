@@ -14,7 +14,7 @@ series_order: 1
 ---
 ```
 
-`series` 以字母、数字或中文开头，可包含连字符和下划线，长度不超过 80 个字符。它是 URL 标识，建议保持稳定。`series_order` 按数字升序排列；指定顺序的文章排在未指定的文章前面。顺序相同或均未填写时，按发布日期升序，再按文章路径排序。
+`series` 以字母、数字或中文开头，可包含连字符和下划线，长度不超过 80 个字符。它是 URL 标识，建议保持稳定。`series_order` 按数字升序排列；指定顺序的文章排在未指定的文章前面。
 
 在**博客根目录**的 `source/_data/series.yml` 填写专题资料：
 
@@ -26,10 +26,14 @@ android-internals:
     en: Android internals
   description: 从启动流程到 UI 渲染，连接零散的技术笔记。
   order: 1
+  order_by: title
+  order_direction: asc
   cover: /images/series/android.jpg
 ```
 
 标题和简介可以使用普通字符串，也可以填写三语言映射。没有资料文件时，使用 `series` 标识作为名称。只填写专题资料而没有文章，不会生成空专题。
+
+`order` 决定该专题在总览中的位置。`order_by` 和 `order_direction` 只用于 `series_order` 相同或均未填写的章节，可选 `date`（默认）或 `title`，以及 `asc`（默认）或 `desc`。按标题升序时，「第 2 章」排在「第 10 章」前面。排序结果相同时，按文章路径升序排列。专题总览预览、系列目录和前后篇使用同一顺序。
 
 生成后可以访问：
 

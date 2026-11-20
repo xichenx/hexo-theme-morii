@@ -301,18 +301,23 @@ test('optional enhancements and Waline produce configured assets and safe sharin
 test('series pages, article order and responsive covers work in English under a deployment subdirectory', async () => {
   const original = name => fs.readFileSync(path.join(__dirname, '../demo/source/_posts', name + '.md'), 'utf8');
   const output = await buildDemo({ root: '/theme/', language: 'en', sourceOverrides: {
-    '_data/series.yml': 'guide:\n  title:\n    en: Morii guide\n    zh-CN: 主题指南\n  description: A reading path\n',
+    '_data/series.yml': 'guide:\n  title:\n    en: Morii guide\n    zh-CN: 主题指南\n  description: A reading path\n  order_by: title\n  order_direction: desc\n',
     '_posts/welcome.md': original('welcome').replace('title:', 'series: guide\nseries_order: 2\ntitle:'),
-    '_posts/cards.md': original('cards').replace('title:', 'series: guide\nseries_order: 1\ntitle:')
+    '_posts/cards.md': original('cards').replace('title:', 'series: guide\nseries_order: 1\ntitle:'),
+    '_posts/series-two.md': '---\ntitle: Chapter 2\ndate: 2020-01-01\nseries: guide\npermalink: posts/series-two/\n---\nTwo\n',
+    '_posts/series-ten.md': '---\ntitle: Chapter 10\ndate: 2020-01-02\nseries: guide\npermalink: posts/series-ten/\n---\nTen\n'
   } });
   const read = file => new JSDOM(fs.readFileSync(path.join(output, file), 'utf8'));
   const index = read('series/index.html'), detail = read('series/guide/index.html'), article = read('posts/welcome/index.html');
   assert.equal(index.window.document.querySelector('h2 a').textContent, 'Morii guide');
-  const links = [...detail.window.document.querySelectorAll('.series-directory li a')];
-  assert.match(links[0].getAttribute('href'), /^\/theme\/posts\/cards\//); assert.match(links[1].getAttribute('href'), /\/posts\/welcome\//);
+  const links = ['cards', 'welcome', 'series-ten', 'series-two'].map(slug => `/theme/posts/${slug}/`);
+  const hrefs = nodes => [...nodes].map(link => link.getAttribute('href'));
+  assert.deepEqual(hrefs(detail.window.document.querySelectorAll('.series-directory li a')), links);
+  assert.deepEqual(hrefs(index.window.document.querySelectorAll('.series-card:first-child li a')), links.slice(0, 3));
   const doc = article.window.document;
   assert.equal(doc.querySelector('.article-series [aria-current="page"]').getAttribute('href'), '/theme/posts/welcome/');
-  assert.match(doc.querySelector('.series-article-nav a').getAttribute('href'), /\/posts\/cards\//); assert.equal(doc.querySelectorAll('.series-article-nav a').length, 1);
+  assert.deepEqual(hrefs(doc.querySelectorAll('.article-series li a')), links);
+  assert.deepEqual(hrefs(doc.querySelectorAll('.series-article-nav a')), [links[0], links[2]]);
   assert.equal(doc.querySelector('.article-breadcrumb [aria-current]').textContent, '欢迎使用 Morii');
   let nativeImages = false; try { nativeImages = !!require('sharp'); } catch {}
   if (nativeImages) {
