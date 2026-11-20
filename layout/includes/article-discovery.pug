@@ -22,4 +22,11 @@ if relatedPosts.length
           span.related-card__reason= item.reason
           h3= item.post.title
           p= morii_excerpt(item.post, 76)
-          span.related-card__date #{date(item.post.date, 'YYYY.MM.DD')} #{morii_t("· 阅读文章 ↗")}
+          span.related-card__date
+            if item.date
+              if item.usesUpdated
+                = morii_t("更新于") + ' '
+              time(datetime=date_xml(item.date))= date(item.date, 'YYYY.MM.DD')
+              = ' ' + morii_t("· 阅读文章 ↗")
+            else
+              | #{morii_t("阅读文章 ↗")}

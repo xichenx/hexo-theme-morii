@@ -112,6 +112,7 @@ article:
   related:
     enable: true
     limit: 3
+    date_type: created # created / updated
   copyright:
     enable: false # 自行选择许可协议后开启；单篇 copyright: false 可隐藏
     author_url: ''

@@ -43,6 +43,7 @@ outdated: false
 | `outdated` | `false` 仅关闭本篇过时提示 | 遵循主题过时提示设置 |
 | `outdated_days` | 设置本篇提醒天数，填写 1–36500 的整数 | 使用全站阈值 |
 | `outdated_position` | `top` 放在正文前，`bottom` 放在正文后 | 使用全站位置 |
+| `related_date_type` | 相关文章日期口径，可填 `created` 或 `updated` | 使用全站日期口径 |
 
 例如要保留列表封面但隐藏文章顶部大图，可以同时写 `cover: /images/posts/first-post.jpg` 和 `top_img: false`。文章 `comments: true` 不会绕过全站 `comments.enable: false`。
 
@@ -68,6 +69,7 @@ article:
   related:
     enable: true
     limit: 3
+    date_type: created
   code:
     style: classic
     theme: dark
@@ -88,6 +90,7 @@ article:
 | `article.outdated.position` | `top` | 提醒位置，`top` 在正文前，`bottom` 在正文后 |
 | `article.related.enable` | `true` | 显示相关文章 |
 | `article.related.limit` | `3` | 相关文章数量，范围 1–6 |
+| `article.related.date_type` | `created` | 显示发布日期或更新时间，可填 `created` 或 `updated` |
 | `article.code.collapse` | `true` | 较长的代码块默认折叠 |
 | `article.code.style` | `classic` | 外观：`classic`、`mac`、`minimal` |
 | `article.code.theme` | `dark` | 配色：`dark`、`light`、`auto`；`auto` 跟随站点深浅模式 |
@@ -112,6 +115,8 @@ reading_list:
 ## 4. 相关文章为什么没有出现？
 
 相关文章按共同标签和分类匹配，共同标签的权重更高；没有匹配文章就不显示。建议先给至少两篇公开文章设置一个相同标签，再查看文章底部。加密文章不参与推荐。
+
+同等相关性下，较新的文章排在前面。设置 `article.related.date_type: updated` 后，卡片显示更新时间，并按该时间排序。缺少有效更新时间时使用发布日期。单篇可通过 `related_date_type` 覆盖全站设置。
 
 ## 5. 目录如何设置？
 
