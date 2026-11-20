@@ -14,6 +14,11 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       assert.ok(fs.existsSync(path.join(output, file)), `Generated ${file}`);
       const dom = new JSDOM(fs.readFileSync(path.join(output, file), 'utf8'), { url: `https://example.test${prefix}${file}` });
       const document = dom.window.document;
+      if (file === 'index.html') {
+        const backToTop = document.querySelector('#back-to-top');
+        assert.equal(backToTop.textContent.trim(), '↑');
+        assert.equal(backToTop.hasAttribute('data-back-top-percent'), false);
+      }
       if (file === 'essay/index.html') {
         assert.equal(document.querySelector('[data-moment-filter]').hidden, true);
         const cards = [...document.querySelectorAll('.essay-card')];

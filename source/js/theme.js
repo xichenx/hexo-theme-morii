@@ -159,12 +159,28 @@
   });
 
   const backToTop = document.getElementById('back-to-top');
-  const updateBackToTop = () => { if (backToTop) backToTop.hidden = window.scrollY < 500; };
-  window.addEventListener('scroll', updateBackToTop, { passive: true });
-  updateBackToTop();
-  backToTop?.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
-  });
+  if (backToTop) {
+    const showPercent = backToTop.hasAttribute('data-back-top-percent');
+    const updateBackToTop = () => {
+      const offset = window.scrollY;
+      const hidden = offset < 500;
+      if (backToTop.hidden !== hidden) backToTop.hidden = hidden;
+      if (!showPercent || hidden) return;
+      const scroller = document.scrollingElement || root;
+      const distance = Math.max(1, scroller.scrollHeight - scroller.clientHeight);
+      const text = Math.round(Math.min(offset / distance, 1) * 100) + '%';
+      if (backToTop.textContent !== text) backToTop.textContent = text;
+    };
+    window.addEventListener('scroll', updateBackToTop, { passive: true });
+    if (showPercent) {
+      window.addEventListener('resize', updateBackToTop);
+      if (typeof ResizeObserver === 'function') new ResizeObserver(updateBackToTop).observe(document.body);
+    }
+    updateBackToTop();
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+    });
+  }
 
   // Warm a same-origin page only when a visitor shows intent to open it.
   // This is especially useful when the HTML response has a variable network delay.

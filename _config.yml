@@ -1,5 +1,6 @@
 # 页面布局。也可写入博客根目录的 _config.morii.yml，升级主题时无需修改主题文件。
 appearance:
+  back_to_top_percent: false # 在返回顶部按钮上显示当前页面的滚动百分比
   effects:
     enable: true        # 视觉特效总开关；独立于页面布局
     aurora: true        # 渐变极光背景

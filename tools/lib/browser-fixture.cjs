@@ -11,6 +11,7 @@ const longArticle = `---\n${yaml.dump({ title, date: '2026-10-30 09:00:00', perm
 const options = {
   fixture: 'browser-layout', root: prefix,
   themeOverrides: {
+    appearance: { back_to_top_percent: true },
     article: {
       nav_title: true,
       navigation_order: 'oldest_first',

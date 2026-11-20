@@ -204,7 +204,7 @@ html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || them
         span#image-counter(aria-live='polite')
         button.icon-button#image-next(type='button' aria-label=morii_t("下一张图片")) →
         a.text-link#image-original(target='_blank' rel='noopener noreferrer') #{morii_t("打开原图 ↗")}
-    button.icon-button.back-to-top#back-to-top(type='button' aria-label=morii_t("返回顶部") hidden) ↑
+    button.icon-button.back-to-top#back-to-top(type='button' aria-label=morii_t("返回顶部") data-back-top-percent=theme.appearance && theme.appearance.back_to_top_percent === true ? '' : null hidden) ↑
     .sr-only#theme-announcement(role='status' aria-live='polite')
     include music-hub.pug
     if morii_locale_asset()

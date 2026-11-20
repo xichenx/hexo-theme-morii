@@ -1529,6 +1529,7 @@ a.footer-filing__item:focus-visible { outline: 2px solid var(--accent); outline-
 .mobile-toc summary { cursor: pointer; font-size: 13px; font-weight: 800; color: var(--accent); }
 .mobile-toc .toc-content { max-height: 280px; margin-top: 8px; }
 .back-to-top { position: fixed; bottom: 24px; right: 22px; z-index: 15; box-shadow: var(--shadow); }
+.back-to-top[data-back-top-percent]{width:44px;height:44px;padding:0;font-size:12px;font-weight:750;font-variant-numeric:tabular-nums}
 .article-body img[role=button], .photo-card img, .essay-images img { cursor: zoom-in; }
 .lightbox { width: min(1100px, calc(100% - 28px)); max-width: none; max-height: 92vh; padding: 40px 20px 18px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); color: var(--ink); }
 .lightbox::backdrop { background: rgba(7, 13, 28, .88); backdrop-filter: blur(8px); }
