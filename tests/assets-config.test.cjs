@@ -18,6 +18,8 @@ test('asset addresses change with bytes and keep CSS relative resource directori
       '  article a {',
       '    --gap: ;',
       '    width: calc(100% - 2rem);',
+      '    height /* keep */ : 10px;',
+      '    content: "two  spaces";',
       '    mask: url(\'../icons/ui/home.svg\');',
       '  }',
       '}',
@@ -28,7 +30,7 @@ test('asset addresses change with bytes and keep CSS relative resource directori
     assert.equal(first.get('js/app.js').path, again.get('js/app.js').path);
     assert.equal(path.dirname(first.get('css/style.css').path), 'css');
     const css = first.get('css/style.css');
-    assert.equal(css.data.toString(), '@charset "utf-8";/* Keep comments. */@media print {article a {--gap: ;width: calc(100% - 2rem);mask: url(\'../icons/ui/home.svg\');}}');
+    assert.equal(css.data.toString(), '@charset "utf-8";/* Keep comments. */@media print{article a{--gap: ;width:calc(100% - 2rem);height /* keep */ : 10px;content:"two  spaces";mask:url(\'../icons/ui/home.svg\');}}');
     assert.equal(css.path, fingerprint('css/style.css', css.data));
     fs.writeFileSync(path.join(root, 'js/app.js'), 'two');
     const changed = collect(root);

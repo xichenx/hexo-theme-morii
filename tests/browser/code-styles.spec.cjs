@@ -6,6 +6,21 @@ installHooks(test);
 const shell = (page, style, theme) => page.locator(`.code-shell[data-code-style=${style}][data-code-theme=${theme}]`);
 const backgrounds = { dark: 'rgb(27, 36, 53)', light: 'rgb(246, 248, 252)' };
 
+test('code toolbar can hide copy and language labels without losing the viewer or wrapping', async ({ page }) => {
+  await ready(page, 'posts/welcome/');
+  const block = page.locator('.code-shell').first();
+  const toolbar = block.locator('.code-tools');
+  await expect(toolbar.locator('span, .code-copy')).toHaveCount(0);
+  await toolbar.locator('.code-view').click();
+  const dialog = page.locator('.code-dialog');
+  await expect(dialog.locator('.code-tools span, .code-copy')).toHaveCount(0);
+  await dialog.locator('.code-wrap').click();
+  await expect(dialog.locator('.code pre')).toHaveCSS('white-space', 'pre-wrap');
+  await page.keyboard.press('Escape');
+  await expect(dialog).toHaveCount(0);
+  await noOverflow(page);
+});
+
 test('all code styles keep their palette, highlighted lines and long filenames in bounds', async ({ page, colorScheme }) => {
   await ready(page, 'posts/code-styles/');
   await expect(page.locator('.code-shell')).toHaveCount(10);
@@ -26,6 +41,7 @@ test('copy and folding preserve the complete source in styled blocks', async ({ 
   await page.addInitScript(() => Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async text => { window.__moriiCopiedCode = text; } } }));
   await ready(page, 'posts/code-styles/');
   const block = shell(page, 'mac', 'auto'), toggle = block.locator('.code-toggle');
+  await expect(block.locator('.code-tools span')).toHaveText(/javascript/);
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await block.locator('.code-copy').click();
   await expect.poll(() => page.evaluate(() => window.__moriiCopiedCode)).toBe(sampleCode + '\n');

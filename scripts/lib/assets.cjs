@@ -12,6 +12,12 @@ function compactCSS(data, from) {
     for (const field of ['before', 'after']) {
       if (/^[ \t\n\r\f]+$/.test(node.raws[field] || '')) node.raws[field] = '';
     }
+    const between = node.raws.between || '';
+    if (node.nodes && /^[ \t\n\r\f]+$/.test(between)) node.raws.between = '';
+    // Keep the raw separator for custom properties and comment-bearing declarations.
+    if (node.type === 'decl' && !node.prop.startsWith('--') && /^[ \t\n\r\f]*:[ \t\n\r\f]*$/.test(between)) {
+      node.raws.between = ':';
+    }
   };
   removeFormatting(root);
   root.walk(removeFormatting);

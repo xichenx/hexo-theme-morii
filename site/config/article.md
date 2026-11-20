@@ -49,6 +49,7 @@ outdated: false
 | `meta_date_type` | 文章页头部日期，可填 `created`、`updated` 或 `both` | 使用全站头部日期设置 |
 | `meta_word_count` | 设为 `true` 或 `false`，显示或隐藏本篇字数 | 使用全站字数显示设置 |
 | `meta_reading_time` | 设为 `true` 或 `false`，显示或隐藏本篇预计阅读时间 | 使用全站阅读时间显示设置 |
+| `code_copy` / `code_language` | 分别控制本篇代码工具栏的复制按钮和语言标签，接受 `true` 或 `false` | 使用各自的全站设置 |
 
 例如要保留列表封面但隐藏文章顶部大图，可以同时写 `cover: /images/posts/first-post.jpg` 和 `top_img: false`。文章 `comments: true` 不会绕过全站 `comments.enable: false`。
 
@@ -84,6 +85,8 @@ article:
   code:
     style: classic
     theme: dark
+    copy: true
+    language: true
     collapse: true
     lines: 18
 ```
@@ -112,6 +115,8 @@ article:
 | `article.code.theme` | `dark` | 配色：`dark`、`light`、`auto`；`auto` 跟随站点深浅模式 |
 | `article.code.lines` | `18` | 代码折叠行数阈值，范围 5–100，建议从默认值开始 |
 | `article.code.word_wrap` | `false` | 默认自动换行；访客仍可按代码块切换 |
+| `article.code.copy` | `true` | 显示代码块和放大窗口里的复制按钮 |
+| `article.code.language` | `true` | 显示代码工具栏的语言标签 |
 
 例如只想关闭打印功能，修改 `article.print.enable` 即可，不需要关闭全部阅读工具。`reading_settings` 和 `navigation` 直接接受布尔值，**不要在它们下面再套一层 `enable`**。
 
@@ -199,7 +204,7 @@ article:
 
 | 外观 | 效果 |
 | --- | --- |
-| `classic` | 经典工具栏，保留语言和复制按钮 |
+| `classic` | 经典工具栏，默认显示语言和复制按钮 |
 | `mac` | 带三色装饰圆点的窗口标题栏与轻阴影 |
 | `minimal` | 简洁边框和透明工具栏背景 |
 

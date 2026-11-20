@@ -227,20 +227,23 @@
       block.before(shell);
       const tools = document.createElement('div');
       tools.className = 'code-tools';
-      const language = document.createElement('span');
       const languageClass = [...(code.querySelector('code')?.classList || [])].find(name => name.startsWith('language-'));
-      language.textContent = languageClass?.replace('language-', '') || [...block.classList].find(name => !['highlight', 'plaintext'].includes(name)) || 'CODE';
+      if (article.dataset.codeLanguage !== 'false') {
+        const language = document.createElement('span');
+        language.textContent = languageClass?.replace('language-', '') || [...block.classList].find(name => !['highlight', 'plaintext'].includes(name)) || 'CODE';
+        tools.append(language);
+      }
       const filename = file?.dataset.filename;
       if (filename) { const label = document.createElement('strong'); label.className = 'code-filename'; label.textContent = filename; tools.append(label); }
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'code-copy';
-      button.textContent = t("复制代码");
-      button.setAttribute('aria-label', t("复制代码"));
-      button.addEventListener('click', () => {
-        copyText(codeText(code), button);
-      });
-      tools.append(language, button);
+      if (article.dataset.codeCopy !== 'false') {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'code-copy';
+        button.textContent = t("复制代码");
+        button.setAttribute('aria-label', t("复制代码"));
+        button.addEventListener('click', () => copyText(codeText(code), button));
+        tools.append(button);
+      }
       const wrap = document.createElement('button');
       wrap.type = 'button';
       wrap.className = 'code-wrap';

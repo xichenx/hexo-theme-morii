@@ -42,6 +42,8 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
         assert.equal(document.querySelector('.article-copyright, .article-edit'), null);
         assert.equal(document.querySelector('.article-body').dataset.codeStyle, 'classic');
         assert.equal(document.querySelector('.article-body').dataset.codeTheme, 'dark');
+        assert.equal(document.querySelector('.article-body').hasAttribute('data-code-copy'), false);
+        assert.equal(document.querySelector('.article-body').hasAttribute('data-code-language'), false);
       }
       assert.equal(document.querySelectorAll('main h1').length, 1, `${file}: one page heading`);
       assert.equal(!!document.querySelector('script[src*="/js/tag-order."]'), file === 'tags/index.html');
