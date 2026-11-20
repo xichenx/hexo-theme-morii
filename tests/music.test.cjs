@@ -183,6 +183,30 @@ test('music lyrics reject stale responses, follow time and support seeking', asy
   window.close();
 });
 
+test('music preferences tolerate invalid fields and unavailable browser storage', t => {
+  const markup = musicMarkup({ title: '音乐', volume: .45, tracks: [] });
+  const key = 'morii-music-preferences:/music/';
+  for (const [stored, volume, mode] of [ ['{', .45, 0], ['{"volume":1.5,"mode":3}', .45, 3], ['{"volume":0,"mode":1.5}', 0, 0] ]) {
+    const { window } = browser(markup);
+    t.after(() => window.close());
+    window.localStorage.setItem(key, stored);
+    window.eval(script('music.js'));
+    assert.equal(window.MoriiMusic.player.volume, volume);
+    assert.equal(window.MoriiMusic.state.mode, mode);
+  }
+
+  const { window } = browser(markup);
+  t.after(() => window.close());
+  Object.defineProperty(window, 'localStorage', { get() { throw new Error('Storage blocked'); } });
+  window.eval(script('music.js'));
+  const { MoriiMusic } = window;
+  assert.equal(MoriiMusic.player.volume, .45);
+  MoriiMusic.volume(.3);
+  MoriiMusic.mode();
+  assert.equal(MoriiMusic.player.volume, .3);
+  assert.equal(MoriiMusic.state.mode, 1);
+});
+
 test('floating music capsule expands lyrics, keeps playback when collapsed and follows pause state', async () => {
   const dom = browser(musicMarkup({ title: '音乐', tracks: [{ title: '测试曲目', artist: '甲', url: '/one.mp3', lyrics: '[00:01.00]开场歌词' }] }));
   const { window } = dom;

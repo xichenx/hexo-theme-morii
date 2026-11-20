@@ -31,7 +31,18 @@
       const text = value => typeof value === 'string' ? value.trim() : '';
       return url ? [{ url, title: text(item.title) || text(item.name) || t("未命名曲目"), artist: text(item.artist) || text(item.author) || t("未知音乐人"), cover: safeURL(item.cover || item.pic), lrc: safeURL(item.lrc), lyrics: text(item.lyrics) || (typeof item.lrc === 'string' && item.lrc.includes('[0') ? item.lrc : '') }] : [];
     });
-    const state = { tracks: normalize(config.tracks), current: 0, playing: false, time: 0, duration: 0, volume: config.volume ?? .7, mode: 0, status: t("选择一首音乐，开始聆听。"), fetchStatus: '', loading: false, failed: false, lyrics: [], lyricIndex: -1, lyricStatus: t("播放一首歌，让旋律和文字相遇。"), activated: false };
+    const preferenceKey = `morii-music-preferences:${new URL(hub.dataset.musicPage || '/music/', location.href).pathname}`;
+    let preferences;
+    try { preferences = JSON.parse(localStorage.getItem(preferenceKey)); } catch { /* Preferences are optional. */ }
+    const savedVolume = preferences?.volume;
+    const savedMode = preferences?.mode;
+    const volume = Number.isFinite(savedVolume) && savedVolume >= 0 && savedVolume <= 1 ? savedVolume : config.volume ?? .7;
+    const mode = Number.isInteger(savedMode) && savedMode >= 0 && savedMode <= 3 ? savedMode : 0;
+    const state = { tracks: normalize(config.tracks), current: 0, playing: false, time: 0, duration: 0, volume, mode, status: t("选择一首音乐，开始聆听。"), fetchStatus: '', loading: false, failed: false, lyrics: [], lyricIndex: -1, lyricStatus: t("播放一首歌，让旋律和文字相遇。"), activated: false };
+    const savePreferences = () => {
+      const { volume, mode } = state;
+      try { localStorage.setItem(preferenceKey, JSON.stringify({ volume, mode })); } catch { /* Playback does not depend on storage. */ }
+    };
     const emit = () => listeners.forEach(listener => listener(state));
     let playRequest = 0;
     let lyricRequest = 0;
@@ -151,8 +162,8 @@
       toggle() { if (!state.tracks.length) return load(); if (!player.paused) player.pause(); else return play(state.current); },
       step(direction) { if (state.tracks.length) return play(nextIndex(direction)); },
       seek(time) { if (Number.isFinite(time) && Number.isFinite(player.duration) && player.duration > 0) { player.currentTime = Math.max(0, Math.min(player.duration, time)); player.dispatchEvent(new Event('timeupdate')); } },
-      volume(value) { state.volume = Math.max(0, Math.min(1, Number(value) || 0)); player.volume = state.volume; emit(); },
-      mode() { state.mode = (state.mode + 1) % 4; emit(); }
+      volume(value) { state.volume = Math.max(0, Math.min(1, Number(value) || 0)); player.volume = state.volume; savePreferences(); emit(); },
+      mode() { state.mode = (state.mode + 1) % 4; savePreferences(); emit(); }
     };
     window.MoriiMusic = api;
     // The audio stays in this document; site pages navigate in a single same-origin frame.
