@@ -108,6 +108,7 @@ article:
   outdated:
     enable: true
     days: 365
+    position: top # top / bottom
   related:
     enable: true
     limit: 3

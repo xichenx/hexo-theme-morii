@@ -13,6 +13,7 @@ const options = {
   themeOverrides: {
     article: {
       nav_title: true,
+      outdated: { enable: true, days: 365, position: 'bottom' },
       reward: { enable: true, text: '感谢支持这篇文章', methods: [
         { label: '打开示例二维码', qr: '/icons/brand/morii-logo.png' },
         { label: '支持说明', url: '/about/' },
@@ -28,6 +29,8 @@ const options = {
     friends_feed: { endpoint: 'https://feed.example.test/articles?source=fixture', page_size: 2 }
   },
   sourceOverrides: {
+    '_posts/outdated-bottom.md': '---\ntitle: 文末时效提醒\ndate: 2020-01-01\nupdated: 2020-01-01\npermalink: posts/outdated-bottom/\noutdated_days: 30\n---\n\n## 正文\n\n文末显示提醒。\n',
+    '_posts/outdated-top.md': '---\ntitle: 文首时效提醒\ndate: 2020-01-01\nupdated: 2020-01-01\npermalink: posts/outdated-top/\noutdated_position: top\n---\n\n## 正文\n\n文首显示提醒。\n',
     ...Object.fromEntries(['manual', 'viewport', 'immediate'].map(mode => [
       `comments/${mode}/index.md`,
       `---\ntitle: 留言板 ${mode}\ncomments: true\n${mode === 'manual' ? '' : 'comments_load: ' + mode + '\n'}---\n\n<div style="height:2400px">欢迎留言。</div>\n`

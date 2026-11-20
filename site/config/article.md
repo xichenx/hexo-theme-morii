@@ -41,6 +41,8 @@ outdated: false
 | `featured` | `true` 时参与首页精选 | 不主动标记为精选 |
 | `comments` | `false` 仅关闭本篇评论 | 遵循主题评论设置 |
 | `outdated` | `false` 仅关闭本篇过时提示 | 遵循主题过时提示设置 |
+| `outdated_days` | 设置本篇提醒天数，填写 1–36500 的整数 | 使用全站阈值 |
+| `outdated_position` | `top` 放在正文前，`bottom` 放在正文后 | 使用全站位置 |
 
 例如要保留列表封面但隐藏文章顶部大图，可以同时写 `cover: /images/posts/first-post.jpg` 和 `top_img: false`。文章 `comments: true` 不会绕过全站 `comments.enable: false`。
 
@@ -62,6 +64,7 @@ article:
   outdated:
     enable: true
     days: 365
+    position: top
   related:
     enable: true
     limit: 3
@@ -82,6 +85,7 @@ article:
 | `article.navigation` | `true` | 显示上一篇、下一篇；需要存在相邻文章 |
 | `article.outdated.enable` | `true` | 根据文章更新时间显示内容可能过时的提示 |
 | `article.outdated.days` | `365` | 过时提示天数阈值，使用正整数 |
+| `article.outdated.position` | `top` | 提醒位置，`top` 在正文前，`bottom` 在正文后 |
 | `article.related.enable` | `true` | 显示相关文章 |
 | `article.related.limit` | `3` | 相关文章数量，范围 1–6 |
 | `article.code.collapse` | `true` | 较长的代码块默认折叠 |

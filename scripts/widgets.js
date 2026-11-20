@@ -38,6 +38,8 @@ hexo.extend.helper.register('morii_outdated_notice', (post, now = Date.now()) =>
   let updated = stamp(post.updated);
   if (!Number.isFinite(updated)) updated = stamp(post.date);
   if (!Number.isFinite(updated)) return null;
-  const limit = bounded(settings.days, 365, 36500);
-  return { updated: new Date(updated).toISOString(), limit, days: Math.max(0, Math.floor((Number(now) - updated) / 86400000)) };
+  const limit = Number.isInteger(post.outdated_days) && post.outdated_days >= 1 && post.outdated_days <= 36500
+    ? post.outdated_days : bounded(settings.days, 365, 36500);
+  const position = [post.outdated_position, settings.position].find(value => ['top', 'bottom'].includes(value)) || 'top';
+  return { updated: new Date(updated).toISOString(), limit, position, days: Math.max(0, Math.floor((Number(now) - updated) / 86400000)) };
 });

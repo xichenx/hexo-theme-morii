@@ -51,7 +51,9 @@ block content
             button.reading-preference-button#reading-resume-continue(type='button') #{morii_t("继续阅读 →")}
             button.reading-preference-button#reading-resume-clear(type='button') #{morii_t("清除本篇记录")}
       include includes/article-series.pug
-      include includes/outdated-notice.pug
+      - var outdatedNotice = morii_outdated_notice(page)
+      if outdatedNotice && outdatedNotice.position === 'top'
+        include includes/outdated-notice.pug
       if tocOptions.enabled
         details.mobile-toc
           summary #{morii_t("本文目录")}
@@ -59,6 +61,8 @@ block content
       - var codeStyle = morii_code_style(page)
       - var codeWrap = typeof page.code_word_wrap === 'boolean' ? page.code_word_wrap : !!(theme.article && theme.article.code && theme.article.code.word_wrap === true)
       .article-body(data-code-style=codeStyle.style data-code-theme=codeStyle.theme data-code-word-wrap=String(codeWrap) data-code-collapse=(!theme.article || !theme.article.code || theme.article.code.collapse !== false) ? 'true' : 'false' data-code-lines=(theme.article && theme.article.code && theme.article.code.lines) || 18)!= morii_article_images(page)
+      if outdatedNotice && outdatedNotice.position === 'bottom'
+        include includes/outdated-notice.pug
       if page.tags && page.tags.length
         .article-tags
           each tag in page.tags.toArray()
