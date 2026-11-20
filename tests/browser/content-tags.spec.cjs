@@ -18,3 +18,17 @@ test('article timeline and button work on a subdirectory without JavaScript', as
   await link.press('Enter');
   await expect(page).toHaveURL(/\/layout\/archives\/$/);
 });
+
+test('inline friend cards show in a generated post without JavaScript', async ({ page }) => {
+  await ready(page, 'posts/reading/');
+  const group = page.getByRole('region', { name: '推荐阅读' });
+  const hexo = group.getByRole('link', { name: /Hexo 文档/ });
+  const morii = group.getByRole('link', { name: /Morii 源码/ });
+  await expect(hexo).toHaveAttribute('href', 'https://hexo.io/docs/');
+  await expect(morii.locator('img')).toHaveAttribute('src', '/layout/icons/brand/morii-logo.png');
+  await expect(hexo.locator('.friend-avatar')).toHaveText('H');
+  await hexo.scrollIntoViewIfNeeded();
+  await hexo.focus();
+  await expect(hexo).toBeFocused();
+  await noOverflow(page);
+});

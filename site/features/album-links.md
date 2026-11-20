@@ -105,6 +105,20 @@ comments: false
 
 友链页的「随机逛逛」会从当前分组和关键词筛选结果里随机选一个站点，在新标签页打开。有多个不同网址时会避免连续打开同一个站点。没有匹配结果时按钮不可用。
 
+### 在正文嵌入友链卡片
+
+在文章或独立页面的 Markdown 正文中用 `flink` 放一组推荐站点。标签内直接写 YAML，分组字段与友链页一致。正文卡片可填写站名、HTTP(S) 链接、简介和头像，缺少头像时显示站名首字，站内头像使用 `/` 开头的路径。
+
+```text
+{% flink %}
+- class_name: 推荐阅读
+  link_list:
+    - name: Hexo
+      link: https://hexo.io/
+      descr: Hexo 官方文档
+{% endflink %}
+```
+
 ## 生成并检查
 
 在博客根目录运行 `hexo clean`、`hexo generate`，重新启动预览。分别打开 `/album/`、`/album/travel/` 和 `/link/`：相册卡片应能点进详情，照片应能加载，友链应能打开。确认后，再按[外观与导航](/features/customization)把首次配置中的 `menu: false` 改成完整菜单。

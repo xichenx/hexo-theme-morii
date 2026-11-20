@@ -73,3 +73,16 @@ console.log(theme);
 {% endtimeline %}
 
 {% btn /archives/, 浏览文章归档, outline %}
+
+{% flink %}
+- class_name: 推荐阅读
+  class_desc: 搭建和完善 Hexo 博客时可以参考这些资料。
+  link_list:
+    - name: Hexo 文档
+      link: https://hexo.io/docs/
+      descr: 了解配置、文章和部署方式
+    - name: Morii 源码
+      link: https://github.com/xichenx/hexo-theme-morii
+      avatar: /icons/brand/morii-logo.png
+      descr: 查看主题示例和更新记录
+{% endflink %}
