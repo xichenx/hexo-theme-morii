@@ -1,6 +1,6 @@
 # Morii 发布与演示站
 
-当前正式版本：`v1.0.0`。配置好工作流不等于已经发布版本。
+当前正式版本：`v1.1.0`。配置好工作流不等于已经发布版本。
 
 ## 工作流
 
@@ -24,7 +24,7 @@ npm run package:theme
 ```
 
 - 演示站输出：`.cache/demo/public/`。
-- 发布包：`dist/hexo-theme-morii-v1.0.0.zip`。
+- 发布包：`dist/hexo-theme-morii-v1.1.0.zip`。
 - 解压后只有 `morii/` 主题目录，不包含博客文章、开发测试、node_modules 或 Git 配置。
 - ZIP 打包需要 `zip`；发布包测试需要 `unzip`。GitHub Ubuntu runner 已提供这两个命令。
 - 本地 Node.js 至少为 20.19.0，CI 验证 Node 22 / 24。
@@ -75,8 +75,8 @@ npm run build:demo
 候选版本示例：
 
 ```bash
-git tag -a v1.0.0 -m "Morii v1.0.0"
-git push origin v1.0.0
+git tag -a v1.1.0 -m "Morii v1.1.0"
+git push origin v1.1.0
 ```
 
 标签版本必须与 `package.json` 完全一致。标签推送后 Release 工作流才会运行；推送普通提交不会创建 Release。
