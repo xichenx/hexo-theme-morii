@@ -86,6 +86,7 @@ article:
   toc:
     enable: true
     scroll_percent: true
+    style_simple: false # 开启后文章侧栏仅显示目录
   reward:
     enable: false
     text: ''

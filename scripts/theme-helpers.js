@@ -35,8 +35,11 @@ hexo.extend.helper.register('morii_toc', content => tocObj(content || '', { min_
 
 hexo.extend.helper.register('morii_toc_options', page => {
   const config = hexo.theme.config.article?.toc || {};
+  const enabled = typeof page.toc === 'boolean' ? page.toc : config.enable !== false;
+  const simple = typeof page.toc_style_simple === 'boolean' ? page.toc_style_simple : config.style_simple === true;
   return {
-    enabled: typeof page.toc === 'boolean' ? page.toc : config.enable !== false,
+    enabled,
+    simple: enabled && simple,
     scrollPercent: typeof page.toc_scroll_percent === 'boolean' ? page.toc_scroll_percent : config.scroll_percent !== false
   };
 });

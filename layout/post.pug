@@ -88,7 +88,8 @@ block content
       include includes/article-discovery.pug
       include includes/comments.pug
     aside.reading-aside
-      include includes/profile-card.pug
+      unless tocOptions.simple
+        include includes/profile-card.pug
       .reading-aside-sticky
         if tocOptions.enabled
           .side-card.toc-card
@@ -98,4 +99,5 @@ block content
                 span(data-reading-percent aria-hidden='true') 0%
             nav(aria-label=morii_t("文章章节"))
               include includes/toc.pug
-        include includes/clock.pug
+        unless tocOptions.simple
+          include includes/clock.pug

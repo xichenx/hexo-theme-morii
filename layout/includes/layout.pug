@@ -223,7 +223,7 @@ html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || them
     script(src=morii_asset('/js/media.js') defer)
     if morii_social_links().some(function(item) { return item.qrcode })
       script(src=morii_asset('/js/social.js') defer)
-    if morii_clock().enable && (is_home() || is_archive() || is_category() || is_tag() || is_post())
+    if morii_clock().enable && (is_home() || is_archive() || is_category() || is_tag() || (is_post() && !tocOptions.simple))
       script(src=morii_asset('/js/clock.js') defer)
     if (is_post() || page.type === 'reading_list') && (!theme.reading_list || theme.reading_list.enable !== false)
       if page.type === 'reading_list' && (!theme.article || !theme.article.resume || theme.article.resume.enable !== false)

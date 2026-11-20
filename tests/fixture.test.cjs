@@ -280,13 +280,14 @@ test('optional enhancements and Waline produce configured assets and safe sharin
     '_posts/related-maintained.md': '---\ntitle: Maintained tutorial\npermalink: posts/related-maintained/\ntags: [Related fixture]\ndate: 2020-01-01 12:00:00\nupdated: 2025-02-03 12:00:00\n---\nMaintained tutorial.',
     '_posts/related-recent.md': '---\ntitle: Published later\npermalink: posts/related-recent/\ntags: [Related fixture]\ndate: 2021-01-01 12:00:00\nupdated: 2024-02-03 12:00:00\n---\nPublished later.'
   }, themeOverrides: {
-    article: { enhancements: { mermaid: true, math: true }, toc: { enable: false, scroll_percent: false }, related: { date_type: 'updated' }, navigation_order: 'oldest_first' },
+    article: { enhancements: { mermaid: true, math: true }, toc: { enable: false, scroll_percent: false, style_simple: true }, related: { date_type: 'updated' }, navigation_order: 'oldest_first' },
     comments: { enable: true, provider: 'waline', server_url: 'https://comments.example.test' },
     seo: { default_image: '/share.jpg', structured_data: true }
   } });
   const dom = new JSDOM(fs.readFileSync(path.join(output, 'posts/welcome/index.html'), 'utf8'));
   const d = dom.window.document;
   assert.equal(d.querySelector('.toc-card, .mobile-toc, #reading-toc-dialog, [data-reading-toc]'), null);
+  assert.ok(d.querySelector('.reading-aside .profile-card'));
   assert.ok(d.querySelector('.reading-progress'));
   assert.equal(d.querySelector('.article-navigation [rel="prev"]').getAttribute('href'), '/theme/posts/reading/');
   assert.equal(d.querySelector('.article-navigation [rel="next"]').getAttribute('href'), '/theme/posts/formulas/');
@@ -295,6 +296,7 @@ test('optional enhancements and Waline produce configured assets and safe sharin
   assert.equal(technical.window.document.querySelector('.article-navigation [rel="prev"]'), null);
   assert.equal(technical.window.document.querySelector('.article-navigation [rel="next"]').getAttribute('href'), '/theme/posts/welcome/');
   assert.equal(technical.window.document.querySelectorAll('.toc-content a').length, 3);
+  assert.equal(technical.window.document.querySelector('.reading-aside .profile-card'), null);
   assert.equal(technical.window.document.querySelectorAll('[data-reading-percent]').length, 2);
   const related = [...technical.window.document.querySelectorAll('.related-card')];
   assert.deepEqual(related.map(card => card.getAttribute('href')), ['/theme/posts/related-maintained/', '/theme/posts/related-recent/']);
