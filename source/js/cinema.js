@@ -13,6 +13,9 @@
   const noResults = root.querySelector('[data-cinema-no-results]');
   const search = root.querySelector('[data-cinema-search]');
   const filters = [...root.querySelectorAll('[data-cinema-filter]')];
+  const watchFilter = root.querySelector('[data-cinema-filter="watchlist"]');
+  const watchCount = root.querySelector('[data-cinema-watch-count]');
+  const watchButtons = new Map(cards.map(card => [card, card.querySelector('[data-cinema-watch]')]));
   const stage = root.querySelector('[data-cinema-stage]');
   const close = root.querySelector('[data-cinema-close]');
   const episodeAnchor = root.querySelector('[data-cinema-episodes-anchor]');
@@ -20,6 +23,22 @@
   let activeFilter = 'all';
   let episodeList;
   let selectedButton;
+  const watchStorageKey = `morii-cinema-watchlist:${root.dataset.cinema}`;
+  const watchlist = new Set();
+  try {
+    const saved = JSON.parse(localStorage.getItem(watchStorageKey));
+    if (Array.isArray(saved)) saved.filter(id => typeof id === 'string').forEach(id => watchlist.add(id));
+  } catch { /* The watchlist can still be used while the page is open. */ }
+
+  function updateWatchlist() {
+    let count = 0;
+    for (const button of watchButtons.values()) {
+      const saved = watchlist.has(button.dataset.cinemaWatch);
+      button.setAttribute('aria-pressed', String(saved));
+      if (saved) count++;
+    }
+    watchCount.textContent = count;
+  }
 
   function stop() {
     video.pause();
@@ -91,13 +110,34 @@
     const query = search.value.trim().toLocaleLowerCase();
     let visible = 0;
     cards.forEach(card => {
-      const show = (activeFilter === 'all' || card.dataset.type === activeFilter) && card.dataset.title.toLocaleLowerCase().includes(query);
+      const matchesFilter = activeFilter === 'watchlist'
+        ? watchlist.has(watchButtons.get(card).dataset.cinemaWatch)
+        : activeFilter === 'all' || card.dataset.type === activeFilter;
+      const show = matchesFilter && card.dataset.title.toLocaleLowerCase().includes(query);
       card.hidden = !show;
       if (show) visible++;
     });
-    if (noResults) noResults.hidden = visible !== 0;
+    if (noResults) {
+      noResults.hidden = visible !== 0;
+      if (!visible) noResults.textContent = activeFilter === 'watchlist' && watchCount.textContent === '0'
+        ? t("想看片单还是空的。返回全部作品，点星标添加。")
+        : t("没有找到符合条件的作品，试试别的关键词。");
+    }
   }
 
+  for (const [card, button] of watchButtons) {
+    button.addEventListener('click', () => {
+      const key = button.dataset.cinemaWatch;
+      if (!watchlist.delete(key)) watchlist.add(key);
+      try { localStorage.setItem(watchStorageKey, JSON.stringify([...watchlist])); } catch { /* Keep the current list in memory. */ }
+      updateWatchlist();
+      filter();
+      if (card.hidden) watchFilter.focus();
+    });
+    button.hidden = false;
+  }
+  updateWatchlist();
+  watchFilter.hidden = false;
   cards.forEach(card => card.querySelector('[data-cinema-select]').addEventListener('click', () => select(card)));
   close?.addEventListener('click', () => {
     stop();
@@ -106,7 +146,8 @@
       card.classList.remove('is-selected');
       card.querySelector('[data-cinema-select]').setAttribute('aria-pressed', 'false');
     });
-    selectedButton?.focus();
+    if (selectedButton?.closest('[data-cinema-card]').hidden) filters.find(button => button.dataset.cinemaFilter === activeFilter)?.focus();
+    else selectedButton?.focus();
   });
   filters.forEach(button => button.addEventListener('click', () => {
     activeFilter = button.dataset.cinemaFilter;

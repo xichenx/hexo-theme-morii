@@ -1,6 +1,6 @@
 - var films = morii_cinema_catalog()
 - var categories = [{key:'all', name:morii_t("全部"), count:films.length}, {key:'movie', name:morii_t("电影"), count:films.filter(function(film) { return film.type === 'movie' }).length}, {key:'series', name:morii_t("电视剧"), count:films.filter(function(film) { return film.type === 'series' }).length}, {key:'anime', name:morii_t("动漫"), count:films.filter(function(film) { return film.type === 'anime' }).length}]
-.cinema(data-cinema)
+.cinema(data-cinema=url_for('/cinema/'))
   if films.length
     .cinema-stage(data-cinema-stage hidden)
       .cinema-stage-heading
@@ -30,6 +30,7 @@
         .cinema-filters(role='group' aria-label=morii_t("作品分类"))
           each category in categories
             button.cinema-filter(type='button' data-cinema-filter=category.key aria-pressed=category.key === 'all' ? 'true' : 'false') #{category.name} #[span= category.count]
+          button.cinema-filter(type='button' data-cinema-filter='watchlist' aria-pressed='false' hidden) #{morii_t("想看")} #[span(data-cinema-watch-count) 0]
         label.cinema-search
           span.sr-only #{morii_t("搜索片名")}
           svg(viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' aria-hidden='true')
@@ -55,7 +56,8 @@
                 strong.cinema-card-title= film.title
                 p= film.description || morii_t("挑一段空闲时间，来这里看一场。")
                 span.cinema-card-action= film.episodes.length ? morii_t("查看片源  →") : morii_t("查看详情  →")
-              span.cinema-card-arrow(aria-hidden='true') ↗
+            button.cinema-watch(type='button' data-cinema-watch=film.watchKey aria-label=morii_t("想看：{0}", film.title) aria-pressed='false' hidden)
+              span(aria-hidden='true')
             .cinema-card-data(hidden)
               each episode in film.episodes
                 span(data-cinema-episode data-kind=episode.kind data-url=url_for(episode.url) data-title=episode.title)

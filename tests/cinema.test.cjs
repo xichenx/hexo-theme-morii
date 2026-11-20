@@ -15,3 +15,13 @@ test('cinema catalog keeps safe local and HTTPS video sources and episode order'
   for (const value of ['//evil.example/movie.mp4', '/videos/../secret.mp4', 'javascript:alert(1)', 'http://example.com/movie.mp4', 'https://user:pass@example.com/movie.mp4']) assert.equal(mediaUrl(value), '');
   assert.equal(embedUrl('https://evil.example/embed/movie'), '');
 });
+
+test('cinema watchlist keys survive catalog reordering and distinguish same-title works', () => {
+  const original = { title: '同名作品', type: 'series', year: 2024 };
+  const remake = { ...original, year: 2026 };
+  const explicit = { ...remake, id: 'remake' };
+  const films = normalize([original, remake, explicit]);
+  const reordered = normalize([{ ...explicit, title: '新片名' }, remake, original]);
+  assert.equal(new Set(films.map(film => film.watchKey)).size, 3);
+  assert.deepEqual(reordered.map(film => film.watchKey), films.map(film => film.watchKey).reverse());
+});

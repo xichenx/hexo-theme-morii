@@ -29,8 +29,12 @@ function embedUrl(value) {
 
 function normalize(items, translate = t) {
   if (!Array.isArray(items)) return [];
-  return items.flatMap((item, index) => {
-    if (!item || !clean(item.title)) return [];
+  return items.flatMap(item => {
+    const title = clean(item?.title);
+    if (!title) return [];
+    const type = Object.hasOwn(types, item.type) ? item.type : 'movie';
+    const year = clean(String(item.year || ''));
+    const id = clean(item.id);
     const rawEpisodes = Array.isArray(item.episodes) ? item.episodes : [{ title: translate("播放"), url: item.url, embed: item.embed }];
     const episodes = rawEpisodes.flatMap((episode, episodeIndex) => {
       if (!episode || typeof episode !== 'object') return [];
@@ -39,7 +43,8 @@ function normalize(items, translate = t) {
       if (!embed && !url) return [];
       return [{ title: clean(episode.title) || translate("第 {0} 集", episodeIndex + 1), url: embed || url, kind: embed ? 'embed' : 'video' }];
     });
-    return [{ id: `cinema-${index}`, title: clean(item.title), type: types[item.type] ? item.type : 'movie', year: clean(String(item.year || '')), description: clean(item.description), cover: mediaUrl(item.cover), episodes }];
+    const watchKey = id ? `id:${id}` : JSON.stringify([type, year, title]);
+    return [{ watchKey, title, type, year, description: clean(item.description), cover: mediaUrl(item.cover), episodes }];
   });
 }
 

@@ -19,9 +19,9 @@
 .cinema-search input { width: 100%; padding: 10px 12px 10px 39px; border: 1px solid var(--line); border-radius: 10px; outline: none; background: var(--surface-2); color: var(--ink); font: inherit; font-size: 12px; }
 .cinema-search input:focus { border-color: var(--accent); }
 .cinema-list { display: grid; }
-.cinema-card { min-width: 0; border-bottom: 1px solid var(--line); }
+.cinema-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; min-width: 0; border-bottom: 1px solid var(--line); }
 .cinema-card:last-child { border-bottom: 0; }
-.cinema-card-button { display: grid; grid-template-columns: 128px minmax(0, 1fr) 34px; align-items: center; gap: 24px; width: 100%; min-height: 176px; padding: 18px 4px; border: 0; background: transparent; color: var(--ink); text-align: left; font: inherit; cursor: pointer; }
+.cinema-card-button { display: grid; grid-template-columns: 128px minmax(0, 1fr); align-items: center; gap: 24px; width: 100%; min-height: 176px; padding: 18px 4px; border: 0; background: transparent; color: var(--ink); text-align: left; font: inherit; cursor: pointer; }
 .cinema-card-button:hover .cinema-card-title { color: var(--accent); }
 .cinema-card-button:hover .cinema-poster { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(25, 31, 63, .18); }
 .cinema-card.is-selected .cinema-card-title { color: var(--accent); }
@@ -41,8 +41,10 @@
 .cinema-card-title { display: block; margin: 9px 0 7px; font-size: clamp(18px, 1.6vw, 23px); letter-spacing: -.025em; transition: color .2s; }
 .cinema-card-copy p { display: -webkit-box; overflow: hidden; max-width: 1000px; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.75; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .cinema-card-action { display: inline-block; margin-top: 12px; color: var(--accent); font-size: 12px; font-weight: 800; }
-.cinema-card-arrow { justify-self: end; color: var(--muted); font-size: 22px; transition: transform .2s, color .2s; }
-.cinema-card-button:hover .cinema-card-arrow { color: var(--accent); transform: translate(3px, -3px); }
+.cinema-watch { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); color: var(--muted); font: inherit; font-size: 23px; line-height: 1; cursor: pointer; }
+.cinema-watch span::before { content: '☆'; }
+.cinema-watch:hover, .cinema-watch[aria-pressed=true] { border-color: var(--accent); color: var(--accent); }
+.cinema-watch[aria-pressed=true] span::before { content: '★'; }
 .cinema-stage { overflow: hidden; border: 1px solid #283555; border-radius: 21px; background: #121a2e; color: #fff; box-shadow: 0 22px 55px rgba(17, 30, 65, .18); scroll-margin-top: 96px; }
 .cinema-stage-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 22px 28px; border-bottom: 1px solid rgba(255,255,255,.1); }
 .cinema-stage-heading .section-kicker { color: #e8ca93; font-size: 10px; }
@@ -80,14 +82,13 @@
   .cinema-library-heading { display: block; margin-bottom: 19px; }
   .cinema-library-heading p { margin-top: 6px; }
   .cinema-toolbar { display: block; padding-bottom: 14px; }
-  .cinema-filters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3px; }
-  .cinema-filter { justify-content: center; gap: 3px; min-height: 38px; padding: 6px 2px; font-size: 11px; }
+  .cinema-filters { gap: 3px; }
+  .cinema-filter { flex: 1 0 auto; justify-content: center; gap: 3px; min-height: 38px; padding: 6px 4px; font-size: 11px; }
   .cinema-filter span { font-size: 9px; }
   .cinema-search { width: 100%; margin-top: 13px; }
   .cinema-card-button { grid-template-columns: 95px minmax(0, 1fr); gap: 14px; min-height: 135px; padding: 15px 0; }
   .cinema-poster { width: 95px; height: 112px; border-radius: 9px; }
   .cinema-poster-mark { font-size: 62px; }
-  .cinema-card-arrow { display: none; }
   .cinema-card-title { margin: 7px 0 5px; font-size: 16px; }
   .cinema-card-copy p { font-size: 11px; line-height: 1.55; }
   .cinema-card-action { margin-top: 7px; font-size: 11px; }
@@ -103,5 +104,5 @@
   .cinema-card-copy p { -webkit-line-clamp: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .cinema-poster, .cinema-card-title, .cinema-card-arrow { transition: none; }
+  .cinema-poster, .cinema-card-title { transition: none; }
 }
