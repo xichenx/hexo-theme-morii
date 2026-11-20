@@ -52,6 +52,8 @@ html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || them
       link(rel='stylesheet' href=morii_asset('/css/categories.css'))
     if is_home() && (!page.current || page.current === 1) && morii_github_calendar()
       link(rel='stylesheet' href=morii_asset('/css/github-calendar.css'))
+    if is_home() && (!page.current || page.current === 1)
+      link(rel='stylesheet' href=morii_asset('/css/discovery.css'))
     if page.type === 'link'
       link(rel='stylesheet' href=morii_asset('/css/friends.css'))
     if page.type === 'music'
