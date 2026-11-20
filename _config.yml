@@ -105,6 +105,7 @@ article:
     enable: true
   reading_settings: true
   navigation: true
+  navigation_order: newest_first # oldest_first 让下一篇指向较新的文章
   outdated:
     enable: true
     days: 365

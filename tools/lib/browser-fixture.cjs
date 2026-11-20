@@ -13,6 +13,7 @@ const options = {
   themeOverrides: {
     article: {
       nav_title: true,
+      navigation_order: 'oldest_first',
       outdated: { enable: true, days: 365, position: 'bottom' },
       reward: { enable: true, text: '感谢支持这篇文章', methods: [
         { label: '打开示例二维码', qr: '/icons/brand/morii-logo.png' },

@@ -1,14 +1,17 @@
 if !theme.article || theme.article.navigation !== false
-  if page.prev || page.next
+  - var navigationOrder = [page.navigation_order, theme.article && theme.article.navigation_order].find(function(order) { return order === 'oldest_first' || order === 'newest_first' })
+  - var previousArticle = navigationOrder === 'oldest_first' ? page.next : page.prev
+  - var nextArticle = navigationOrder === 'oldest_first' ? page.prev : page.next
+  if previousArticle || nextArticle
     nav.article-navigation(aria-label=morii_t("相邻文章"))
-      if page.prev
-        a.article-navigation__item(href=url_for(page.prev.path) rel='prev')
+      if previousArticle
+        a.article-navigation__item(href=url_for(previousArticle.path) rel='prev')
           span #{morii_t("← 上一篇")}
-          strong= page.prev.title
-      if page.next
-        a.article-navigation__item(href=url_for(page.next.path) rel='next')
+          strong= previousArticle.title
+      if nextArticle
+        a.article-navigation__item(href=url_for(nextArticle.path) rel='next')
           span #{morii_t("下一篇 →")}
-          strong= page.next.title
+          strong= nextArticle.title
 - var relatedPosts = morii_related_posts(page, site.posts)
 if relatedPosts.length
   section.related-section(aria-labelledby='related-heading')

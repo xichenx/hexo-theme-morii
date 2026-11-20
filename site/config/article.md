@@ -44,6 +44,7 @@ outdated: false
 | `outdated_days` | 设置本篇提醒天数，填写 1–36500 的整数 | 使用全站阈值 |
 | `outdated_position` | `top` 放在正文前，`bottom` 放在正文后 | 使用全站位置 |
 | `related_date_type` | 相关文章日期口径，可填 `created` 或 `updated` | 使用全站日期口径 |
+| `navigation_order` | 相邻文章翻页方向，可填 `newest_first` 或 `oldest_first` | 使用全站翻页方向 |
 
 例如要保留列表封面但隐藏文章顶部大图，可以同时写 `cover: /images/posts/first-post.jpg` 和 `top_img: false`。文章 `comments: true` 不会绕过全站 `comments.enable: false`。
 
@@ -62,6 +63,7 @@ article:
     enable: true
   reading_settings: true
   navigation: true
+  navigation_order: newest_first
   outdated:
     enable: true
     days: 365
@@ -85,6 +87,7 @@ article:
 | `article.print.enable` | `true` | 显示打印 / 导出 PDF 工具，通过浏览器打印流程保存 |
 | `article.reading_settings` | `true` | 允许访客调整字号和专注阅读模式 |
 | `article.navigation` | `true` | 显示上一篇、下一篇；需要存在相邻文章 |
+| `article.navigation_order` | `newest_first` | `newest_first` 的下一篇指向较旧文章，`oldest_first` 的下一篇指向较新文章 |
 | `article.outdated.enable` | `true` | 根据文章更新时间显示内容可能过时的提示 |
 | `article.outdated.days` | `365` | 过时提示天数阈值，使用正整数 |
 | `article.outdated.position` | `top` | 提醒位置，`top` 在正文前，`bottom` 在正文后 |
@@ -98,6 +101,8 @@ article:
 | `article.code.word_wrap` | `false` | 默认自动换行；访客仍可按代码块切换 |
 
 例如只想关闭打印功能，修改 `article.print.enable` 即可，不需要关闭全部阅读工具。`reading_settings` 和 `navigation` 直接接受布尔值，**不要在它们下面再套一层 `enable`**。
+
+`article.navigation_order` 控制按发布日期生成的相邻文章链接。单篇可在 Front Matter 使用 `navigation_order` 覆盖，系列内的前后篇仍按系列章节顺序排列。
 
 ## 3. 稍后阅读
 
