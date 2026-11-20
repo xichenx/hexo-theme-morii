@@ -86,6 +86,10 @@ article:
   toc:
     enable: true
     scroll_percent: true
+  reward:
+    enable: false
+    text: ''
+    methods: [] # 每项填写 label，以及 qr 或 url
   enhancements:
     # 默认不下载渲染库；单篇文章也可用 mermaid: true / math: true 开启。
     mermaid: false

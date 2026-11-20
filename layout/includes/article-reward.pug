@@ -1,0 +1,12 @@
+- var reward = morii_article_reward(page)
+if reward
+  .wrap
+    details.article-reward.folding-tag
+      summary #{morii_t("支持作者")}
+      if reward.text
+        p= reward.text
+      each method in reward.methods
+        if method.qr
+          .social-qr-frame
+            img(src=method.qr.local ? url_for(method.qr.path) : method.qr.path alt=morii_t("{0}赞赏二维码", method.label) loading='lazy' decoding='async' width='270' height='270')
+        a.button.service-button.inline-link-card(href=method.url.local ? url_for(method.url.path) : method.url.path data-no-music-nav)= method.label
