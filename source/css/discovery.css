@@ -112,6 +112,32 @@
 
 @media (max-width: 800px) { .home-discovery { grid-template-columns: 1fr; } }
 @media (max-width: 580px) {
-  .discovery-card { padding: 22px; }
-  .moment-item p { font-size: 16px; }
+  .home-discovery { --discovery-edge-clearance: 36px; gap: 12px; margin-block: 18px 30px; }
+  .discovery-card { padding: 16px; border-radius: 18px; }
+  .discovery-heading { gap: 10px; margin-bottom: 10px; }
+  .discovery-heading h2 { margin-top: 3px; font-size: 20px; line-height: 1.25; }
+  .discovery-heading .text-link { display: inline-flex; align-items: center; min-height: 44px; }
+  .moments-card, .moment-item { position: relative; }
+  .moment-item { gap: 6px; }
+  .moment-item p { font-size: 15px; line-height: 1.55; }
+  .moments-card:has(.discovery-controls:not([hidden])) .moment-item { padding-bottom: 50px; }
+  .moments-card:has(.discovery-controls:not([hidden])) .moment-item time {
+    position: absolute; inset-inline-start: 0; bottom: 0; display: flex; align-items: center; min-height: 44px;
+  }
+  .moments-card .discovery-controls {
+    position: absolute; inset-inline-end: calc(16px + var(--discovery-edge-clearance)); bottom: 16px; gap: 6px; margin: 0;
+  }
+  .discovery-controls .icon-button { width: 44px; height: 44px; font-size: 18px; }
+  .random-card__icon { font-size: 25px; line-height: 1; }
+  .random-result { gap: 6px; }
+  .random-result strong { font-size: 16px; line-height: 1.4; min-height: 2.8em; }
+  .random-result p { line-height: 1.55; min-height: 3.1em; }
+  .random-result > span { padding-top: 2px; }
+  .random-controls { justify-content: flex-start; margin-top: 10px; padding-inline-end: var(--discovery-edge-clearance); }
+  .random-refresh { min-height: 44px; padding-inline: 11px; }
+  .random-controls [data-random-refresh] {
+    margin-inline-start: auto;
+    background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+    border-color: color-mix(in srgb, var(--accent) 22%, var(--line));
+  }
 }

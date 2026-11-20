@@ -4,6 +4,59 @@ const { installHooks, ready, noOverflow } = require('./helpers.cjs');
 installHooks(test);
 test.use({ reducedMotion: 'no-preference' });
 
+test('discovery card controls fit mobile widths and moment paging stays usable', async ({ page, viewport }, info) => {
+  await ready(page);
+  const discovery = page.locator('.home-discovery');
+  const moments = discovery.locator('[data-moments]');
+  const random = discovery.locator('[data-random]');
+  const previous = moments.getByRole('button', { name: '上一条即刻' });
+  const next = moments.getByRole('button', { name: '下一条即刻' });
+  const date = moments.locator('.moment-item:visible time');
+  const playback = random.locator('[data-random-autoplay]');
+  const refresh = random.locator('[data-random-refresh]');
+  const count = moments.locator('[data-moment-count]');
+
+  await next.click();
+  await expect(count).toHaveText('2 / 2');
+  await expect(moments.locator('.moment-item:visible')).toContainText('September note');
+  await previous.click();
+  await expect(count).toHaveText('1 / 2');
+  await expect(moments.locator('.moment-item:visible')).toContainText('October note');
+  await playback.click();
+  await expect(playback).toHaveText('继续轮播');
+
+  if (viewport.width <= 580) {
+    await expect(discovery).toHaveCSS('row-gap', '12px');
+    for (const width of [viewport.width, 320]) {
+      await page.setViewportSize({ width, height: viewport.height });
+      for (const control of [previous, next, playback, refresh]) {
+        expect((await control.boundingBox()).height).toBeGreaterThanOrEqual(44);
+      }
+      const dateBox = await date.boundingBox();
+      const previousBox = await previous.boundingBox();
+      expect(dateBox.x + dateBox.width).toBeLessThan(previousBox.x);
+      await expect.poll(async () => {
+        const time = await date.boundingBox();
+        const button = await previous.boundingBox();
+        return Math.abs(time.y + time.height / 2 - button.y - button.height / 2);
+      }).toBeLessThan(1);
+      const controls = await random.locator('.random-controls').boundingBox();
+      expect((await playback.boundingBox()).x).toBeCloseTo(controls.x, 0);
+      await expect(page.locator('#back-to-top')).toBeVisible();
+      const backToTop = await page.locator('#back-to-top').boundingBox();
+      for (const control of [next, refresh]) {
+        const box = await control.boundingBox();
+        expect(box.x + box.width).toBeLessThan(backToTop.x);
+      }
+      await noOverflow(page);
+    }
+    await page.setViewportSize(viewport);
+  }
+  const preview = info.outputPath('home-discovery.png');
+  await discovery.screenshot({ path: preview, animations: 'disabled' });
+  await info.attach('homepage discovery', { path: preview, contentType: 'image/png' });
+});
+
 test('random articles rotate in view, pause for interaction and respect reduced motion', async ({ page }) => {
   await page.clock.install();
   await page.addInitScript(() => {
