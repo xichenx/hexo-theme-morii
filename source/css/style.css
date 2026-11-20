@@ -32,6 +32,10 @@ html[data-theme=dark]{
 html{
   scroll-behavior:smooth
 }
+/* Keep the sticky header anchored during desktop scroll-boundary gestures. */
+@media (hover:hover) and (pointer:fine){
+  html{overscroll-behavior-y:none}
+}
 body{
   margin:0;
   background:var(--bg);
@@ -79,14 +83,19 @@ button{
   flex-direction:column
 }
 .site-header{
+  --header-surface:color-mix(in srgb,var(--accent) 5%,var(--surface));
+  --header-line:color-mix(in srgb,var(--accent) 20%,var(--line));
+  --header-active:color-mix(in srgb,var(--accent) 16%,var(--surface));
+  --header-nav:color-mix(in srgb,var(--header-active) 45%,var(--header-surface));
+  --header-ink:color-mix(in srgb,var(--accent) 30%,var(--ink));
   height:78px;
   padding:0 var(--page-gutter);
-  background:color-mix(in srgb,var(--surface) 93%,transparent);
-  border-bottom:1px solid var(--line);
+  background:var(--header-surface);
+  border-bottom:1px solid var(--header-line);
   position:sticky;
   top:0;
   z-index:20;
-  backdrop-filter:blur(18px)
+  color:var(--ink)
 }
 .site-header__inner{
   /* Match the page gutter used by .wrap; a separate max-width misaligns wide screens. */
@@ -113,7 +122,7 @@ button{
   border-radius:13px;
   background:var(--accent);
   color:white;
-  box-shadow:0 7px 16px rgba(85,104,246,.25)
+  box-shadow:0 7px 16px color-mix(in srgb,var(--accent) 25%,transparent)
 }
 .brand__mark--image { background: transparent; box-shadow: none; border-radius: 0; }
 .brand__mark img { width: 100%; height: 100%; object-fit: contain; }
@@ -127,31 +136,33 @@ button{
   gap:2px;
   margin-left:auto;
   padding:4px;
-  border:1px solid var(--line);
+  border:1px solid var(--header-line);
   border-radius:15px;
-  background:color-mix(in srgb,var(--surface-2) 64%,transparent)
+  background:var(--header-nav)
 }
 .site-nav a{
   padding:7px 12px;
   border-radius:10px;
   font-size:13px;
   font-weight:700;
-  color:var(--muted);
+  color:color-mix(in srgb,var(--ink) 25%,var(--muted));
   white-space:nowrap;
   line-height:1.5
 }
-.site-nav a:hover,.site-nav a.site-nav__item--active{
-  background:var(--surface);
-  color:var(--accent)
+.site-nav a:is(:hover,.site-nav__item--active),.header-actions .icon-button:is(:hover,[aria-expanded=true],[aria-pressed=true]){
+  background:var(--header-active);
+  border-color:var(--header-line);
+  color:var(--header-ink)
 }
-.site-nav a.site-nav__item--active{ box-shadow:0 2px 9px rgba(35,51,91,.08); }
+.site-nav a.site-nav__item--active{box-shadow:inset 0 0 0 1px var(--header-line)}
 .header-actions{
   display:flex;
   align-items:center;
   gap:7px;
   flex-shrink:0
 }
-.header-actions .icon-button{ width:40px; height:40px; border-radius:12px; }
+.header-actions .icon-button{ width:40px; height:40px; border-radius:12px; background:var(--header-surface); border-color:var(--header-line); }
+.site-header :focus-visible{outline-color:var(--header-ink)}
 .header-actions .icon-button svg{ width:19px; height:19px; flex-shrink:0; }
 .header-actions .header-search{ display:flex; align-items:center; justify-content:center; width:auto; min-width:90px; padding:0 12px; gap:8px; font-size:12px; font-weight:750; white-space:nowrap; }
 .header-search__label{ line-height:1; }
@@ -1280,8 +1291,7 @@ a.footer-filing__item:focus-visible { outline: 2px solid var(--accent); outline-
     right:0;
     margin:0;
     padding:12px;
-    background:var(--surface);
-    border:1px solid var(--line);
+    background:var(--header-surface);
     border-radius:0 0 18px 18px;
     box-shadow:0 18px 35px rgba(24,34,56,.14);
     flex-wrap:wrap;
@@ -1293,7 +1303,7 @@ a.footer-filing__item:focus-visible { outline: 2px solid var(--accent); outline-
   .site-nav a{
     width:calc(50% - 3px);
     padding:11px 14px;
-    background:var(--surface-2)
+    background:var(--header-nav)
   }
   .header-actions{
     margin-left:auto

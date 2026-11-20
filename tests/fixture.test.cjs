@@ -25,6 +25,8 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       assert.equal(!!codeStyle, file.startsWith('posts/'), `${file}: code styles load only on article pages`);
       if (file === 'posts/welcome/index.html') {
         assert.deepEqual([...document.querySelectorAll('.article-header .article-meta time[datetime]')].map(time => time.parentElement.textContent.split(' ')[0]), ['发布于', '更新于']);
+        assert.match(document.querySelector('.article-header .article-meta').textContent, /分钟阅读/);
+        assert.doesNotMatch(document.querySelector('.article-header .article-meta').textContent, /字数/);
         assert.equal(document.querySelector('.reading-layout--left'), null);
         assert.equal(document.querySelector('.header-post-title'), null);
         assert.equal(document.querySelector('.article-reward'), null);
@@ -280,9 +282,9 @@ test('optional enhancements and Waline produce configured assets and safe sharin
     'comments/index.md': '---\ntitle: 留言板\ncomments: true\n---\n欢迎留言。',
     '_posts/formulas.md': '---\ntitle: Formulas and diagrams\ndate: 2026-10-16 12:00:00\npermalink: posts/formulas/\ntags: [Related fixture]\ntoc: true\ntoc_scroll_percent: true\nnavigation_order: newest_first\nsidebar_position: right\nmeta_date_type: created\n---\n\n## Examples\n\n{% math %}x^2{% endmath %}\n\n{% mermaid %}\ngraph TD; A-->B;\n{% endmermaid %}',
     '_posts/related-maintained.md': '---\ntitle: Maintained tutorial\npermalink: posts/related-maintained/\ntags: [Related fixture]\ndate: 2020-01-01 12:00:00\nupdated: 2025-02-03 12:00:00\n---\nMaintained tutorial.',
-    '_posts/related-recent.md': '---\ntitle: Published later\npermalink: posts/related-recent/\ntags: [Related fixture]\ndate: 2021-01-01 12:00:00\nupdated: 2024-02-03 12:00:00\n---\nPublished later.'
+    '_posts/related-recent.md': '---\ntitle: Published later\npermalink: posts/related-recent/\ntags: [Related fixture]\ndate: 2021-01-01 12:00:00\nupdated: 2024-02-03 12:00:00\nmeta_word_count: false\nmeta_reading_time: true\n---\nPublished later.'
   }, themeOverrides: {
-    article: { enhancements: { mermaid: true, math: true }, toc: { enable: false, scroll_percent: false, style_simple: true }, related: { date_type: 'updated' }, navigation_order: 'oldest_first', sidebar_position: 'left', meta: { date_type: 'updated' } },
+    article: { enhancements: { mermaid: true, math: true }, toc: { enable: false, scroll_percent: false, style_simple: true }, related: { date_type: 'updated' }, navigation_order: 'oldest_first', sidebar_position: 'left', meta: { date_type: 'updated', word_count: true, reading_time: false } },
     comments: { enable: true, provider: 'waline', server_url: 'https://comments.example.test' },
     seo: { default_image: '/share.jpg', structured_data: true }
   } });
@@ -291,6 +293,13 @@ test('optional enhancements and Waline produce configured assets and safe sharin
   const headerDates = d.querySelectorAll('.article-header .article-meta time[datetime]');
   assert.equal(headerDates.length, 1);
   assert.match(headerDates[0].parentElement.textContent, /^更新于 /);
+  assert.match(d.querySelector('.article-header .article-meta').textContent, /字数 [\d,]+/);
+  assert.doesNotMatch(d.querySelector('.article-header .article-meta').textContent, /分钟阅读/);
+  const override = new JSDOM(fs.readFileSync(path.join(output, 'posts/related-recent/index.html'), 'utf8'));
+  const overrideMeta = override.window.document.querySelector('.article-header .article-meta').textContent;
+  assert.doesNotMatch(overrideMeta, /字数/);
+  assert.match(overrideMeta, /约 1 分钟阅读/);
+  override.window.close();
   assert.ok(d.querySelector('.reading-layout--left'));
   assert.equal(d.querySelector('.toc-card, .mobile-toc, #reading-toc-dialog, [data-reading-toc]'), null);
   assert.ok(d.querySelector('.reading-aside .profile-card'));

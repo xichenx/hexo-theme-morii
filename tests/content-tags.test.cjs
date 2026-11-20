@@ -53,6 +53,18 @@ test('inline answers escape text and stay out of generated excerpts', () => {
   dom.window.close();
 });
 
+test('article word count uses visible prose and omits protected or empty content', () => {
+  const count = helpers.morii_article_word_count;
+  const content = '<p>中文Hexo&nbsp;2026</p><p>hello<br>world</p>' +
+    '<pre>code block</pre><figure><figcaption>hidden caption</figcaption></figure>' +
+    '<script>ignored script</script><style>ignored style</style><span class="inline-answer">secret answer</span>';
+  assert.equal(count({ content }), '字数 6');
+  assert.equal(count.call({ page: { lang: 'en' } }, { content }), 'Word count 6');
+  assert.equal(count.call({ page: { lang: 'zh-TW' } }, { content }), '字數 6');
+  assert.equal(count({ content, password: 'protected' }), '');
+  assert.equal(count({ content: '<img alt="Image"><pre>code only</pre>' }), '');
+});
+
 test('timeline preserves invalid or incomplete blocks as ordinary content', () => {
   const entry = '<!-- timeline 2024-02-31 -->\nAn entry\n<!-- endtimeline -->';
   assert.match(tags.timeline(['<更新>,', 'unknown'], entry), /&lt;更新&gt;/);

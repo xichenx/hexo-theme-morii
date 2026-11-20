@@ -33,6 +33,9 @@ function inspect(config, site = {}, knownKeys) {
   if (sidebarPosition != null && !['left', 'right'].includes(sidebarPosition)) add('error', 'article.sidebar_position', '可选值：left, right。');
   const metaDate = config.article?.meta?.date_type;
   if (metaDate != null && !['created', 'updated', 'both'].includes(metaDate)) add('error', 'article.meta.date_type', '可选值：created, updated, both。');
+  for (const field of ['article.meta.word_count', 'article.meta.reading_time']) {
+    if (get(field) != null && typeof get(field) !== 'boolean') add('error', field, '必须为 true 或 false，不能使用带引号的字符串。');
+  }
   for (const field of ['friends_feed.endpoint', 'music.meting.api', 'github_calendar.api']) if (get(field) && !https(get(field))) add('error', field, '必须为完整 HTTP(S) 地址。');
   for (const field of ['accent', 'accent_dark']) if (get(field) != null && !/^#[\da-f]{6}$/i.test(get(field))) add('error', field, '使用六位十六进制颜色，如 #5568f6。');
   for (const field of ['search.page_size', 'search.shard_size']) if (get(field) != null && (!Number.isInteger(get(field)) || get(field) < 1)) add('error', field, '必须为正整数。');

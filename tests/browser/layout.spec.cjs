@@ -28,6 +28,28 @@ for (const route of ['', 'archives/', 'categories/', 'about/', 'album/', 'music/
   });
 }
 
+test('desktop scroll boundaries keep the homepage header anchored', async ({ page, isMobile }) => {
+  await ready(page);
+  const root = page.locator('html');
+  const header = page.locator('.site-header');
+  await expect(root).toHaveCSS('overscroll-behavior-x', 'auto');
+  await expect(root).toHaveCSS('overscroll-behavior-y', isMobile ? 'auto' : 'none');
+  const headerTop = () => header.evaluate(element => element.getBoundingClientRect().top);
+  expect(await headerTop()).toBeCloseTo(0, 0);
+
+  await page.evaluate(() => window.scrollTo({ top: 400, behavior: 'instant' }));
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(400);
+  expect(await headerTop()).toBeCloseTo(0, 0);
+
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  if (!isMobile) {
+    await page.mouse.move(180, 210);
+    await page.mouse.wheel(0, -350);
+  }
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  expect(await headerTop()).toBeCloseTo(0, 0);
+});
+
 test('long article keeps a complete clock while the outline scrolls', async ({ page, viewport }) => {
   test.skip(viewport.width <= 960, 'Mobile article uses the TOC dialog instead of the sidebar.');
   await ready(page, 'posts/layout-stress/');

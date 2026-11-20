@@ -43,6 +43,9 @@ test('configuration checker detects service mistakes, string booleans, typos and
   for (const field of ['comments.server_url', 'motion.enable', 'search.shard_size', 'menu[0].path']) assert.ok(issues.some(issue => issue.field === field && issue.level === 'error'), field);
   for (const field of ['brand', 'language', 'typo']) assert.ok(issues.some(issue => issue.field === field && issue.level === 'warning'), field);
   assert.deepEqual(inspect({ comments: { enable: false }, menu: [{ path: '/notes/' }], accent: '#abcdef', motion: { enable: false } }, { language: ['zh-TW', 'en'] }), []);
+  assert.deepEqual(inspect({ article: { meta: { word_count: 'true', reading_time: 0 } } }).map(({ field, level }) => [field, level]), [
+    ['article.meta.word_count', 'error'], ['article.meta.reading_time', 'error']
+  ]);
 });
 
 test('footer navigation skips malformed links and reports their configuration fields', () => {

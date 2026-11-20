@@ -86,6 +86,8 @@ article:
   sidebar_position: right # left / right，只作用于桌面文章页
   meta:
     date_type: both # created / updated / both，只作用于文章页头部
+    word_count: false
+    reading_time: true
   toc:
     enable: true
     scroll_percent: true

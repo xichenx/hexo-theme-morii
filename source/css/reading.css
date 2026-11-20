@@ -17,8 +17,13 @@
 .article-header.has-cover[data-image-state=error]::before{content:none}
 .article-header .article-kicker{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:20px;letter-spacing:.04em}
 .article-header h1{margin:12px 0 16px;font-size:clamp(27px,2.8vw,38px);line-height:1.45;letter-spacing:-.025em;overflow-wrap:anywhere}
-.article-header.has-cover :is(.article-breadcrumb,.back-link,.article-kicker,.article-description,.article-meta){color:#e7edf8}
-.article-meta{flex-wrap:wrap;row-gap:4px}
+.article-header.has-cover :is(.article-breadcrumb,.back-link,.article-kicker,.article-description){color:#e7edf8}
+.post-hero .article-meta{gap:8px 22px;width:fit-content;max-width:100%;padding-top:12px;border-top:1px solid color-mix(in srgb,currentColor 27%,transparent);color:color-mix(in srgb,var(--ink) 72%,var(--muted));font-size:13px;line-height:1.5}
+.post-hero.has-cover .article-meta{color:#e7edf8}
+.article-meta__group{display:flex;align-items:flex-start;gap:7px;min-width:0}
+.article-meta__group svg{flex:none;width:16px;height:16px;margin-top:2px}
+.article-meta__items{display:flex;flex-wrap:wrap;gap:3px 12px;min-width:0}
+.article-meta__items time{font-variant-numeric:tabular-nums;font-weight:650;white-space:nowrap}
 .article-toolbar{position:relative;display:flex;align-items:center;flex-wrap:wrap;gap:10px 20px;padding:16px 40px;border-bottom:1px solid var(--line)}
 .article-toolbar .article-save-tools{margin:0}
 .article-toolbar #reading-list-message:empty{display:none}

@@ -47,6 +47,8 @@ outdated: false
 | `navigation_order` | 相邻文章翻页方向，可填 `newest_first` 或 `oldest_first` | 使用全站翻页方向 |
 | `sidebar_position` | 桌面阅读侧栏位置，可填 `left` 或 `right` | 使用全站侧栏位置 |
 | `meta_date_type` | 文章页头部日期，可填 `created`、`updated` 或 `both` | 使用全站头部日期设置 |
+| `meta_word_count` | 设为 `true` 或 `false`，显示或隐藏本篇字数 | 使用全站字数显示设置 |
+| `meta_reading_time` | 设为 `true` 或 `false`，显示或隐藏本篇预计阅读时间 | 使用全站阅读时间显示设置 |
 
 例如要保留列表封面但隐藏文章顶部大图，可以同时写 `cover: /images/posts/first-post.jpg` 和 `top_img: false`。文章 `comments: true` 不会绕过全站 `comments.enable: false`。
 
@@ -60,6 +62,8 @@ article:
   sidebar_position: right
   meta:
     date_type: both
+    word_count: false
+    reading_time: true
   resume:
     enable: true
   share:
@@ -89,6 +93,8 @@ article:
 | `article.nav_title` | `false` | 设为 `true` 后，滚过正文标题时在顶部导航显示文章名，滚回后恢复站点名称 |
 | `article.sidebar_position` | `right` | 桌面阅读侧栏位置，设为 `left` 时放在正文左侧 |
 | `article.meta.date_type` | `both` | 文章页头部日期。 `created` 显示发布日期，`updated` 显示更新时间，`both` 同时显示两个日期 |
+| `article.meta.word_count` | `false` | 在文章页头部显示正文字数 |
+| `article.meta.reading_time` | `true` | 在文章页头部显示预计阅读时间 |
 | `article.resume.enable` | `true` | 记录阅读位置，再次打开文章时可继续阅读 |
 | `article.share.enable` | `true` | 显示文章分享功能；关闭后仍保留“复制文章链接”按钮 |
 | `article.print.enable` | `true` | 显示打印 / 导出 PDF 工具，通过浏览器打印流程保存 |
@@ -114,6 +120,8 @@ article:
 `article.sidebar_position` 用于桌面文章页。单篇可在 Front Matter 使用 `sidebar_position` 覆盖。手机和专注阅读继续使用单栏布局。
 
 单篇文章可在 Front Matter 使用 `meta_date_type` 覆盖头部日期设置，例如 `meta_date_type: updated`。如果 Hexo 未提供更新时间，头部的更新日期使用发布日期。
+
+正文字数在生成站点时计算，汉字按字计，其余文字和数字按连续词计。代码块、图注和通过 `hideInline` 隐藏的答案不计入字数。加密文章省略字数和预计阅读时间。
 
 ## 3. 稍后阅读
 

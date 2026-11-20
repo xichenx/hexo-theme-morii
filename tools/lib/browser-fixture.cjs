@@ -30,7 +30,7 @@ const options = {
     friends_feed: { endpoint: 'https://feed.example.test/articles?source=fixture', page_size: 2 }
   },
   sourceOverrides: {
-    '_posts/toc-simple.md': '---\ntitle: 简洁目录示例\ndate: 2020-01-01\nupdated: 2024-02-03 12:00:00\npermalink: posts/toc-simple/\ntoc_style_simple: true\nsidebar_position: left\nmeta_date_type: updated\n---\n\n## 第一个章节\n\n正文。\n\n## 第二个章节\n\n更多内容。\n',
+    '_posts/toc-simple.md': '---\ntitle: 简洁目录示例\ndate: 2020-01-01\nupdated: 2024-02-03 12:00:00\npermalink: posts/toc-simple/\ntoc_style_simple: true\nsidebar_position: left\nmeta_date_type: updated\nmeta_word_count: true\nmeta_reading_time: false\n---\n\n## 第一个章节\n\n正文。\n\n## 第二个章节\n\n更多内容。\n',
     '_posts/outdated-bottom.md': '---\ntitle: 文末时效提醒\ndate: 2020-01-01\nupdated: 2020-01-01\npermalink: posts/outdated-bottom/\noutdated_days: 30\n---\n\n## 正文\n\n文末显示提醒。\n',
     '_posts/outdated-top.md': '---\ntitle: 文首时效提醒\ndate: 2020-01-01\nupdated: 2020-01-01\npermalink: posts/outdated-top/\noutdated_position: top\n---\n\n## 正文\n\n文首显示提醒。\n',
     ...Object.fromEntries(['manual', 'viewport', 'immediate'].map(mode => [

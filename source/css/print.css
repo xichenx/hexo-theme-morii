@@ -14,11 +14,12 @@ body.is-reading .article-header { padding: 0 0 18px; border-bottom: 1px solid #c
 body.is-reading .post-hero { display: block; min-height: 0; max-width: 860px; margin: 24px auto 0; padding: 0 24px 18px; background: #fff; color: #111; text-align: left; }
 body.is-reading .post-hero .post-hero-inner { width: 100%; }
 body.is-reading .post-hero .article-kicker { display: none; }
-body.is-reading .post-hero .article-meta { color: #555; justify-content: flex-start; }
+body.is-reading .post-hero .article-meta { color: #555; justify-content: flex-start; padding-top: 0; border: 0; font-size: 9pt; }
+body.is-reading .article-meta__group svg { display: none; }
 body.is-reading .article-header.has-cover { min-height: 0; display: block; background: #fff; color: #111; }
-body.is-reading .article-header.has-cover :is(.article-kicker, .article-meta, .article-description) { color: #555; }
+body.is-reading .article-header.has-cover :is(.article-kicker, .article-description) { color: #555; }
 body.is-reading .article-header h1 { color: #111; font-size: 24pt; line-height: 1.35; }
-body.is-reading .article-kicker, body.is-reading .article-meta { color: #555; font-size: 9pt; }
+body.is-reading .article-kicker { color: #555; font-size: 9pt; }
 body.is-reading .article-body { padding: 0; color: #111; font-size: 11pt; line-height: 1.8; }
 body.is-reading .article-body h1 { font-size: 20pt; }
 body.is-reading .article-body h2 { font-size: 17pt; }

@@ -30,13 +30,29 @@ block content
         p.article-description= page.description
       - var postMeta = theme.article && theme.article.meta
       - var postDateType = [page.meta_date_type, postMeta && postMeta.date_type].find(function(type) { return ['created', 'updated', 'both'].includes(type) }) || 'both'
+      - var showWordCount = typeof page.meta_word_count === 'boolean' ? page.meta_word_count : !!(postMeta && postMeta.word_count === true)
+      - var showReadingTime = typeof page.meta_reading_time === 'boolean' ? page.meta_reading_time : !postMeta || postMeta.reading_time !== false
+      - var wordCount = showWordCount ? morii_article_word_count(page) : ''
+      - var readingTime = showReadingTime ? morii_reading_time(page) : ''
       .article-meta
-        if postDateType !== 'updated'
-          span #{morii_t("发布于")} #[time(datetime=date_xml(page.date))=date(page.date, 'YYYY-MM-DD')]
-        if postDateType !== 'created'
-          span #{morii_t("更新于")} #[time(datetime=date_xml(page.updated || page.date))=date(page.updated || page.date, 'YYYY-MM-DD')]
-        if morii_reading_time(page)
-          span= morii_reading_time(page)
+        .article-meta__group
+          svg(viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' aria-hidden='true')
+            rect(x='4' y='6' width='16' height='14' rx='3')
+            path(d='M8 4v4m8-4v4M4 11h16')
+          .article-meta__items
+            if postDateType !== 'updated'
+              span #{morii_t("发布于")} #[time(datetime=date_xml(page.date))=date(page.date, 'YYYY-MM-DD')]
+            if postDateType !== 'created'
+              span #{morii_t("更新于")} #[time(datetime=date_xml(page.updated || page.date))=date(page.updated || page.date, 'YYYY-MM-DD')]
+        if wordCount || readingTime
+          .article-meta__group
+            svg(viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true')
+              path(d='M12 6c-2.5-1.7-5.7-2-9-1v14c3-1 6.5-.7 9 1 2.5-1.7 6-2 9-1V5c-3-.9-6.5-.7-9 1zM12 6v14')
+            .article-meta__items
+              if wordCount
+                span= wordCount
+              if readingTime
+                span= readingTime
   - var sidebarPosition = [page.sidebar_position, theme.article && theme.article.sidebar_position].find(function(position) { return position === 'left' || position === 'right' })
   .wrap.reading-layout(class=sidebarPosition === 'left' ? 'reading-layout--left' : null)
     article.article-card
