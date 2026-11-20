@@ -3,7 +3,7 @@
   const main = document.getElementById('main');
   if (!main) return;
   const preference = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
-  const selector = '.hero__main, .hero-mini, .section-heading, .feature-card, .post-card, .profile-card, .side-card, .discovery-card, .selected-card, .friend-card, .feed-card, .photo-card, .taxonomy-card, .related-card, .archive-tree-item, .page-intro:not(.music-page-heading), .article-header';
+  const selector = '.hero__main, .hero-mini, .theme-promo, .section-heading, .feature-card, .post-card, .profile-card, .side-card, .discovery-card, .selected-card, .friend-card, .feed-card, .photo-card, .taxonomy-card, .related-card, .archive-tree-item, .page-intro:not(.music-page-heading), .article-header';
   const seen = new WeakSet();
   const ambientSelector = '.hero__main, .page-intro:not(.music-page-heading)';
   let ambientObserved = new WeakSet();
@@ -56,14 +56,15 @@
         if (element.matches('.hero__main')) {
           // Keep the large hero and title painted from the first frame (including LCP).
           [...element.children].filter(child => child.matches('.eyebrow, h1, p, .hero__actions')).forEach((child, index) => {
-            play(child, [{ translate: '0 12px' }, { translate: '0 0' }], Math.min(index, 3) * 55, 620);
+            play(child, [{ translate: '0 9px' }, { translate: '0 0' }], index * 45, 560);
           });
           return;
         }
         const order = groups.get(element.parentElement) || 0;
         groups.set(element.parentElement, order + 1);
         // Stagger siblings, not unrelated sections; no baseline CSS hides content.
-        play(element, [{ opacity: .25, translate: '0 14px' }, { opacity: 1, translate: '0 0' }], Math.min(order, 3) * 55);
+        const heroCard = element.matches('.hero-mini, .theme-promo');
+        play(element, [{ opacity: heroCard ? .7 : .25, translate: heroCard ? '0 10px' : '0 14px' }, { opacity: 1, translate: '0 0' }], Math.min(order, 3) * 55);
       });
     }, { threshold: .06 });
     ambient = new IntersectionObserver(entries => entries.forEach(entry => {

@@ -1,5 +1,6 @@
 'use strict';
 const { footerNav } = require('./footer-nav.cjs');
+const { navigationTarget } = require('./navigation-url.cjs');
 const { isCodeHeightLimit } = require('./code-style.cjs');
 function inspect(config, site = {}, knownKeys) {
   const issues = [];
@@ -8,6 +9,11 @@ function inspect(config, site = {}, knownKeys) {
   const https = value => { try { const url = new URL(value); return /^https?:$/.test(url.protocol) && !url.username && !url.password; } catch { return false; } };
   if (knownKeys) for (const key of Object.keys(config)) if (!knownKeys.includes(key)) add('warning', key, '未知顶层配置，请检查是否拼写错误。');
   const language = Array.isArray(site.language) ? site.language[0] : site.language;
+  const promo = config.home?.theme_promo;
+  if (promo?.enable != null && typeof promo.enable !== 'boolean') add('error', 'home.theme_promo.enable', '必须为 true 或 false。');
+  for (const key of ['docs_url', 'repository_url']) {
+    if (promo?.[key] && !navigationTarget(promo[key])) add('error', 'home.theme_promo.' + key, '填写站内路径或 HTTP(S) 链接。');
+  }
   if (language && !['en', 'zh-CN', 'zh-TW'].includes(language)) add('warning', 'language', '建议使用 en、zh-CN 或 zh-TW，其他语言会使用兼容或回退规则。');
   for (const field of ['appearance.back_to_top_percent', 'motion.enable', 'series.enable', 'images.responsive', 'images.cover_tone', 'images.lazy_article', 'images.article_captions', 'search.inverted', 'search.worker', 'performance.diagnostics', 'cinema.enable', 'music.meting.enable', 'comments.enable', 'article.nav_title', 'article.toc.enable', 'article.toc.scroll_percent', 'article.toc.style_simple', 'article.reward.enable', 'article.enhancements.mermaid', 'article.enhancements.math', 'article.copyright.enable', 'article.edit.enable', 'article.code.word_wrap', 'article.code.copy', 'article.code.language', 'article.code.viewer', 'article.code.start_collapsed']) {
     if (get(field) != null && typeof get(field) !== 'boolean') add('error', field, '必须为 true 或 false，不能使用带引号的字符串。');

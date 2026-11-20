@@ -4,6 +4,7 @@ include includes/mixins.pug
 block content
   - var firstPage = !page.current || page.current === 1
   if firstPage
+    - var themePromo = morii_theme_promo()
     section.hero.wrap
       .hero__main
         .eyebrow #[span.eyebrow__dot] #{morii_t("个人博客 · 技术与生活")}
@@ -19,19 +20,33 @@ block content
           if morii_has_page('/about/')
             a.button.button--ghost(href=url_for('/about/')) #{morii_t("关于我")}
         .hero__signature= siteIdentity.brand
-      .hero__side
-        .hero-mini.hero-mini--quote
-          span.mini-label #{morii_t("✦ 随手记")}
-          strong= theme.hero && theme.hero.note || morii_t("把热爱写进日常，把好奇带向远方。")
-          if morii_has_page('/essay/')
-            a(href=url_for('/essay/')) #{morii_t("看看即刻")} #[span →]
-          else
-            a(href=url_for('/archives/')) #{morii_t("继续探索")} #[span →]
-        .hero-mini.hero-mini--stats
-          span.mini-label #{morii_t("◉ 博客手账")}
-          .stats-grid
-            div #[strong=site.posts.length] #[span #{morii_t("篇文章")}]
-            div #[strong=site.categories.length] #[span #{morii_t("个分类")}]
+      if themePromo
+        section.theme-promo(aria-labelledby='theme-promo-title')
+          .theme-promo__art(aria-hidden='true')
+            img(src=url_for('/icons/brand/morii-orbit-nav.png') alt='' width='112' height='112' decoding='async')
+          .theme-promo__body
+            span.section-kicker #{morii_t("开源 Hexo 主题")}
+            h2#theme-promo-title Morii
+            p #{morii_t("卡片式布局，配备站内搜索、阅读工具和音乐馆。")}
+            .theme-promo__actions
+              if themePromo.docs
+                a.button.theme-promo__primary(href=themePromo.docs) #{morii_t("安装指南")} #[span(aria-hidden='true') ↗]
+              if themePromo.source
+                a.button(href=themePromo.source) #{morii_t("GitHub 源码")} #[span(aria-hidden='true') ↗]
+      else
+        .hero__side
+          .hero-mini.hero-mini--quote
+            span.mini-label #{morii_t("✦ 随手记")}
+            strong= theme.hero && theme.hero.note || morii_t("把热爱写进日常，把好奇带向远方。")
+            if morii_has_page('/essay/')
+              a(href=url_for('/essay/')) #{morii_t("看看即刻")} #[span →]
+            else
+              a(href=url_for('/archives/')) #{morii_t("继续探索")} #[span →]
+          .hero-mini.hero-mini--stats
+            span.mini-label #{morii_t("◉ 博客手账")}
+            .stats-grid
+              div #[strong=site.posts.length] #[span #{morii_t("篇文章")}]
+              div #[strong=site.categories.length] #[span #{morii_t("个分类")}]
     if theme.featured && theme.featured.length
       section.wrap.section-block
         .section-heading

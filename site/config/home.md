@@ -22,6 +22,20 @@ intro: 分享编程、读书和生活中的小发现。
 
 未设置标题时，直接使用博客标题和副标题；`intro` 沿用博客简介。上面的 `0:`、`1:` 是兼容写法，也支持两项字符串列表或单个字符串。首页“关于我”和“看看即刻”只在对应页面存在时显示，后者缺页时转为文章入口。
 
+### Morii 主题推广卡
+
+首页第一页默认在首屏右侧显示主题推广卡，窄屏时移到主卡片下方。可设置 `home.theme_promo.enable: false` 恢复右侧的「随手记」和「博客手账」。
+
+```yaml
+home:
+  theme_promo:
+    enable: true
+    docs_url: 'https://github.com/xichenx/hexo-theme-morii#quick-start'
+    repository_url: 'https://github.com/xichenx/hexo-theme-morii'
+```
+
+两个链接可填写完整 HTTP(S) 地址或以 `/` 开头的站内路径。将其中一个设为 `false` 可隐藏对应入口。
+
 ## 2. “从这里开始”三张入口卡片
 
 默认不展示入口卡片。准备好目标页面后，可以添加任意数量的卡片，例如：

@@ -1,6 +1,7 @@
 'use strict';
 
 const { forPage } = require('../scripts/lib/i18n.cjs');
+const { navigationTarget } = require('../scripts/lib/navigation-url.cjs');
 const { tocObj, unescapeHTML, stripHTML } = require('hexo-util');
 
 hexo.extend.helper.register('morii_page_title', function (page) {
@@ -21,6 +22,18 @@ hexo.extend.helper.register('morii_safe_url', value => {
     const url = new URL(String(value || ''));
     return /^https?:$/.test(url.protocol) ? url.href : '';
   } catch { return ''; }
+});
+
+hexo.extend.helper.register('morii_theme_promo', function () {
+  const promo = hexo.theme.config.home?.theme_promo;
+  if (!promo || promo.enable === false) return null;
+  const href = value => {
+    const target = navigationTarget(value);
+    return target?.local ? this.url_for(target.path) : target?.path;
+  };
+  const docs = href(promo.docs_url);
+  const source = href(promo.repository_url);
+  return docs || source ? { docs, source } : null;
 });
 
 hexo.extend.helper.register('morii_accent', () => {

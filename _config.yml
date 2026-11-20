@@ -55,6 +55,10 @@ hero:
   title: [] # 未配置时使用博客 title / subtitle
   note: ''
 home:
+  theme_promo:
+    enable: true # 首页首屏右侧显示 Morii 推广卡
+    docs_url: 'https://github.com/xichenx/hexo-theme-morii#quick-start'
+    repository_url: 'https://github.com/xichenx/hexo-theme-morii'
   moments:
     enable: true
     limit: 5

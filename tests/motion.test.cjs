@@ -84,7 +84,7 @@ test('reduced motion, hidden pages and print cancel effects without hiding conte
 test('hero text enters in layers without fading the title or the large background', () => {
   const f = fixture(); const hero = f.window.document.querySelector('.hero__main');
   f.observers[0].enter([hero]);
-  assert.deepEqual(f.animations.map(a => a.options.delay), [0, 55, 110, 165]);
+  assert.deepEqual(f.animations.map(a => a.options.delay), [0, 45, 90, 135]);
   assert.ok(f.animations.every(a => a.element !== hero && a.frames.every(frame => frame.opacity === undefined)));
   hero.querySelector('a').focus();
   assert.equal(f.animations.at(-1).cancelled, true);
