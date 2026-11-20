@@ -33,6 +33,14 @@ hexo.extend.helper.register('morii_toc', content => tocObj(content || '', { min_
   .filter(item => item.id)
   .map(item => ({ ...item, text: unescapeHTML(item.text) })));
 
+hexo.extend.helper.register('morii_toc_options', page => {
+  const config = hexo.theme.config.article?.toc || {};
+  return {
+    enabled: typeof page.toc === 'boolean' ? page.toc : config.enable !== false,
+    scrollPercent: typeof page.toc_scroll_percent === 'boolean' ? page.toc_scroll_percent : config.scroll_percent !== false
+  };
+});
+
 hexo.extend.helper.register('morii_reading_time', function (page) {
   const t = (...args) => forPage(hexo, this).t(...args);
   if (page.password) return '';

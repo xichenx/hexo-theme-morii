@@ -2,6 +2,7 @@ doctype html
 - var siteIdentity = morii_identity()
 - var visualEffects = morii_effects()
 - var articleEnhancements = morii_enhancements(page)
+- var tocOptions = morii_toc_options(page)
 html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || theme.motion.enable !== false) ? 'on' : 'off' data-glass=visualEffects.enabled ? (visualEffects.glass ? 'on' : 'off') : null data-effects=visualEffects.enabled ? 'on' : null data-theme-transition=visualEffects.transition ? 'on' : null)
   head
     meta(charset='utf-8')
@@ -157,8 +158,11 @@ html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || them
             include footer-filing.pug
     include navigation-panel.pug
     include social-dialog.pug
-    if is_post()
-      button.reading-toc-trigger(type='button' data-reading-toc aria-haspopup='dialog' aria-controls='reading-toc-dialog' hidden) #{morii_t("目录")} #[span(data-reading-percent aria-hidden='true') 0%]
+    if is_post() && tocOptions.enabled
+      button.reading-toc-trigger(type='button' data-reading-toc aria-haspopup='dialog' aria-controls='reading-toc-dialog' hidden)
+        | #{morii_t("目录")}
+        if tocOptions.scrollPercent
+          span(data-reading-percent aria-hidden='true') 0%
       dialog.reading-toc-dialog#reading-toc-dialog(aria-labelledby='reading-toc-title')
         .reading-toc-heading
           h2#reading-toc-title #{morii_t("本文目录")}

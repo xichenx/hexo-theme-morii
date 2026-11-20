@@ -52,9 +52,10 @@ block content
             button.reading-preference-button#reading-resume-clear(type='button') #{morii_t("清除本篇记录")}
       include includes/article-series.pug
       include includes/outdated-notice.pug
-      details.mobile-toc
-        summary #{morii_t("本文目录")}
-        include includes/toc.pug
+      if tocOptions.enabled
+        details.mobile-toc
+          summary #{morii_t("本文目录")}
+          include includes/toc.pug
       - var codeStyle = morii_code_style(page)
       - var codeWrap = typeof page.code_word_wrap === 'boolean' ? page.code_word_wrap : !!(theme.article && theme.article.code && theme.article.code.word_wrap === true)
       .article-body(data-code-style=codeStyle.style data-code-theme=codeStyle.theme data-code-word-wrap=String(codeWrap) data-code-collapse=(!theme.article || !theme.article.code || theme.article.code.collapse !== false) ? 'true' : 'false' data-code-lines=(theme.article && theme.article.code && theme.article.code.lines) || 18)!= morii_article_images(page)
@@ -84,10 +85,12 @@ block content
     aside.reading-aside
       include includes/profile-card.pug
       .reading-aside-sticky
-        .side-card.toc-card
-          .reading-toc-heading
-            h2 #{morii_t("本文目录")}
-            span(data-reading-percent aria-hidden='true') 0%
-          nav(aria-label=morii_t("文章章节"))
-            include includes/toc.pug
+        if tocOptions.enabled
+          .side-card.toc-card
+            .reading-toc-heading
+              h2 #{morii_t("本文目录")}
+              if tocOptions.scrollPercent
+                span(data-reading-percent aria-hidden='true') 0%
+            nav(aria-label=morii_t("文章章节"))
+              include includes/toc.pug
         include includes/clock.pug

@@ -271,16 +271,20 @@ test('English and Traditional Chinese build at a subpath with cached locale asse
 test('optional enhancements and Waline produce configured assets and safe sharing metadata', async () => {
   const output = await buildDemo({ root: '/theme/', sourceOverrides: {
     'comments/index.md': '---\ntitle: 留言板\ncomments: true\n---\n欢迎留言。',
-    '_posts/formulas.md': '---\ntitle: Formulas and diagrams\npermalink: posts/formulas/\n---\n\n{% math %}x^2{% endmath %}\n\n{% mermaid %}\ngraph TD; A-->B;\n{% endmermaid %}'
+    '_posts/formulas.md': '---\ntitle: Formulas and diagrams\npermalink: posts/formulas/\ntoc: true\ntoc_scroll_percent: true\n---\n\n## Examples\n\n{% math %}x^2{% endmath %}\n\n{% mermaid %}\ngraph TD; A-->B;\n{% endmermaid %}'
   }, themeOverrides: {
-    article: { enhancements: { mermaid: true, math: true } },
+    article: { enhancements: { mermaid: true, math: true }, toc: { enable: false, scroll_percent: false } },
     comments: { enable: true, provider: 'waline', server_url: 'https://comments.example.test' },
     seo: { default_image: '/share.jpg', structured_data: true }
   } });
   const dom = new JSDOM(fs.readFileSync(path.join(output, 'posts/welcome/index.html'), 'utf8'));
   const d = dom.window.document;
+  assert.equal(d.querySelector('.toc-card, .mobile-toc, #reading-toc-dialog, [data-reading-toc]'), null);
+  assert.ok(d.querySelector('.reading-progress'));
   assert.equal(d.querySelector('link[rel="preconnect"]'), null, 'Enabling features alone does not emit a CDN hint');
   const technical = new JSDOM(fs.readFileSync(path.join(output, 'posts/formulas/index.html'), 'utf8'));
+  assert.equal(technical.window.document.querySelectorAll('.toc-content a').length, 3);
+  assert.equal(technical.window.document.querySelectorAll('[data-reading-percent]').length, 2);
   const connections = [...technical.window.document.querySelectorAll('link[rel="preconnect"]')];
   assert.deepEqual(connections.map(link => [link.getAttribute('href'), link.crossOrigin]), [['https://cdn.jsdelivr.net', 'anonymous']]);
   technical.window.close();
