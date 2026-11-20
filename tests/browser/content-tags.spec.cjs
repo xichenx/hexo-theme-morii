@@ -6,6 +6,9 @@ test.use({ javaScriptEnabled: false });
 
 test('article timeline and button work on a subdirectory without JavaScript', async ({ page }) => {
   await ready(page, 'posts/reading/');
+  const inline = page.locator('img.content-inline-image');
+  await expect(inline).toHaveAttribute('alt', 'Morii 图标');
+  await expect(inline).toHaveCSS('display', 'inline-block');
   const timeline = page.locator('.content-timeline');
   await expect(timeline).toHaveAttribute('data-tone', 'purple');
   await expect(timeline.getByRole('listitem')).toHaveCount(2);

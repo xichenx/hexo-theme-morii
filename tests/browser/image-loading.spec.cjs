@@ -10,6 +10,13 @@ test('body images load on scroll and in print preview, with image viewing availa
     return route.fulfill({ contentType: 'image/svg+xml', body: '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="60"><rect width="120" height="60" fill="teal"/></svg>' });
   });
   await ready(page, 'posts/lazy-images/');
+  const inline = page.getByRole('img', { name: 'Morii 图标' });
+  await expect(inline).toHaveAttribute('src', '/layout/icons/brand/morii-logo.png');
+  await expect(inline).toHaveCSS('display', 'inline-block');
+  await expect(inline).toHaveCSS('height', '18px');
+  await expect(inline).not.toHaveAttribute('tabindex');
+  await inline.click();
+  await expect(page.locator('#image-dialog')).toBeHidden();
   const first = page.locator('.article-body img[alt="First"]');
   const later = page.locator('.article-body img[alt="Later"]');
   await expect(first).not.toHaveAttribute('loading', 'lazy');

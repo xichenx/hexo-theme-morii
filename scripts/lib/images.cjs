@@ -66,7 +66,7 @@ function lazyArticleImages(html) {
   const parser = new Parser({
     onopentag(tag, attrs) {
       if (inertTags.has(tag)) inertDepth++;
-      if (inertDepth || tag !== 'img') return;
+      if (inertDepth || tag !== 'img' || attrs.class?.split(/\s+/).includes('content-inline-image')) return;
       const src = attrs.src?.trim();
       if (!attrs.srcset?.trim() && (!src || /^data:/i.test(src))) return;
       if (!hasFirstImage) {

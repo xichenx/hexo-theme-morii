@@ -3,7 +3,7 @@
   const dialog = document.getElementById('image-dialog');
   const preview = document.getElementById('image-preview');
   const caption = document.getElementById('image-caption');
-  const selector = '.article-body img, .photo-card img, .essay-images img';
+  const selector = '.article-body img:not(.content-inline-image), .photo-card img, .essay-images img';
   const previous = document.getElementById('image-previous');
   const next = document.getElementById('image-next');
   const counter = document.getElementById('image-counter');

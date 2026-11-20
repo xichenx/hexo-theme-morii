@@ -63,6 +63,8 @@ console.log(theme);
 
 ## 写作组件示例
 
+识别主题图标 {% inlineImg /icons/brand/morii-logo.png 1.2em "Morii 图标" %}，再回顾阅读体验的更新。
+
 {% timeline 阅读体验, purple %}
 <!-- timeline 2026-10 -->
 整理 **阅读工具** 和代码块外观。

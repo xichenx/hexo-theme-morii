@@ -740,6 +740,7 @@ html[data-theme=dark] .page-intro[data-intro-tone=about],html[data-theme=dark] .
   border-radius:13px;
   margin:20px auto
 }
+img.content-inline-image{display:inline-block;vertical-align:-.15em;height:var(--inline-image-height,1em);width:auto;object-fit:contain;margin:0;border-radius:0}
 .article-body pre,.page-prose pre{
   padding:18px;
   overflow:auto;

@@ -47,6 +47,20 @@ test('timeline preserves invalid or incomplete blocks as ordinary content', () =
   }
 });
 
+test('inline images resolve deployment paths, escape text and use only supported heights', () => {
+  const dom = new JSDOM(tags.inlineImg(['/icons/logo.png', '1.5em', '"<Morii>', 'logo"']) + tags.inlineImg(['https://example.test/logo.png', '50vh']));
+  const [local, remote] = dom.window.document.images;
+  assert.equal(local.getAttribute('src'), '/blog/icons/logo.png');
+  assert.equal(local.alt, '<Morii> logo');
+  assert.equal(local.style.getPropertyValue('--inline-image-height'), '1.5em');
+  assert.equal(remote.getAttribute('src'), 'https://example.test/logo.png');
+  assert.equal(remote.alt, '');
+  assert.equal(remote.hasAttribute('style'), false);
+  assert.equal(tags.inlineImg(['javascript:alert(1)', 'auto', 'Logo']), 'Logo');
+  assert.equal(tags.inlineImg(['/%2e%2e/logo.png']), '');
+  dom.window.close();
+});
+
 test('inline friend groups render plain text and accept safe links and deployment-aware avatars', () => {
   const dom = new JSDOM(tags.flink([], `
 - class_name: '<目录>'

@@ -6,17 +6,29 @@ const { navigationTarget } = require('../scripts/lib/navigation-url.cjs');
 const { timelineDate } = require('../scripts/lib/timeline-date.cjs');
 const markdown = text => hexo.render.renderSync({ text, engine: 'markdown' });
 const siteURL = path => url_for.call({ config: hexo.config }, path);
+const unquote = value => value.replace(/^(["'])(.*)\1$/, '$2');
 const timelineColors = { blue: '#5288e9', pink: '#d967a0', red: '#de6868', purple: '#9a74df', orange: '#c87d35', green: '#3c9b72' };
 
 hexo.extend.tag.register('btn', args => {
   const [value = '', label = '', style, options] = args.join(' ').split(',').map(part => part.trim());
-  const destination = value.replace(/^(["'])(.*)\1$/, '$2');
+  const destination = unquote(value);
   const target = navigationTarget(destination);
   const fragment = /^#[^\s\\\u0000-\u001f\u007f]+$/.test(destination) ? destination : '';
   const href = target?.local ? siteURL(target.path) : target?.path || fragment;
   if (!href || !label) return escapeHTML(label);
   const outline = `${style || ''} ${options || ''}`.split(/\s+/).includes('outline') ? ' content-button--outline' : '';
   return `<a class="button content-button${outline}" href="${escapeHTML(href)}">${escapeHTML(label)}</a>`;
+});
+
+hexo.extend.tag.register('inlineImg', ([source = '', size = '', ...description]) => {
+  const alt = escapeHTML(unquote(description.join(' ')));
+  const target = navigationTarget(unquote(source));
+  if (!target) return alt;
+  const src = escapeHTML(target.local ? siteURL(target.path) : target.path);
+  const length = /^(\d*\.\d+|\d+)(px|em|rem)?$/.exec(size);
+  const amount = Number(length?.[1]);
+  const height = Number.isFinite(amount) && amount > 0 ? ` style="--inline-image-height:${length[1]}${length[2] || 'px'}"` : '';
+  return `<img class="content-inline-image" src="${src}" alt="${alt}"${height} decoding="async">`;
 });
 
 hexo.extend.tag.register('timeline', (args, content) => {

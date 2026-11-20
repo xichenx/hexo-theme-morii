@@ -51,6 +51,8 @@ date: 2020-01-01 00:00:00
 permalink: posts/lazy-images/
 ---
 
+图标 {% inlineImg /icons/brand/morii-logo.png 18px "Morii 图标" %} 会保留在句子里。
+
 <img src="${prefix}test-images/first.svg" alt="First" width="120" height="60">
 
 <div style="height:12000px"></div>
