@@ -108,6 +108,7 @@ test('random articles rotate in view, pause for interaction and respect reduced 
   await expect(link).not.toHaveAttribute('href', paused);
 
   await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect.poll(() => page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches)).toBe(true);
   const stopped = await link.getAttribute('href');
   await page.clock.fastForward(8000);
   await expect(link).toHaveAttribute('href', stopped);
