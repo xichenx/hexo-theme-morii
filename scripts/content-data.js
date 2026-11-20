@@ -4,6 +4,7 @@ const { forPage } = require('../scripts/lib/i18n.cjs');
 const t = (...args) => forPage(hexo).t(...args);
 const { identity } = require('../scripts/lib/identity.cjs');
 const { navigationTarget } = require('../scripts/lib/navigation-url.cjs');
+const { timelineDate } = require('../scripts/lib/timeline-date.cjs');
 const { URL } = require('node:url');
 const array = value => Array.isArray(value) ? value : [];
 const text = value => typeof value === 'string' || typeof value === 'number' ? String(value).trim() : '';
@@ -50,14 +51,6 @@ hexo.extend.helper.register('morii_album', (data, path) => {
   return requested ? albums(data, forPage(hexo, this).t).find(album => album.path === requested) : undefined;
 });
 
-const careerDate = value => {
-  const date = value instanceof Date && Number.isFinite(value.getTime()) ? value.toISOString().slice(0, 10) : text(value);
-  if (!/^\d{4}-(0[1-9]|1[0-2])(?:-(0[1-9]|[12]\d|3[01]))?$/.test(date) || date.startsWith('0000-')) return { date, datetime: '' };
-  const day = date.length === 7 ? date + '-01' : date;
-  const parsed = new Date(day + 'T00:00:00Z');
-  return { date, datetime: Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === day ? date : '' };
-};
-
 hexo.extend.helper.register('morii_about', data => {
   const source = (Array.isArray(data) ? data.find(item => item && typeof item === 'object') : data) || {};
   return {
@@ -65,7 +58,7 @@ hexo.extend.helper.register('morii_about', data => {
     motto: [text(source.maxim?.maxim_top), text(source.maxim?.maxim_bottom)].join(''),
     skills: [...array(source.avatarSkills?.left), ...array(source.avatarSkills?.right)].map(text).filter(Boolean),
     careers: array(source.careers?.list).map(item => ({
-      title: text(item?.title), description: text(item?.desc), link: navigationTarget(item?.url), ...careerDate(item?.date)
+      title: text(item?.title), description: text(item?.desc), link: navigationTarget(item?.url), ...timelineDate(item?.date)
     })).filter(item => item.title || item.description),
     music: text(source.music?.music_title), interest: text(source.like?.like_title), interestDescription: text(source.like?.like_bottom)
   };

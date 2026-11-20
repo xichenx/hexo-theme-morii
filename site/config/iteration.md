@@ -65,6 +65,32 @@ MoriiDiagnostics.download()
 
 可选类型：`info`、`tip`、`warning`、`danger`。
 
+### 正文时间线
+
+用 `timeline` 在文章或页面中展示项目里程碑、版本更新或学习路线。条目按写作顺序展示，正文支持 Markdown。
+
+```text
+{% timeline 项目进度, purple %}
+<!-- timeline 2026-10-15 -->
+完成 **第一版**。
+<!-- endtimeline -->
+<!-- timeline 下一步 -->
+补充部署说明。
+<!-- endtimeline -->
+{% endtimeline %}
+```
+
+把条目的开始和结束注释放在独立行。标题与颜色可省略，默认使用主题色。颜色可选 `blue`、`pink`、`red`、`purple`、`orange`、`green`。日期可用 `YYYY-MM-DD` 或 `YYYY-MM`，也可以直接写阶段名。
+
+### 正文按钮链接
+
+```text
+{% btn /archives/, 浏览归档 %}
+{% btn https://hexo.io/, 查看 Hexo 文档, outline %}
+```
+
+支持站内路径、`#章节锚点` 和 HTTP(S) 网址。站内路径会自动加上博客部署前缀。第三个参数 `outline` 可选，用于显示描边样式。
+
 ### 文件名与行高亮
 
 ```text

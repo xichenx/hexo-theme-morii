@@ -60,3 +60,16 @@ console.log(theme);
 const theme = 'Morii';
 console.log(theme);
 {% endcodefile %}
+
+## 写作组件示例
+
+{% timeline 阅读体验, purple %}
+<!-- timeline 2026-10 -->
+整理 **阅读工具** 和代码块外观。
+<!-- endtimeline -->
+<!-- timeline 持续更新 -->
+用时间线记录进展，用按钮标出下一步。
+<!-- endtimeline -->
+{% endtimeline %}
+
+{% btn /archives/, 浏览文章归档, outline %}
