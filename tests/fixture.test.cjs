@@ -70,24 +70,13 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
           assert.ok(fs.existsSync(path.join(output, localPath, 'index.html')));
         }
       }
-      const introTones = {
-        'page/2/index.html': 'archive',
-        'archives/index.html': 'archive',
-        'categories/index.html': 'categories',
-        'categories/主题使用/index.html': 'taxonomy',
-        'tags/index.html': 'tags',
-        'about/index.html': 'about',
-        'link/index.html': 'link',
-        'album/index.html': 'album',
-        'album/morii/index.html': 'album_detail',
-        'music/index.html': 'music',
-        'cinema/index.html': 'cinema',
-        'reading-list/index.html': 'reading'
-      };
-      if (introTones[file]) {
-        const intro = document.querySelector('main .page-intro');
-        assert.equal(intro?.dataset.introTone, introTones[file], `${file}: page-specific intro tone`);
-        assert.ok(intro?.dataset.introWord, `${file}: decorative intro label`);
+      assert.equal(document.querySelector('main .intro-atmosphere, main [data-intro-word], main [data-intro-tone]'), null, `${file}: no decorative banner`);
+      if (['page/2/index.html', 'archives/index.html', 'categories/index.html', 'categories/主题使用/index.html', 'tags/index.html', 'about/index.html', 'link/index.html', 'album/index.html', 'album/morii/index.html', 'cinema/index.html', 'reading-list/index.html'].includes(file)) {
+        assert.ok(document.querySelector('main .page-intro h1')?.textContent.trim(), `${file}: page title stays visible`);
+      }
+      if (file === 'music/index.html') {
+        assert.ok(document.querySelector('main h1.sr-only')?.textContent.trim());
+        assert.equal(document.querySelector('main .page-intro'), null);
       }
       assert.ok(document.querySelector('#morii-audio-hub'), `${file}: shared music player`);
       assert.ok(document.querySelector('.morii-atmosphere[aria-hidden="true"] #morii-particles'), `${file}: decorative particles`);

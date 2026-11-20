@@ -77,11 +77,8 @@ block content
     include includes/github-calendar.pug
   else
     .wrap.listing-page
-      .page-intro(data-intro-word='STORIES' data-intro-tone='archive')
-        include includes/intro-atmosphere.pug
-        span.section-kicker KEEP EXPLORING
+      .page-intro
         h1 #{morii_t("文章 · 第 {0} 页", page.current)}
-        p #{morii_t("翻开下一页，继续发现技术与日常。")}
   .wrap.content-grid#latest
     section.posts-column
       .section-heading.section-heading--posts

@@ -1,7 +1,6 @@
 - var currentTopic = hierarchy.current
 .wrap.listing-page.category-directory-page
-  header.page-intro.category-directory-intro(data-intro-word='TOPICS' data-intro-tone='taxonomy')
-    include ../intro-atmosphere.pug
+  header.page-intro
     if hierarchy.ancestors.length
       include ../category-breadcrumb.pug
     else if morii_has_page('/categories/')

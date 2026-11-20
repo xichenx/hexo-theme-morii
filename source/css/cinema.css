@@ -1,5 +1,4 @@
 .cinema-page { padding-top: 30px; }
-.cinema-page-heading { margin-bottom: 28px; }
 .cinema { display: grid; gap: 26px; padding-bottom: 55px; }
 .cinema [hidden] { display: none !important; }
 .cinema-library { overflow: hidden; padding: 34px clamp(20px, 3vw, 46px) 12px; border: 1px solid var(--line); border-radius: 23px; background: var(--surface); box-shadow: 0 16px 48px rgba(34, 45, 80, .05); }
@@ -76,7 +75,6 @@
 }
 @media (max-width: 650px) {
   .cinema-page { padding-top: 20px; }
-  .cinema-page-heading { margin-bottom: 18px; }
   .cinema { gap: 18px; padding-bottom: 38px; }
   .cinema-library { padding: 22px 16px 5px; border-radius: 16px; }
   .cinema-library-heading { display: block; margin-bottom: 19px; }

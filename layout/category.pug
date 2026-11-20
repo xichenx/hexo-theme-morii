@@ -6,9 +6,7 @@ block content
   - var hierarchy = morii_category_hierarchy(directoryTopics, page)
   if morii_layout('category') === 'cards'
     .wrap.listing-page
-      .page-intro(data-intro-word='CATEGORY' data-intro-tone='taxonomy')
-        include includes/intro-atmosphere.pug
-        span.section-kicker CATEGORY
+      .page-intro
         if hierarchy.ancestors.length
           include includes/category-breadcrumb.pug
         h1= morii_page_title(page)

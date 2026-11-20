@@ -104,21 +104,18 @@ test('nested cards avoid duplicate movement and focused cards never fade', () =>
   f.dom.window.close();
 });
 
-test('new intro atmospheres pause outside the viewport and after page exit', () => {
+test('hero atmosphere pauses outside the viewport and after page exit', () => {
   const f = fixture();
-  const intro = f.window.document.createElement('section');
-  intro.className = 'page-intro';
-  f.window.document.querySelector('main').append(intro);
-  f.mutations[0].callback([{ addedNodes: [intro] }]);
+  const hero = f.window.document.querySelector('.hero__main');
   const ambient = f.observers[1];
-  assert.ok(ambient.elements.has(intro));
-  ambient.enter([intro]);
-  assert.equal(intro.style.getPropertyValue('--morii-ambient-state'), 'running');
-  ambient.callback([{ target: intro, isIntersecting: false }]);
-  assert.equal(intro.style.getPropertyValue('--morii-ambient-state'), 'paused');
-  ambient.enter([intro]);
+  assert.ok(ambient.elements.has(hero));
+  ambient.enter([hero]);
+  assert.equal(hero.style.getPropertyValue('--morii-ambient-state'), 'running');
+  ambient.callback([{ target: hero, isIntersecting: false }]);
+  assert.equal(hero.style.getPropertyValue('--morii-ambient-state'), 'paused');
+  ambient.enter([hero]);
   f.window.dispatchEvent(new f.window.Event('pagehide'));
-  assert.equal(intro.style.getPropertyValue('--morii-ambient-state'), 'paused');
+  assert.equal(hero.style.getPropertyValue('--morii-ambient-state'), 'paused');
   assert.equal(ambient.elements.size, 0);
   f.dom.window.close();
 });

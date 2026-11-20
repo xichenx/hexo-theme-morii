@@ -7,9 +7,9 @@
   const finishWriting = () => promo?.removeAttribute('data-writing');
   inkEnd?.addEventListener('animationend', finishWriting);
   const preference = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
-  const selector = '.hero__main, .hero-mini, .theme-promo, .section-heading, .feature-card, .post-card, .profile-card, .side-card, .discovery-card, .selected-card, .friend-card, .feed-card, .photo-card, .taxonomy-card, .related-card, .archive-tree-item, .page-intro:not(.music-page-heading), .article-header';
+  const selector = '.hero__main, .hero-mini, .theme-promo, .section-heading, .feature-card, .post-card, .profile-card, .side-card, .discovery-card, .selected-card, .friend-card, .feed-card, .photo-card, .taxonomy-card, .related-card, .archive-tree-item, .page-intro, .article-header';
   const seen = new WeakSet();
-  const ambientSelector = '.hero__main, .page-intro:not(.music-page-heading)';
+  const ambientSelector = '.hero__main';
   let ambientObserved = new WeakSet();
   const active = new Map();
   let observed = new WeakSet();

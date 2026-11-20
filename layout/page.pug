@@ -1,33 +1,31 @@
 extends includes/layout.pug
 
 block content
+  - var isAirConditioner = page.path && page.path.startsWith('air-conditioner/')
   - var categoryLayout = morii_layout('categories')
   - var categoryEditorial = page.type === 'categories' && categoryLayout !== 'cards'
-  - var pageWords = { about: 'ABOUT', link: 'FRIENDS', essay: 'MOMENTS', album: 'ALBUM', album_detail: 'JOURNAL', fcircle: 'FRIENDS', music: 'MUSIC', cinema: 'CINEMA', categories: 'TOPICS', tags: 'TAGS' }
   .wrap.listing-page(class=page.type === 'cinema' ? 'cinema-page' : categoryEditorial ? 'category-directory-page category-overview' : '')
-    .page-intro(class=page.type === 'link' ? 'friends-intro' : page.type === 'music' ? 'music-page-heading' : page.type === 'cinema' ? 'cinema-page-heading' : categoryEditorial ? 'category-directory-intro' : '' data-intro-word=pageWords[page.type] || 'EXPLORE' data-intro-tone=page.type || 'default')
-      if page.type !== 'music'
-        include includes/intro-atmosphere.pug
-      - var pageKickers = { about: 'ABOUT', link: 'FRIENDS', essay: 'MOMENTS', album: 'ALBUMS', album_detail: 'PHOTO JOURNAL', fcircle: 'FRIENDS FEED', music: 'MUSIC', cinema: 'CINEMA', categories: 'TOPICS', tags: 'TAGS' }
-      span.section-kicker= pageKickers[page.type] || 'EXPLORE'
-      h1= morii_page_title(page)
-      if page.description
-        p= page.description
-      else if page.type === 'link'
-        p #{morii_t("以文字相识，在彼此的小站里，发现更大的世界。")}
-      else if page.type === 'categories'
-        p #{morii_t("从一个感兴趣的主题，开始下一次探索。")}
-      if categoryEditorial
-        span.category-intro-mark(aria-hidden='true') #
-        .category-directory-stats
-          div #[strong=morii_category_directory(site.categories).length] #[span #{morii_t("个主题")}]
-          div #[strong=site.posts.length] #[span #{morii_t("篇全站文章")}]
-      if page.type === 'link'
-        - var introGroups = morii_friend_groups(site.data.link)
-        .friends-intro-meta
-          span #{introGroups.reduce(function(total, group) { return total + group.friends.length }, 0)} #{morii_t("条友链")}
-          span #{introGroups.length} #{morii_t("个分组")}
-          a(href='#friend-connect') #{morii_t("交换友链 ↗")}
+    if isAirConditioner || page.type === 'music'
+      h1.sr-only= morii_page_title(page)
+    else
+      .page-intro
+        h1= morii_page_title(page)
+        if page.description
+          p= page.description
+        else if page.type === 'link'
+          p #{morii_t("以文字相识，在彼此的小站里，发现更大的世界。")}
+        else if page.type === 'categories'
+          p #{morii_t("从一个感兴趣的主题，开始下一次探索。")}
+        if categoryEditorial
+          .category-directory-stats
+            div #[strong=morii_category_directory(site.categories).length] #[span #{morii_t("个主题")}]
+            div #[strong=site.posts.length] #[span #{morii_t("篇全站文章")}]
+        if page.type === 'link'
+          - var introGroups = morii_friend_groups(site.data.link)
+          .friends-intro-meta
+            span #{introGroups.reduce(function(total, group) { return total + group.friends.length }, 0)} #{morii_t("条友链")}
+            span #{introGroups.length} #{morii_t("个分组")}
+            a(href='#friend-connect') #{morii_t("交换友链 ↗")}
     case page.type
       when 'about'
         include includes/page/about.pug
@@ -59,7 +57,7 @@ block content
       when 'cinema'
         include includes/page/cinema.pug
       default
-        if page.path && page.path.startsWith('air-conditioner/')
+        if isAirConditioner
           include includes/page/air-conditioner.pug
         else if page.path && page.path.startsWith('game/')
           .taxonomy-grid

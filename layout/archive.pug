@@ -3,9 +3,7 @@ include includes/mixins.pug
 
 block content
   .wrap.listing-page
-    .page-intro(data-intro-word=is_archive() ? 'ARCHIVE' : is_category() ? 'CATEGORY' : 'TAG' data-intro-tone=is_archive() ? 'archive' : 'taxonomy')
-      include includes/intro-atmosphere.pug
-      span.section-kicker= is_category() ? 'CATEGORY' : is_tag() ? 'TAG' : 'ALL STORIES'
+    .page-intro
       h1= morii_page_title(page)
       p= is_category() || is_tag() ? morii_t("这个主题下的所有文章。") : morii_t("所有思考与实践，都在这里留下时间的刻度。")
     .content-grid
