@@ -28,9 +28,13 @@ block content
       h1= page.title
       if page.description && !page.password
         p.article-description= page.description
+      - var postMeta = theme.article && theme.article.meta
+      - var postDateType = [page.meta_date_type, postMeta && postMeta.date_type].find(function(type) { return ['created', 'updated', 'both'].includes(type) }) || 'both'
       .article-meta
-        span #{morii_t("发布于")} #[time(datetime=date_xml(page.date))=date(page.date, 'YYYY-MM-DD')]
-        span #{morii_t("更新于")} #[time(datetime=date_xml(page.updated || page.date))=date(page.updated || page.date, 'YYYY-MM-DD')]
+        if postDateType !== 'updated'
+          span #{morii_t("发布于")} #[time(datetime=date_xml(page.date))=date(page.date, 'YYYY-MM-DD')]
+        if postDateType !== 'created'
+          span #{morii_t("更新于")} #[time(datetime=date_xml(page.updated || page.date))=date(page.updated || page.date, 'YYYY-MM-DD')]
         if morii_reading_time(page)
           span= morii_reading_time(page)
   - var sidebarPosition = [page.sidebar_position, theme.article && theme.article.sidebar_position].find(function(position) { return position === 'left' || position === 'right' })

@@ -84,6 +84,8 @@ clock:
 article:
   nav_title: false # 滚过文章标题后，在粘性导航栏显示当前文章标题
   sidebar_position: right # left / right，只作用于桌面文章页
+  meta:
+    date_type: both # created / updated / both，只作用于文章页头部
   toc:
     enable: true
     scroll_percent: true

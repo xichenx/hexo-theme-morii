@@ -24,6 +24,7 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       const codeStyle = document.querySelector('link[href*="/css/code."]');
       assert.equal(!!codeStyle, file.startsWith('posts/'), `${file}: code styles load only on article pages`);
       if (file === 'posts/welcome/index.html') {
+        assert.deepEqual([...document.querySelectorAll('.article-header .article-meta time[datetime]')].map(time => time.parentElement.textContent.split(' ')[0]), ['发布于', '更新于']);
         assert.equal(document.querySelector('.reading-layout--left'), null);
         assert.equal(document.querySelector('.header-post-title'), null);
         assert.equal(document.querySelector('.article-reward'), null);
@@ -277,16 +278,19 @@ test('English and Traditional Chinese build at a subpath with cached locale asse
 test('optional enhancements and Waline produce configured assets and safe sharing metadata', async () => {
   const output = await buildDemo({ root: '/theme/', sourceOverrides: {
     'comments/index.md': '---\ntitle: 留言板\ncomments: true\n---\n欢迎留言。',
-    '_posts/formulas.md': '---\ntitle: Formulas and diagrams\ndate: 2026-10-16 12:00:00\npermalink: posts/formulas/\ntags: [Related fixture]\ntoc: true\ntoc_scroll_percent: true\nnavigation_order: newest_first\nsidebar_position: right\n---\n\n## Examples\n\n{% math %}x^2{% endmath %}\n\n{% mermaid %}\ngraph TD; A-->B;\n{% endmermaid %}',
+    '_posts/formulas.md': '---\ntitle: Formulas and diagrams\ndate: 2026-10-16 12:00:00\npermalink: posts/formulas/\ntags: [Related fixture]\ntoc: true\ntoc_scroll_percent: true\nnavigation_order: newest_first\nsidebar_position: right\nmeta_date_type: created\n---\n\n## Examples\n\n{% math %}x^2{% endmath %}\n\n{% mermaid %}\ngraph TD; A-->B;\n{% endmermaid %}',
     '_posts/related-maintained.md': '---\ntitle: Maintained tutorial\npermalink: posts/related-maintained/\ntags: [Related fixture]\ndate: 2020-01-01 12:00:00\nupdated: 2025-02-03 12:00:00\n---\nMaintained tutorial.',
     '_posts/related-recent.md': '---\ntitle: Published later\npermalink: posts/related-recent/\ntags: [Related fixture]\ndate: 2021-01-01 12:00:00\nupdated: 2024-02-03 12:00:00\n---\nPublished later.'
   }, themeOverrides: {
-    article: { enhancements: { mermaid: true, math: true }, toc: { enable: false, scroll_percent: false, style_simple: true }, related: { date_type: 'updated' }, navigation_order: 'oldest_first', sidebar_position: 'left' },
+    article: { enhancements: { mermaid: true, math: true }, toc: { enable: false, scroll_percent: false, style_simple: true }, related: { date_type: 'updated' }, navigation_order: 'oldest_first', sidebar_position: 'left', meta: { date_type: 'updated' } },
     comments: { enable: true, provider: 'waline', server_url: 'https://comments.example.test' },
     seo: { default_image: '/share.jpg', structured_data: true }
   } });
   const dom = new JSDOM(fs.readFileSync(path.join(output, 'posts/welcome/index.html'), 'utf8'));
   const d = dom.window.document;
+  const headerDates = d.querySelectorAll('.article-header .article-meta time[datetime]');
+  assert.equal(headerDates.length, 1);
+  assert.match(headerDates[0].parentElement.textContent, /^更新于 /);
   assert.ok(d.querySelector('.reading-layout--left'));
   assert.equal(d.querySelector('.toc-card, .mobile-toc, #reading-toc-dialog, [data-reading-toc]'), null);
   assert.ok(d.querySelector('.reading-aside .profile-card'));
@@ -295,6 +299,9 @@ test('optional enhancements and Waline produce configured assets and safe sharin
   assert.equal(d.querySelector('.article-navigation [rel="next"]').getAttribute('href'), '/theme/posts/formulas/');
   assert.equal(d.querySelector('link[rel="preconnect"]'), null, 'Enabling features alone does not emit a CDN hint');
   const technical = new JSDOM(fs.readFileSync(path.join(output, 'posts/formulas/index.html'), 'utf8'));
+  const overrideDates = technical.window.document.querySelectorAll('.article-header .article-meta time[datetime]');
+  assert.equal(overrideDates.length, 1);
+  assert.equal(overrideDates[0].parentElement.textContent, '发布于 2026-10-16');
   assert.equal(technical.window.document.querySelector('.reading-layout--left'), null);
   assert.equal(technical.window.document.querySelector('.article-navigation [rel="prev"]'), null);
   assert.equal(technical.window.document.querySelector('.article-navigation [rel="next"]').getAttribute('href'), '/theme/posts/welcome/');
