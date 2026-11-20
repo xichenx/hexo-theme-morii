@@ -24,6 +24,7 @@ const PAGES = [
   'cinema/index.html',
   'series/index.html',
   'series/morii-guide/index.html',
+  'reading-list/index.html',
   'posts/reading/index.html'
 ];
 const KIB = 1024;

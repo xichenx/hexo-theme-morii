@@ -8,6 +8,8 @@
   const grid = document.getElementById('reading-list-items');
   const retry = document.getElementById('reading-list-retry');
   const search = document.getElementById('reading-list-search');
+  const progressOnly = document.getElementById('reading-list-progress-only');
+  const progressSource = window.MoriiReadingProgress;
   const noMatch = document.getElementById('reading-list-no-match');
   const exportButton = document.getElementById('reading-list-export');
   const importButton = document.getElementById('reading-list-import');
@@ -63,11 +65,22 @@
     if (!page || !grid) return;
     if (exportButton) exportButton.disabled = !saved.length || Boolean(storageError);
     document.getElementById('reading-list-empty').hidden = saved.length > 0 || Boolean(storageError);
+    const progress = new Map();
+    if (metadata && progressSource && saved.length) {
+      for (const record of progressSource.read()) {
+        const entry = metadata.get(record.path);
+        if (entry?.updated && !entry.protected && entry.updated === record.updated) progress.set(record.path, record.ratio);
+      }
+    }
+    if (progressOnly) {
+      progressOnly.parentElement.hidden = !progressSource || !metadata || !saved.length;
+      if (progressOnly.parentElement.hidden) progressOnly.checked = false;
+    }
     const terms = (search?.value || '').trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
     const filtered = saved.filter(path => {
       const entry = metadata?.get(path);
       const text = `${entry?.title || ''} ${entry?.topics || ''} ${path}`.toLocaleLowerCase();
-      return terms.every(term => text.includes(term));
+      return (!progressOnly?.checked || progress.has(path)) && terms.every(term => text.includes(term));
     });
     if (noMatch) noMatch.hidden = !saved.length || filtered.length > 0 || Boolean(storageError);
     const missing = saved.filter(path => !metadata?.has(path)).length;
@@ -84,6 +97,7 @@
       } else heading.textContent = metadata ? t("暂未找到这篇文章") : t("正在等待文章信息");
       const description = document.createElement('p');
       description.textContent = entry ? `${entry.protected ? t("加密文章 · ") : ''}${entry.date || t("打开文章继续阅读")}` : path;
+      if (progress.has(path)) description.textContent += ` · ${t("上次读到 {0}%", Math.round(progress.get(path) * 100))}`;
       const actions = document.createElement('div');
       actions.className = 'saved-card__actions';
       if (entry) {
@@ -102,7 +116,7 @@
       card.append(heading, description, actions);
       return card;
     }));
-    if (status) status.textContent = storageError || loadError || `${terms.length ? t("找到 {0} / {1} 篇收藏", filtered.length, saved.length) : t("收藏了 {0} 篇文章", saved.length)}${metadata && missing ? t("，其中 {0} 篇暂未找到，记录仍保留。", missing) : '。'}`;
+    if (status) status.textContent = storageError || loadError || `${terms.length || progressOnly?.checked ? t("找到 {0} / {1} 篇收藏", filtered.length, saved.length) : t("收藏了 {0} 篇文章", saved.length)}${metadata && missing ? t("，其中 {0} 篇暂未找到，记录仍保留。", missing) : '。'}`;
   };
   const load = () => {
     if (!page || pending || !read().length) return pending;
@@ -116,8 +130,9 @@
         const response = await fetch(page.dataset.index, { signal: controller.signal });
         if (!response.ok) throw new Error('Index unavailable');
         const data = await response.json();
-        if (!Array.isArray(data)) throw new Error('Invalid index');
-        metadata = new Map(data.filter(entry => entry && pathFor(entry.url) && typeof entry.title === 'string').map(entry => [pathFor(entry.url), entry]));
+        const entries = Array.isArray(data) ? data : data?.entries;
+        if (!Array.isArray(entries)) throw new Error('Invalid index');
+        metadata = new Map(entries.filter(entry => entry && pathFor(entry.url) && typeof entry.title === 'string').map(entry => [pathFor(entry.url), entry]));
       } catch {
         loadError = t("文章信息暂时无法加载，收藏记录仍保留，可稍后重试。");
         if (retry) retry.hidden = false;
@@ -146,7 +161,9 @@
   });
   retry?.addEventListener('click', load);
   search?.addEventListener('input', render);
+  progressOnly?.addEventListener('change', render);
   document.getElementById('reading-list-reset-filter')?.addEventListener('click', () => {
+    if (progressOnly) progressOnly.checked = false;
     if (search) { search.value = ''; render(); search.focus(); }
   });
   exportButton?.addEventListener('click', () => {
@@ -206,10 +223,12 @@
     }
   });
   window.addEventListener('storage', event => {
+    if (progressSource && event.key === progressSource.key) { render(); return; }
     if (event.key !== key && event.key !== null) return;
     render();
     if (!metadata) load();
   });
+  if (progressSource) window.addEventListener('pageshow', event => { if (event.persisted) render(); });
   render();
   load();
 })();

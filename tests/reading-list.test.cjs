@@ -5,23 +5,29 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { JSDOM } = require('jsdom');
 const source = fs.readFileSync(path.join(__dirname, '../source/js/reading-list.js'), 'utf8');
+const resumeSource = fs.readFileSync(path.join(__dirname, '../source/js/reading-resume.js'), 'utf8');
 const key = 'morii-reading-list';
+const progressKey = 'morii-reading-progress';
+const updated = '2026-10-16T00:00:00.000Z';
 const tick = () => new Promise(resolve => setImmediate(resolve));
 const backup = (items, root = '/old/') => ({ format: 'morii-reading-list', version: 1, root, items });
-async function fixture(saved = ['/blog/posts/android/', '/blog/posts/music/']) {
-  const dom = new JSDOM(`<section data-reading-list data-index="/blog/morii-search.json" data-root="/blog/"><input id="reading-list-search"><div id="reading-list-no-match" hidden></div><button id="reading-list-reset-filter"></button><button id="reading-list-export"></button><button id="reading-list-import"></button><input id="reading-list-import-file" type="file"><p id="reading-list-transfer-status"></p><p id="reading-list-status"></p><button id="reading-list-retry" hidden></button><div id="reading-list-items"></div><div id="reading-list-empty" hidden></div></section>`, { url: 'https://example.test/blog/reading-list/', runScripts: 'outside-only' });
+async function fixture(saved = ['/blog/posts/android/', '/blog/posts/music/'], version) {
+  const dom = new JSDOM(`<section data-reading-list data-index="/blog/morii-search.json" data-root="/blog/"><input id="reading-list-search"><label hidden><input id="reading-list-progress-only" type="checkbox"></label><div id="reading-list-no-match" hidden></div><button id="reading-list-reset-filter"></button><button id="reading-list-export"></button><button id="reading-list-import"></button><input id="reading-list-import-file" type="file"><p id="reading-list-transfer-status"></p><p id="reading-list-status"></p><button id="reading-list-retry" hidden></button><div id="reading-list-items"></div><div id="reading-list-empty" hidden></div></section>`, { url: 'https://example.test/blog/reading-list/', runScripts: 'outside-only' });
   const { window } = dom;
   const { document } = window;
   window.localStorage.setItem(key, JSON.stringify(saved));
-  window.fetch = async () => ({ ok: true, json: async () => [
-    { title: 'Android 实践', url: '/blog/posts/android/', topics: 'Android 开发', date: '2026.10.16', content: 'Private body must never be exported' },
-    { title: '音乐播放器', url: '/blog/posts/music/', topics: '前端 音乐', date: '2026.10.15' }
-  ] });
+  const entries = [
+    { title: 'Android 实践', url: '/blog/posts/android/', topics: 'Android 开发', date: '2026.10.16', updated, content: 'Private body must never be exported' },
+    { title: '音乐播放器', url: '/blog/posts/music/', topics: '前端 音乐', date: '2026.10.15', updated },
+    { title: '加密文章', url: '/blog/posts/locked/', protected: true, updated }
+  ];
+  window.fetch = async () => ({ ok: true, json: async () => version ? { version, entries, shards: ['/blog/search/shard.json'] } : entries });
   const blobs = []; const downloads = [];
   window.Blob = class { constructor(parts) { this.parts = parts; blobs.push(this); } };
   window.URL.createObjectURL = () => 'blob:test';
   window.URL.revokeObjectURL = () => {};
   window.HTMLAnchorElement.prototype.click = function () { downloads.push({ href: this.href, download: this.download }); };
+  window.eval(resumeSource);
   window.eval(source);
   await tick();
   const click = id => document.getElementById(id).click();
@@ -49,6 +55,34 @@ test('saved posts filter across title and topics, and empty matches do not imply
   assert.equal(f.cards().length, 2);
   assert.equal(f.document.activeElement.id, 'reading-list-search');
   f.dom.window.close();
+});
+
+test('saved articles show only valid progress with either sharded search manifest', async t => {
+  const android = '/blog/posts/android/';
+  const music = '/blog/posts/music/';
+  const locked = '/blog/posts/locked/';
+  for (const version of [2, 3]) {
+    const f = await fixture([android, music, locked], version);
+    t.after(() => f.dom.window.close());
+    const record = { updated, ratio: .42, at: Date.now() };
+    f.window.localStorage.setItem(progressKey, JSON.stringify([
+      { ...record, path: android },
+      { ...record, path: music, updated: 'old' },
+      { ...record, path: music, at: Date.now() - 91 * 86400000 },
+      { ...record, path: locked }
+    ]));
+    f.window.dispatchEvent(new f.window.StorageEvent('storage', { key: progressKey }));
+    assert.match(f.cards()[0].textContent, /上次读到 42%/);
+    assert.ok(!f.cards()[1].textContent.includes('42%'));
+    assert.ok(!f.cards()[2].textContent.includes('42%'));
+    f.click('reading-list-progress-only');
+    assert.equal(f.cards().length, 1);
+    f.search('音乐');
+    assert.equal(f.cards().length, 0);
+    f.click('reading-list-reset-filter');
+    assert.equal(f.cards().length, 3);
+    assert.deepEqual(f.read(), [android, music, locked]);
+  }
 });
 
 test('export includes only paths and a versioned deployment root', async () => {

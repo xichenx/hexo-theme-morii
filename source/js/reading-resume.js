@@ -1,15 +1,7 @@
 (() => {
   const t = (...args) => window.MoriiI18n ? window.MoriiI18n.t(...args) : args[0].replace(/\{(\d+)\}/g, (_, i) => String(args[Number(i) + 1] ?? ''));
-  const article = document.querySelector('.article-body');
-  const banner = document.getElementById('reading-resume');
-  if (!article || !banner) return;
   const key = 'morii-reading-progress';
-  const path = new URL(document.querySelector('link[rel="canonical"]')?.href || location.href).pathname.replace(/index\.html$/, '');
-  const updated = banner.dataset.updated || '';
   const lifetime = 90 * 86400000;
-  let timer;
-  let interacted = false;
-  let cleared = false;
   const read = () => {
     try {
       const entries = JSON.parse(localStorage.getItem(key) || '[]');
@@ -17,6 +9,18 @@
       return entries.filter(item => item && typeof item.path === 'string' && item.path.startsWith('/') && typeof item.updated === 'string' && Number.isFinite(item.ratio) && item.ratio >= .03 && item.ratio < .97 && Number.isFinite(item.at) && Date.now() - item.at < lifetime && item.at <= Date.now() + 60000).slice(0, 50);
     } catch { return []; }
   };
+  if (document.querySelector('[data-reading-list]')) {
+    window.MoriiReadingProgress = { key, read };
+    return;
+  }
+  const article = document.querySelector('.article-body');
+  const banner = document.getElementById('reading-resume');
+  if (!article || !banner) return;
+  const path = new URL(document.querySelector('link[rel="canonical"]')?.href || location.href).pathname.replace(/index\.html$/, '');
+  const updated = banner.dataset.updated || '';
+  let timer;
+  let interacted = false;
+  let cleared = false;
   const write = entries => {
     try { localStorage.setItem(key, JSON.stringify(entries.sort((a, b) => b.at - a.at).slice(0, 50))); }
     catch { /* Reading remains available when browser storage is blocked. */ }

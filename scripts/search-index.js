@@ -23,6 +23,7 @@ hexo.extend.generator.register('morii-search-index', locals => {
     title: plain(post.title),
     url: prefix + String(post.path).replace(/^\/+/, ''),
     date: post.date?.format?.('YYYY.MM.DD') || '',
+    updated: post.password ? undefined : (post.updated || post.date)?.toISOString?.() || undefined,
     protected: Boolean(post.password),
     content: post.password ? '' : plain(`${post.description || ''} ${post.excerpt || ''} ${hexo.theme.config.search?.content === false ? '' : post.content || ''}`),
     categories: post.password ? [] : list(post.categories).map(item => plain(item?.name)).filter(Boolean),

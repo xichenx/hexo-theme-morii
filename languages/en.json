@@ -562,6 +562,8 @@
   "已开启专注阅读，目录仍可展开查看。": "Focus mode enabled. The table of contents is still available.",
   "已退出专注阅读。": "Focus mode disabled.",
   "已恢复默认字号与阅读布局。": "Default text size and reading layout restored.",
+  "仅显示有阅读进度的文章": "Only show articles with reading progress",
+  "上次读到 {0}%": "Last read: {0}%",
   "上次读到 {0}%{1}。进度仅保存在当前浏览器。": "Last read: {0}%{1}. Progress is saved only in this browser.",
   "已清除此篇阅读记录，本次访问不再保存。": "Reading position cleared. It will not be saved during this visit.",
   "已复制": "Copied",

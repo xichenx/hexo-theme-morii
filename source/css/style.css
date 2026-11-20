@@ -1844,6 +1844,8 @@ a.footer-filing__item:focus-visible { outline: 2px solid var(--accent); outline-
 .reading-list-search { display: grid; flex: 1 1 280px; gap: 9px; min-width: 0; font-size: 12px; font-weight: 700; }
 .reading-list-search input { box-sizing: border-box; width: 100%; min-width: 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 11px; font: inherit; font-weight: 400; background: var(--surface-2); color: var(--ink); }
 .reading-list-search input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+#reading-list-progress-filter:not([hidden]) { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 12px; cursor: pointer; }
+#reading-list-progress-only { accent-color: var(--accent); }
 .reading-list-transfer { display: flex; flex-wrap: wrap; gap: 10px; }
 .reading-list-transfer button { white-space: nowrap; }
 .reading-list-transfer button:disabled { opacity: .45; cursor: default; }
