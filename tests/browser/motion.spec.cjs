@@ -21,14 +21,40 @@ test('layered entrances finish cleanly and navigation remains interactive', asyn
   await noOverflow(page);
   if (viewport.width <= 580) {
     const heading = page.getByRole('heading', { name: '从这里开始' });
+    const featureGrid = page.locator('.feature-grid');
+    const featureCards = featureGrid.locator('.feature-card');
+    await expect(featureGrid).toHaveCSS('row-gap', '8px');
     for (const width of [viewport.width, 320]) {
       await page.setViewportSize({ width, height: viewport.height });
       await expect.poll(async () => (await heading.boundingBox()).y).toBeLessThan(650);
       for (const link of await page.locator('.hero__actions a, .theme-promo__actions a').all()) {
         expect((await link.boundingBox()).height).toBeGreaterThanOrEqual(44);
       }
+      for (const card of await featureCards.all()) {
+        const bounds = await card.boundingBox();
+        expect(bounds.height).toBeGreaterThanOrEqual(44);
+        expect(bounds.height).toBeLessThan(85);
+      }
       await noOverflow(page);
     }
+    const firstCard = featureCards.first();
+    const fitsLongText = await firstCard.evaluate(card => {
+      const title = card.querySelector('strong');
+      const description = card.querySelector('small');
+      const previousTitle = title.textContent;
+      const previousDescription = description.textContent;
+      title.textContent = '一个需要在窄屏完整展示的自定义入口标题';
+      description.textContent = 'A long description that should wrap without covering the icon or arrow. '.repeat(2);
+      const bounds = card.getBoundingClientRect();
+      const fits = [title, description].every(element => {
+        const rect = element.getBoundingClientRect();
+        return element.scrollWidth <= element.clientWidth + 1 && rect.bottom <= bounds.bottom;
+      });
+      title.textContent = previousTitle;
+      description.textContent = previousDescription;
+      return fits && bounds.height > 85;
+    });
+    expect(fitsLongText).toBe(true);
     await page.setViewportSize(viewport);
   }
   const preview = info.outputPath('home-depth.png');
