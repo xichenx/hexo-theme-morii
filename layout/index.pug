@@ -1,6 +1,20 @@
 extends includes/layout.pug
 include includes/mixins.pug
 
+mixin homeJournal()
+  .hero-mini.hero-mini--quote
+    span.mini-label #{morii_t("✦ 随手记")}
+    strong= theme.hero && theme.hero.note || morii_t("把热爱写进日常，把好奇带向远方。")
+    if morii_has_page('/essay/')
+      a(href=url_for('/essay/')) #{morii_t("看看即刻")} #[span →]
+    else
+      a(href=url_for('/archives/')) #{morii_t("继续探索")} #[span →]
+  .hero-mini.hero-mini--stats
+    span.mini-label #{morii_t("◉ 博客手账")}
+    .stats-grid
+      div #[strong=site.posts.length] #[span #{morii_t("篇文章")}]
+      div #[strong=site.categories.length] #[span #{morii_t("个分类")}]
+
 block content
   - var firstPage = !page.current || page.current === 1
   if firstPage
@@ -33,20 +47,12 @@ block content
                 a.button.theme-promo__primary(href=themePromo.docs) #{morii_t("安装指南")} #[span(aria-hidden='true') ↗]
               if themePromo.source
                 a.button(href=themePromo.source) #{morii_t("GitHub 源码")} #[span(aria-hidden='true') ↗]
+        if themePromo.journalBelow
+          .hero__journal
+            +homeJournal()
       else
         .hero__side
-          .hero-mini.hero-mini--quote
-            span.mini-label #{morii_t("✦ 随手记")}
-            strong= theme.hero && theme.hero.note || morii_t("把热爱写进日常，把好奇带向远方。")
-            if morii_has_page('/essay/')
-              a(href=url_for('/essay/')) #{morii_t("看看即刻")} #[span →]
-            else
-              a(href=url_for('/archives/')) #{morii_t("继续探索")} #[span →]
-          .hero-mini.hero-mini--stats
-            span.mini-label #{morii_t("◉ 博客手账")}
-            .stats-grid
-              div #[strong=site.posts.length] #[span #{morii_t("篇文章")}]
-              div #[strong=site.categories.length] #[span #{morii_t("个分类")}]
+          +homeJournal()
     if theme.featured && theme.featured.length
       section.wrap.section-block
         .section-heading

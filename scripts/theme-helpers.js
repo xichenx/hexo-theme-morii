@@ -33,7 +33,7 @@ hexo.extend.helper.register('morii_theme_promo', function () {
   };
   const docs = href(promo.docs_url);
   const source = href(promo.repository_url);
-  return docs || source ? { docs, source } : null;
+  return docs || source ? { docs, source, journalBelow: promo.journal_below === true } : null;
 });
 
 hexo.extend.helper.register('morii_accent', () => {

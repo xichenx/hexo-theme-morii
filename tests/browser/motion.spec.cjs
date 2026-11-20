@@ -17,6 +17,7 @@ test('layered entrances finish cleanly and navigation remains interactive', asyn
   const promoBox = await promo.boundingBox();
   if (viewport.width > 800) expect(promoBox.x).toBeGreaterThan(mainBox.x + mainBox.width);
   else expect(promoBox.y).toBeGreaterThan(mainBox.y + mainBox.height);
+  await expect(page.locator('.hero-mini--quote, .hero-mini--stats')).toHaveCount(0);
   await noOverflow(page);
   const preview = info.outputPath('home-depth.png');
   await page.screenshot({ path: preview, animations: 'disabled' });

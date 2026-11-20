@@ -24,12 +24,13 @@ intro: 分享编程、读书和生活中的小发现。
 
 ### Morii 主题推广卡
 
-首页第一页默认在首屏右侧显示主题推广卡，窄屏时移到主卡片下方。可设置 `home.theme_promo.enable: false` 恢复右侧的「随手记」和「博客手账」。
+首页第一页默认由主题推广卡独占首屏右侧，窄屏时推广卡排在主卡片下方。若想同时展示「随手记」和「博客手账」，可将 `journal_below` 设为 `true`，两张卡就会排在首屏卡片下方。关闭推广卡后，两张卡恢复到原来的首屏位置。
 
 ```yaml
 home:
   theme_promo:
     enable: true
+    journal_below: false
     docs_url: 'https://github.com/xichenx/hexo-theme-morii#quick-start'
     repository_url: 'https://github.com/xichenx/hexo-theme-morii'
 ```

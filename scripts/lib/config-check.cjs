@@ -10,7 +10,9 @@ function inspect(config, site = {}, knownKeys) {
   if (knownKeys) for (const key of Object.keys(config)) if (!knownKeys.includes(key)) add('warning', key, '未知顶层配置，请检查是否拼写错误。');
   const language = Array.isArray(site.language) ? site.language[0] : site.language;
   const promo = config.home?.theme_promo;
-  if (promo?.enable != null && typeof promo.enable !== 'boolean') add('error', 'home.theme_promo.enable', '必须为 true 或 false。');
+  for (const key of ['enable', 'journal_below']) {
+    if (promo?.[key] != null && typeof promo[key] !== 'boolean') add('error', 'home.theme_promo.' + key, '必须为 true 或 false。');
+  }
   for (const key of ['docs_url', 'repository_url']) {
     if (promo?.[key] && !navigationTarget(promo[key])) add('error', 'home.theme_promo.' + key, '填写站内路径或 HTTP(S) 链接。');
   }

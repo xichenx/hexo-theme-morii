@@ -57,6 +57,7 @@ hero:
 home:
   theme_promo:
     enable: true # 首页首屏右侧显示 Morii 推广卡
+    journal_below: false # 同时展示随手记和博客手账时，将两张卡放在首屏下方
     docs_url: 'https://github.com/xichenx/hexo-theme-morii#quick-start'
     repository_url: 'https://github.com/xichenx/hexo-theme-morii'
   moments:

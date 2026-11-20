@@ -21,6 +21,7 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
         const promo = document.querySelector('.theme-promo');
         assert.equal(promo.querySelector('h2').textContent, 'Morii');
         assert.equal(promo.querySelector('img').getAttribute('src'), `${prefix}icons/brand/morii-orbit-nav.png`);
+        assert.equal(document.querySelector('.hero-mini--quote, .hero-mini--stats'), null);
       }
       if (file === 'page/2/index.html') assert.equal(document.querySelector('.theme-promo'), null);
       if (file === 'essay/index.html') {
@@ -218,16 +219,24 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
     { home: 'featured', categories: 'directory', category: 'list', archives: 'timeline' }
   ]) await t.test(`configurable layouts: ${layouts.categories}`, async () => {
     const monthly = layouts.archives === 'grouped';
-    const themePromo = monthly ? { enable: false } : { docs_url: '/about/', repository_url: 'javascript:invalid' };
+    const themePromo = monthly ? { enable: false, journal_below: true } : {
+      docs_url: '/about/', repository_url: 'javascript:invalid', journal_below: true
+    };
     const output = await buildDemo({ root: '/theme/', url: 'https://example.test', siteOverrides: { archive_dir: 'history', archive_generator: { monthly }, category_generator: { per_page: 1 } }, themeOverrides: { footer: { nav: false }, appearance: { layouts, effects: { enable: false } }, home: { theme_promo: themePromo } } });
     const documentFor = file => new JSDOM(fs.readFileSync(path.join(output, file, 'index.html'), 'utf8')).window.document;
     const home = documentFor('');
     if (monthly) {
       assert.equal(home.querySelector('.theme-promo'), null);
-      assert.ok(home.querySelector('.hero-mini--stats'));
+      assert.equal(home.querySelector('.hero__journal'), null);
+      assert.ok(home.querySelector('.hero__side .hero-mini--quote'));
+      assert.ok(home.querySelector('.hero__side .hero-mini--stats'));
     } else {
       const links = [...home.querySelectorAll('.theme-promo a')];
       assert.deepEqual(links.map(link => link.getAttribute('href')), ['/theme/about/']);
+      const journal = home.querySelector('.hero__journal');
+      assert.equal(journal.previousElementSibling.className, 'theme-promo');
+      assert.equal(journal.querySelector('.hero-mini--quote a').getAttribute('href'), '/theme/essay/');
+      assert.equal(journal.querySelectorAll('.stats-grid strong').length, 2);
     }
     assert.equal(home.querySelector('.footer-nav'), null);
     assert.ok(home.querySelector('.footer-explore a[href="/theme/reading-list/"]'));
