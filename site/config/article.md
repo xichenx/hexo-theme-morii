@@ -50,6 +50,7 @@ outdated: false
 
 ```yaml
 article:
+  nav_title: false
   resume:
     enable: true
   share:
@@ -73,6 +74,7 @@ article:
 
 | 字段 | 默认值 | 功能与使用提示 |
 | --- | --- | --- |
+| `article.nav_title` | `false` | 设为 `true` 后，滚过正文标题时在顶部导航显示文章名，滚回后恢复站点名称 |
 | `article.resume.enable` | `true` | 记录阅读位置，再次打开文章时可继续阅读 |
 | `article.share.enable` | `true` | 显示文章分享功能；关闭后仍保留“复制文章链接”按钮 |
 | `article.print.enable` | `true` | 显示打印 / 导出 PDF 工具，通过浏览器打印流程保存 |

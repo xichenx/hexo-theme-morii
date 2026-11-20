@@ -24,6 +24,7 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       const codeStyle = document.querySelector('link[href*="/css/code."]');
       assert.equal(!!codeStyle, file.startsWith('posts/'), `${file}: code styles load only on article pages`);
       if (file === 'posts/welcome/index.html') {
+        assert.equal(document.querySelector('.header-post-title'), null);
         assert.equal(document.querySelector('.article-copyright, .article-edit'), null);
         assert.equal(document.querySelector('.article-body').dataset.codeStyle, 'classic');
         assert.equal(document.querySelector('.article-body').dataset.codeTheme, 'dark');

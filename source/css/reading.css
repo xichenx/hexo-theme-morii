@@ -1,4 +1,5 @@
 .reading-layout{grid-template-columns:minmax(0,1fr) 280px;gap:24px;padding-top:24px}
+.header-post-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .article-header{position:relative;isolation:isolate;overflow:hidden;padding:32px 40px;background:linear-gradient(115deg,var(--surface-2),var(--surface))}
 .article-header.has-cover{
   --hero-shade:color-mix(in srgb,#101827 82%,var(--cover-tone,#27365b));

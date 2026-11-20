@@ -48,6 +48,10 @@
   });
   const progress = document.querySelector('.reading-progress');
   const progressBar = document.querySelector('.reading-progress__bar');
+  const headerTitle = document.querySelector('.header-post-title');
+  const siteHeader = headerTitle?.closest('.site-header');
+  const brandCopy = siteHeader?.querySelector('.brand__copy');
+  const articleTitle = headerTitle && document.querySelector('.article-header h1');
   const announcement = document.getElementById('theme-announcement');
   let headings = [];
   let tocLinks = [];
@@ -81,6 +85,13 @@
     const start = article.getBoundingClientRect().top + window.scrollY - 130;
     const distance = article.offsetHeight - window.innerHeight + 160;
     const value = Math.round(Math.max(0, Math.min(100, (window.scrollY - start) / Math.max(1, distance) * 100)));
+    if (articleTitle && brandCopy) {
+      const showTitle = articleTitle.getBoundingClientRect().bottom <= siteHeader.getBoundingClientRect().bottom;
+      if (headerTitle.hidden === showTitle) {
+        headerTitle.hidden = !showTitle;
+        brandCopy.hidden = showTitle;
+      }
+    }
     progress?.setAttribute('aria-valuenow', String(value));
     if (progressBar) progressBar.style.transform = `scaleX(${value / 100})`;
     document.querySelectorAll('[data-reading-percent]').forEach(label => { label.textContent = `${value}%`; });
@@ -286,5 +297,6 @@
   window.addEventListener('scroll', scheduleProgress, { passive: true });
   window.addEventListener('resize', scheduleProgress);
   window.addEventListener('load', scheduleProgress);
+  window.addEventListener('pageshow', scheduleProgress);
   if (typeof ResizeObserver === 'function') new ResizeObserver(scheduleProgress).observe(article);
 })();

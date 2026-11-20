@@ -12,6 +12,7 @@ const options = {
   fixture: 'browser-layout', root: prefix,
   themeOverrides: {
     article: {
+      nav_title: true,
       copyright: { enable: true, license: 'Example license', license_url: 'https://example.test/license' },
       edit: { enable: true, url: 'https://github.com/example/blog/edit/main/source/{path}' }
     },

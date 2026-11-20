@@ -86,6 +86,8 @@ html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || them
               strong.brand__text= siteIdentity.brand
               if siteIdentity.tagline
                 small.brand__tagline= siteIdentity.tagline
+          if is_post() && theme.article && theme.article.nav_title === true && page.title
+            strong.brand__text.header-post-title(title=page.title hidden)= page.title
           nav.site-nav#site-nav(aria-label=morii_t("主导航"))
             each item in theme.menu
               - var activeMenu = is_current(item.path) || (item.path === '/' && is_home()) || (item.path === '/archives/' && (is_archive() || is_post())) || (item.path === '/album/' && page.type === 'album_detail')

@@ -82,6 +82,7 @@ clock:
   longitude: null
   timezone: '' # 继承博客 timezone；只开时钟无需填写坐标
 article:
+  nav_title: false # 滚过文章标题后，在粘性导航栏显示当前文章标题
   enhancements:
     # 默认不下载渲染库；单篇文章也可用 mermaid: true / math: true 开启。
     mermaid: false
