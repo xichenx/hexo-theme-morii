@@ -135,9 +135,11 @@ article:
     theme: dark    # dark / light / auto（跟随站点深浅模式）
     copy: true # 显示复制按钮
     language: true # 显示语言标签
+    viewer: true # 显示「放大查看」
     collapse: true
+    start_collapsed: true # 长代码默认折叠；设为 false 时保留折叠按钮
     word_wrap: false # 默认保留横向滚动；每个代码块可独立切换换行
-    # 超过此行数的代码默认收起；复制始终包含完整代码。
+    # 超过此行数的代码可折叠；复制始终包含完整代码。
     lines: 18
 sidebar:
   announcement:

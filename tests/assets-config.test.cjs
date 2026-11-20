@@ -48,6 +48,9 @@ test('configuration checker detects service mistakes, string booleans, typos and
   assert.deepEqual(inspect({ article: { meta: { word_count: 'true', reading_time: 0 } } }).map(({ field, level }) => [field, level]), [
     ['article.meta.word_count', 'error'], ['article.meta.reading_time', 'error']
   ]);
+  assert.deepEqual(inspect({ article: { code: { viewer: 'false', start_collapsed: 0 } } }).map(issue => issue.field), [
+    'article.code.viewer', 'article.code.start_collapsed'
+  ]);
 });
 
 test('footer navigation skips malformed links and reports their configuration fields', () => {

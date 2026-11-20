@@ -257,7 +257,9 @@
         scheduleProgress();
       });
       tools.append(wrap);
-      if (!block.classList.contains('mermaid') && languageClass !== 'language-mermaid') addCodeViewer(shell, tools, block);
+      if (article.dataset.codeViewer !== 'false' && !block.classList.contains('mermaid') && languageClass !== 'language-mermaid') {
+        addCodeViewer(shell, tools, block);
+      }
       shell.append(tools, block);
       const lineCount = codeText(code).replace(/\n$/, '').split('\n').length;
       if (article.dataset.codeCollapse !== 'false' && lineCount > collapseLines) {
@@ -268,7 +270,7 @@
         toggle.type = 'button';
         toggle.className = 'code-toggle';
         toggle.setAttribute('aria-controls', block.id);
-        shell.classList.add('is-collapsed');
+        shell.classList.toggle('is-collapsed', article.dataset.codeStartCollapsed !== 'false');
         const codeStyle = getComputedStyle(code);
         const lineHeight = parseFloat(codeStyle.lineHeight) || 20.8;
         const padding = (parseFloat(codeStyle.paddingTop) || 0) + (parseFloat(codeStyle.paddingBottom) || 0);

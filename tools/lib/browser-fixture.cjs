@@ -58,6 +58,11 @@ const options = {
     '_posts/search-matches.md': '---\ntitle: Search matches fixture\ndate: 2020-02-01 00:00:00\npermalink: posts/search-matches/\n---\n\nOverview.\n\n<!-- more -->\n\norioncache ' + 'Ordinary prose. '.repeat(22) + '\n\nnebularender\n',
     '_posts/layout-stress.md': longArticle,
     '_posts/code-styles.md': codeArticle,
+    '_posts/code-controls.md': [
+      '---', 'title: 长代码阅读设置', 'date: 2019-01-01', 'permalink: posts/code-controls/',
+      'code_viewer: false', 'code_start_collapsed: false', 'code_copy: true', '---', '',
+      '```javascript', sampleCode, '```', ''
+    ].join('\n'),
     '_posts/lazy-images.md': `---
 title: Article image loading
 date: 2020-01-01 00:00:00

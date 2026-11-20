@@ -44,6 +44,8 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
         assert.equal(document.querySelector('.article-body').dataset.codeTheme, 'dark');
         assert.equal(document.querySelector('.article-body').hasAttribute('data-code-copy'), false);
         assert.equal(document.querySelector('.article-body').hasAttribute('data-code-language'), false);
+        assert.equal(document.querySelector('.article-body').hasAttribute('data-code-viewer'), false);
+        assert.equal(document.querySelector('.article-body').hasAttribute('data-code-start-collapsed'), false);
       }
       assert.equal(document.querySelectorAll('main h1').length, 1, `${file}: one page heading`);
       assert.equal(!!document.querySelector('script[src*="/js/tag-order."]'), file === 'tags/index.html');
@@ -287,16 +289,18 @@ test('English and Traditional Chinese build at a subpath with cached locale asse
 test('optional enhancements and Waline produce configured assets and safe sharing metadata', async () => {
   const output = await buildDemo({ root: '/theme/', sourceOverrides: {
     'comments/index.md': '---\ntitle: 留言板\ncomments: true\n---\n欢迎留言。',
-    '_posts/formulas.md': '---\ntitle: Formulas and diagrams\ndate: 2026-10-16 12:00:00\npermalink: posts/formulas/\ntags: [Related fixture]\ntoc: true\ntoc_scroll_percent: true\nnavigation_order: newest_first\nsidebar_position: right\nmeta_date_type: created\nimage_captions: true\n---\n\n## Examples\n\n{% math %}x^2{% endmath %}\n\n{% mermaid %}\ngraph TD; A-->B;\n{% endmermaid %}\n\n![Sample diagram](/images/covers/welcome.jpg "Build output")',
+    '_posts/formulas.md': '---\ntitle: Formulas and diagrams\ndate: 2026-10-16 12:00:00\npermalink: posts/formulas/\ntags: [Related fixture]\ntoc: true\ntoc_scroll_percent: true\nnavigation_order: newest_first\nsidebar_position: right\nmeta_date_type: created\ncode_viewer: true\ncode_start_collapsed: true\nimage_captions: true\n---\n\n## Examples\n\n{% math %}x^2{% endmath %}\n\n{% mermaid %}\ngraph TD; A-->B;\n{% endmermaid %}\n\n![Sample diagram](/images/covers/welcome.jpg "Build output")',
     '_posts/related-maintained.md': '---\ntitle: Maintained tutorial\npermalink: posts/related-maintained/\ntags: [Related fixture]\ndate: 2020-01-01 12:00:00\nupdated: 2025-02-03 12:00:00\n---\nMaintained tutorial.',
     '_posts/related-recent.md': '---\ntitle: Published later\npermalink: posts/related-recent/\ntags: [Related fixture]\ndate: 2021-01-01 12:00:00\nupdated: 2024-02-03 12:00:00\nmeta_word_count: false\nmeta_reading_time: true\n---\nPublished later.'
   }, themeOverrides: {
-    article: { enhancements: { mermaid: true, math: true }, toc: { enable: false, scroll_percent: false, style_simple: true }, related: { date_type: 'updated' }, navigation_order: 'oldest_first', sidebar_position: 'left', meta: { date_type: 'updated', word_count: true, reading_time: false } },
+    article: { code: { viewer: false, start_collapsed: false }, enhancements: { mermaid: true, math: true }, toc: { enable: false, scroll_percent: false, style_simple: true }, related: { date_type: 'updated' }, navigation_order: 'oldest_first', sidebar_position: 'left', meta: { date_type: 'updated', word_count: true, reading_time: false } },
     comments: { enable: true, provider: 'waline', server_url: 'https://comments.example.test' },
     seo: { default_image: '/share.jpg', structured_data: true }
   } });
   const dom = new JSDOM(fs.readFileSync(path.join(output, 'posts/welcome/index.html'), 'utf8'));
   const d = dom.window.document;
+  assert.equal(d.querySelector('.article-body').dataset.codeViewer, 'false');
+  assert.equal(d.querySelector('.article-body').dataset.codeStartCollapsed, 'false');
   const headerDates = d.querySelectorAll('.article-header .article-meta time[datetime]');
   assert.equal(headerDates.length, 1);
   assert.match(headerDates[0].parentElement.textContent, /^更新于 /);
@@ -315,6 +319,8 @@ test('optional enhancements and Waline produce configured assets and safe sharin
   assert.equal(d.querySelector('.article-navigation [rel="next"]').getAttribute('href'), '/theme/posts/formulas/');
   assert.equal(d.querySelector('link[rel="preconnect"]'), null, 'Enabling features alone does not emit a CDN hint');
   const technical = new JSDOM(fs.readFileSync(path.join(output, 'posts/formulas/index.html'), 'utf8'));
+  assert.equal(technical.window.document.querySelector('.article-body').hasAttribute('data-code-viewer'), false);
+  assert.equal(technical.window.document.querySelector('.article-body').hasAttribute('data-code-start-collapsed'), false);
   const illustration = technical.window.document.querySelector('.article-body .article-figure');
   assert.equal(illustration.querySelector('figcaption').textContent, 'Build output');
   assert.equal(illustration.querySelector('img').alt, 'Sample diagram');

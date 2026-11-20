@@ -49,6 +49,24 @@ test('copy and folding preserve the complete source in styled blocks', async ({ 
   await toggle.click(); await expect(toggle).toHaveAttribute('aria-expanded', 'false');
 });
 
+test('long code starts expanded and can still fold when the viewer is disabled', async ({ page }) => {
+  await ready(page, 'posts/code-controls/');
+  const block = page.locator('.code-shell');
+  const toggle = block.locator('.code-toggle');
+  const code = block.locator(':scope > figure');
+  await expect(block.locator('.code-view')).toHaveCount(0);
+  await expect(block.locator('.code-copy')).toBeVisible();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await expect(code).toHaveCSS('max-height', 'none');
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await expect(code).toHaveCSS('overflow-y', 'hidden');
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await expect(code).toHaveCSS('max-height', 'none');
+  await noOverflow(page);
+});
+
 test('code viewer opens the complete block and restores position and focus', async ({ page, viewport }) => {
   await page.addInitScript(() => Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async text => { window.__moriiCopiedCode = text; } } }));
   await ready(page, 'posts/code-styles/');

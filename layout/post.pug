@@ -84,7 +84,19 @@ block content
       - var codeWrap = typeof page.code_word_wrap === 'boolean' ? page.code_word_wrap : codeSettings.word_wrap === true
       - var codeCopy = typeof page.code_copy === 'boolean' ? page.code_copy : codeSettings.copy !== false
       - var codeLanguage = typeof page.code_language === 'boolean' ? page.code_language : codeSettings.language !== false
-      .article-body(data-code-style=codeStyle.style data-code-theme=codeStyle.theme data-code-word-wrap=String(codeWrap) data-code-copy=codeCopy ? null : 'false' data-code-language=codeLanguage ? null : 'false' data-code-collapse=String(codeSettings.collapse !== false) data-code-lines=codeSettings.lines || 18)!= morii_article_images(page)
+      - var codeViewer = typeof page.code_viewer === 'boolean' ? page.code_viewer : codeSettings.viewer !== false
+      - var codeStartCollapsed = typeof page.code_start_collapsed === 'boolean' ? page.code_start_collapsed : codeSettings.start_collapsed !== false
+      .article-body(
+        data-code-style=codeStyle.style
+        data-code-theme=codeStyle.theme
+        data-code-word-wrap=String(codeWrap)
+        data-code-copy=codeCopy ? null : 'false'
+        data-code-language=codeLanguage ? null : 'false'
+        data-code-viewer=codeViewer ? null : 'false'
+        data-code-start-collapsed=codeStartCollapsed ? null : 'false'
+        data-code-collapse=String(codeSettings.collapse !== false)
+        data-code-lines=codeSettings.lines || 18
+      )!= morii_article_images(page)
       if outdatedNotice && outdatedNotice.position === 'bottom'
         include includes/outdated-notice.pug
       if page.tags && page.tags.length

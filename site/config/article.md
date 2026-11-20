@@ -50,6 +50,7 @@ outdated: false
 | `meta_word_count` | 设为 `true` 或 `false`，显示或隐藏本篇字数 | 使用全站字数显示设置 |
 | `meta_reading_time` | 设为 `true` 或 `false`，显示或隐藏本篇预计阅读时间 | 使用全站阅读时间显示设置 |
 | `code_copy` / `code_language` | 分别控制本篇代码工具栏的复制按钮和语言标签，接受 `true` 或 `false` | 使用各自的全站设置 |
+| `code_viewer` / `code_start_collapsed` | 分别控制本篇代码工具栏的「放大查看」入口和长代码的初始折叠状态，接受 `true` 或 `false` | 使用各自的全站设置 |
 
 例如要保留列表封面但隐藏文章顶部大图，可以同时写 `cover: /images/posts/first-post.jpg` 和 `top_img: false`。文章 `comments: true` 不会绕过全站 `comments.enable: false`。
 
@@ -87,7 +88,9 @@ article:
     theme: dark
     copy: true
     language: true
+    viewer: true
     collapse: true
+    start_collapsed: true
     lines: 18
 ```
 
@@ -110,13 +113,15 @@ article:
 | `article.related.enable` | `true` | 显示相关文章 |
 | `article.related.limit` | `3` | 相关文章数量，范围 1–6 |
 | `article.related.date_type` | `created` | 显示发布日期或更新时间，可填 `created` 或 `updated` |
-| `article.code.collapse` | `true` | 较长的代码块默认折叠 |
+| `article.code.collapse` | `true` | 为超过行数阈值的代码块提供折叠按钮 |
+| `article.code.start_collapsed` | `true` | 开启折叠时决定长代码的初始状态。设为 `false` 时默认展开，访客仍可手动折叠 |
 | `article.code.style` | `classic` | 外观：`classic`、`mac`、`minimal` |
 | `article.code.theme` | `dark` | 配色：`dark`、`light`、`auto`；`auto` 跟随站点深浅模式 |
 | `article.code.lines` | `18` | 代码折叠行数阈值，范围 5–100，建议从默认值开始 |
 | `article.code.word_wrap` | `false` | 默认自动换行；访客仍可按代码块切换 |
 | `article.code.copy` | `true` | 显示代码块和放大窗口里的复制按钮 |
 | `article.code.language` | `true` | 显示代码工具栏的语言标签 |
+| `article.code.viewer` | `true` | 在支持原生弹窗的浏览器中显示「放大查看」 |
 
 例如只想关闭打印功能，修改 `article.print.enable` 即可，不需要关闭全部阅读工具。`reading_settings` 和 `navigation` 直接接受布尔值，**不要在它们下面再套一层 `enable`**。
 
@@ -238,7 +243,11 @@ console.log(theme);
 
 ### 放大查看代码
 
-代码工具栏的“放大查看”会打开独立阅读窗口，完整显示当前代码块，并提供复制和自动换行。按 Esc 或用关闭按钮可返回原来的代码块，保留折叠状态。支持原生弹窗的浏览器会显示此入口。
+代码工具栏的「放大查看」会打开独立阅读窗口，完整显示当前代码块，并提供自动换行和已启用的复制功能。按 Esc 或使用关闭按钮可返回原来的代码块。可设置 `article.code.viewer: false` 隐藏入口，或在单篇 Front Matter 中用 `code_viewer` 覆盖。
+
+### 长代码的初始状态
+
+长代码默认折叠。设置 `article.code.start_collapsed: false` 后，代码默认展开，读者仍可手动折叠。单篇可用 `code_start_collapsed` 覆盖。若关闭 `article.code.collapse`，代码始终展开，折叠按钮也会隐藏。
 
 ## 文章版权与源文件编辑
 
