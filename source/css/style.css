@@ -1354,16 +1354,22 @@ a.footer-filing__item:focus-visible { outline: 2px solid var(--accent); outline-
   .header-actions .icon-button{ width:36px; height:36px; border-radius:10px; }
   .header-actions .header-search{ width:36px; }
   .hero{
-    padding-top:14px;
-    gap:12px
+    padding-top:10px;
+    gap:10px
   }
   .hero__main{
-    min-height:350px;
-    padding:36px 28px
+    min-height:0;
+    padding:22px
   }
+  .hero__main .eyebrow{padding-block:5px}
   .hero h1{
-    font-size:clamp(35px,10.5vw,49px)
+    font-size:clamp(35px,10.5vw,49px);
+    margin:15px 0 10px
   }
+  .hero__main>p{margin:0;font-size:14px;line-height:1.6}
+  .hero__actions{flex-wrap:wrap;gap:8px;margin-top:16px}
+  .hero__actions .button{min-height:44px;gap:9px;padding-inline:14px}
+  .hero__signature{display:none}
   .hero__main::after{top:-18%;right:-14%}
   .hero__side{
     gap:12px
@@ -1388,6 +1394,7 @@ a.footer-filing__item:focus-visible { outline: 2px solid var(--accent); outline-
   .section-block,.content-grid{
     margin-top:34px
   }
+  .hero + .section-block{margin-top:26px}
   .feature-grid{
     grid-template-columns:1fr;
     gap:10px

@@ -19,6 +19,18 @@ test('layered entrances finish cleanly and navigation remains interactive', asyn
   else expect(promoBox.y).toBeGreaterThan(mainBox.y + mainBox.height);
   await expect(page.locator('.hero-mini--quote, .hero-mini--stats')).toHaveCount(0);
   await noOverflow(page);
+  if (viewport.width <= 580) {
+    const heading = page.getByRole('heading', { name: '从这里开始' });
+    for (const width of [viewport.width, 320]) {
+      await page.setViewportSize({ width, height: viewport.height });
+      await expect.poll(async () => (await heading.boundingBox()).y).toBeLessThan(650);
+      for (const link of await page.locator('.hero__actions a, .theme-promo__actions a').all()) {
+        expect((await link.boundingBox()).height).toBeGreaterThanOrEqual(44);
+      }
+      await noOverflow(page);
+    }
+    await page.setViewportSize(viewport);
+  }
   const preview = info.outputPath('home-depth.png');
   await page.screenshot({ path: preview, animations: 'disabled' });
   await info.attach('homepage depth', { path: preview, contentType: 'image/png' });

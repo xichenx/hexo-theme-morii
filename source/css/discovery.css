@@ -57,7 +57,17 @@
 @media (max-width: 1050px) { .hero__journal .hero-mini--quote { grid-template-columns: 1fr; } }
 @media (max-width: 800px) { .hero__journal { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 580px) {
-  .theme-promo__art { min-height: 120px; }
+  .theme-promo { display: grid; grid-template-columns: minmax(0, 1fr) 68px; gap: 6px 12px; padding: 17px 20px; }
+  .theme-promo__body { display: contents; }
+  .theme-promo__art { grid-area: 1 / 2 / 3 / 3; min-height: 0; }
+  .theme-promo__art img { width: 52px; padding: 4px; }
+  .theme-promo__art::before {
+    inset: 34% 0;
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 7%, transparent);
+  }
+  .theme-promo h2 { margin: 0; font-size: 34px; }
+  .theme-promo p { grid-column: 1 / -1; font-size: 13px; line-height: 1.6; }
+  .theme-promo__actions { grid-column: 1 / -1; margin-top: 4px; }
   .hero__journal { grid-template-columns: 1fr; }
 }
 
