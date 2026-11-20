@@ -28,7 +28,7 @@ const options = {
     },
     clock: { enable: true, city: '布局测试城市', latitude: 0, longitude: 0, timezone: 'UTC' },
     music: { meting: { enable: false }, tracks: [] },
-    github_calendar: { enable: false },
+    github_calendar: { enable: true, user: 'xichenx', api: 'https://contributions.example.test/calendar' },
     comments: { enable: true, env_id: 'https://comments.example.test/', script_url: '/test-comments.js', load_mode: 'manual' },
     friends_feed: { endpoint: 'https://feed.example.test/articles?source=fixture', page_size: 2 }
   },

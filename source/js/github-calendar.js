@@ -10,6 +10,12 @@
   const scroller = card.querySelector('.github-calendar-scroll');
   const key = `morii-github-calendar:${card.dataset.user}:${card.dataset.api}`;
   let pending = false;
+  const syncScrollEdges = () => {
+    const max = scroller.scrollWidth - scroller.clientWidth;
+    const overflow = grid.childElementCount > 0 && max > 1;
+    card.toggleAttribute('data-calendar-scroll-left', overflow && scroller.scrollLeft > 1);
+    card.toggleAttribute('data-calendar-scroll-right', overflow && scroller.scrollLeft < max - 1);
+  };
   const normalize = data => {
     if (!Array.isArray(data?.contributions)) throw new Error('Invalid contribution data');
     const unique = new Map();
@@ -54,8 +60,10 @@
       }
     }
     status.textContent = t("{0} 次贡献 · 数据截至 {1}{2}", total.toLocaleString(window.MoriiI18n?.locale || 'zh-CN'), days.at(-1).date, cached ? t(" · 缓存") : '');
+    card.removeAttribute('data-calendar-date-selected');
     detail.textContent = t("悬停或点选日期查看详情；可用方向键切换。");
     scroller.scrollLeft = scroller.scrollWidth;
+    syncScrollEdges();
   };
   const load = async () => {
     if (pending) return;
@@ -76,12 +84,16 @@
   };
   const showDetail = event => {
     const button = event.target.closest('.github-calendar-day');
-    if (!button) return;
-    detail.textContent = button.title;
-    grid.querySelector('[tabindex="0"]')?.setAttribute('tabindex', '-1');
-    button.tabIndex = 0;
+    const hover = event.type === 'pointermove';
+    if (!button || (hover && event.pointerType === 'touch')) return;
+    card.setAttribute('data-calendar-date-selected', '');
+    if (detail.textContent !== button.title) detail.textContent = button.title;
+    if (!hover && button.tabIndex !== 0) {
+      grid.querySelector('[tabindex="0"]')?.setAttribute('tabindex', '-1');
+      button.tabIndex = 0;
+    }
   };
-  for (const type of ['pointerover', 'focusin', 'click']) grid.addEventListener(type, showDetail);
+  for (const type of ['pointermove', 'focusin', 'click']) grid.addEventListener(type, showDetail);
   grid.addEventListener('keydown', event => {
     const buttons = [...grid.querySelectorAll('button')];
     const current = buttons.indexOf(event.target);
@@ -92,6 +104,8 @@
     buttons[index].focus({ preventScroll: true }); buttons[index].scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
   });
   retry.addEventListener('click', load);
+  scroller.addEventListener('scroll', syncScrollEdges, { passive: true });
+  window.addEventListener('resize', syncScrollEdges);
   try {
     const cached = JSON.parse(sessionStorage.getItem(key) || 'null');
     if (cached && Number.isFinite(cached.at) && Date.now() - cached.at >= 0 && Date.now() - cached.at < 3600000) { render(normalize(cached), true); return; }
