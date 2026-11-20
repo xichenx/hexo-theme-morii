@@ -1,5 +1,6 @@
 'use strict';
 const { footerNav } = require('./footer-nav.cjs');
+const { isCodeHeightLimit } = require('./code-style.cjs');
 function inspect(config, site = {}, knownKeys) {
   const issues = [];
   const add = (level, field, message) => issues.push({ level, field, message });
@@ -31,6 +32,8 @@ function inspect(config, site = {}, knownKeys) {
   if (navigationOrder != null && !['newest_first', 'oldest_first'].includes(navigationOrder)) add('error', 'article.navigation_order', '可选值：newest_first, oldest_first。');
   const sidebarPosition = config.article?.sidebar_position;
   if (sidebarPosition != null && !['left', 'right'].includes(sidebarPosition)) add('error', 'article.sidebar_position', '可选值：left, right。');
+  const codeHeightLimit = config.article?.code?.height_limit;
+  if (codeHeightLimit != null && !isCodeHeightLimit(codeHeightLimit)) add('error', 'article.code.height_limit', '填写正整数像素值或 false。');
   const metaDate = config.article?.meta?.date_type;
   if (metaDate != null && !['created', 'updated', 'both'].includes(metaDate)) add('error', 'article.meta.date_type', '可选值：created, updated, both。');
   for (const field of ['article.meta.word_count', 'article.meta.reading_time']) {

@@ -94,6 +94,28 @@ test('code viewer opens the complete block and restores position and focus', asy
   await expect(block.locator(':scope > figure')).toHaveCount(1);
 });
 
+test('pixel-based folding follows rendered height when wrapping changes', async ({ page }) => {
+  await ready(page, 'posts/code-height/');
+  const block = page.locator('.code-shell');
+  const code = block.locator(':scope > figure');
+  const toggle = block.locator('.code-toggle');
+  const wrap = block.locator('.code-wrap');
+  await expect(toggle).toBeHidden();
+  await wrap.click();
+  await expect(toggle).toBeVisible();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await expect(code).toHaveCSS('max-height', '130px');
+  await toggle.click();
+  await expect(code).toHaveCSS('max-height', 'none');
+  expect(await code.evaluate(element => element.scrollHeight)).toBeGreaterThan(130);
+  await toggle.click();
+  await expect(code).toHaveCSS('max-height', '130px');
+  await wrap.click();
+  await expect(toggle).toBeHidden();
+  await expect(code).toHaveCSS('max-height', 'none');
+  await noOverflow(page);
+});
+
 test('auto palettes follow theme changes without rebuilding or expanding code blocks', async ({ page, colorScheme }) => {
   await ready(page, 'posts/code-styles/');
   const block = shell(page, 'mac', 'auto');

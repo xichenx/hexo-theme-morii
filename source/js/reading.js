@@ -74,6 +74,9 @@
   }
   const configuredLines = Math.floor(Number(article.dataset.codeLines) || 18);
   const collapseLines = Math.max(5, Math.min(100, configuredLines));
+  const collapseHeight = Number(article.dataset.codeHeightLimit);
+  const heightFolds = new Map();
+  let codeLayoutChanged = false;
   const codeText = code => {
     const clone = code.cloneNode(true);
     clone.querySelectorAll('br').forEach(br => br.replaceWith('\n'));
@@ -82,6 +85,13 @@
 
   const updateProgress = () => {
     frame = null;
+    if (codeLayoutChanged) {
+      codeLayoutChanged = false;
+      for (const [block, sync] of heightFolds) {
+        if (article.contains(block)) sync();
+        else heightFolds.delete(block);
+      }
+    }
     const start = article.getBoundingClientRect().top + window.scrollY - 130;
     const distance = article.offsetHeight - window.innerHeight + 160;
     const value = Math.round(Math.max(0, Math.min(100, (window.scrollY - start) / Math.max(1, distance) * 100)));
@@ -116,6 +126,10 @@
     }
   };
   const scheduleProgress = () => { if (!frame) frame = requestAnimationFrame(updateProgress); };
+  const updateArticleLayout = () => {
+    codeLayoutChanged = heightFolds.size > 0;
+    scheduleProgress();
+  };
 
   const copyText = async (text, button) => {
     const label = button.textContent;
@@ -165,7 +179,7 @@
         dialog.remove();
         shell.style.removeProperty('min-height');
         trigger.focus({ preventScroll: true });
-        scheduleProgress();
+        updateArticleLayout();
       };
       const print = () => {
         dialog.close();
@@ -254,6 +268,7 @@
       wrap.addEventListener('click', () => {
         shell.classList.toggle('is-wrapped');
         syncWrap();
+        heightFolds.get(block)?.();
         scheduleProgress();
       });
       tools.append(wrap);
@@ -262,7 +277,7 @@
       }
       shell.append(tools, block);
       const lineCount = codeText(code).replace(/\n$/, '').split('\n').length;
-      if (article.dataset.codeCollapse !== 'false' && lineCount > collapseLines) {
+      if (article.dataset.codeCollapse !== 'false' && (collapseHeight || lineCount > collapseLines)) {
         let blockId;
         do { blockId = `morii-code-${++blockIndex}`; } while (document.getElementById(blockId));
         if (!block.id) block.id = blockId;
@@ -270,24 +285,34 @@
         toggle.type = 'button';
         toggle.className = 'code-toggle';
         toggle.setAttribute('aria-controls', block.id);
-        shell.classList.toggle('is-collapsed', article.dataset.codeStartCollapsed !== 'false');
-        const codeStyle = getComputedStyle(code);
-        const lineHeight = parseFloat(codeStyle.lineHeight) || 20.8;
-        const padding = (parseFloat(codeStyle.paddingTop) || 0) + (parseFloat(codeStyle.paddingBottom) || 0);
-        shell.style.setProperty('--code-preview-height', `${collapseLines * lineHeight + padding}px`);
+        let previewHeight = collapseHeight;
+        if (!previewHeight) {
+          const codeStyle = getComputedStyle(code);
+          const lineHeight = parseFloat(codeStyle.lineHeight) || 20.8;
+          const padding = (parseFloat(codeStyle.paddingTop) || 0) + (parseFloat(codeStyle.paddingBottom) || 0);
+          previewHeight = collapseLines * lineHeight + padding;
+        }
+        shell.style.setProperty('--code-preview-height', `${previewHeight}px`);
+        let collapsed = article.dataset.codeStartCollapsed !== 'false';
         const sync = () => {
-          const expanded = !shell.classList.contains('is-collapsed');
+          if (block.parentElement !== shell) return;
+          const canFold = !collapseHeight || block.scrollHeight > collapseHeight;
+          const expanded = !(canFold && collapsed);
+          if (toggle.hidden === canFold) toggle.hidden = !canFold;
+          shell.classList.toggle('is-collapsed', !expanded);
+          if (toggle.getAttribute('aria-expanded') === String(expanded)) return;
           toggle.setAttribute('aria-expanded', String(expanded));
           toggle.textContent = expanded ? t("收起代码 ↑") : t("展开全部 {0} 行代码 ↓", lineCount);
         };
         toggle.addEventListener('click', () => {
-          shell.classList.toggle('is-collapsed');
+          collapsed = !collapsed;
           sync();
           if (shell.classList.contains('is-collapsed') && shell.getBoundingClientRect().top < 80) shell.scrollIntoView?.({ block: 'start', behavior: 'auto' });
           scheduleProgress();
         });
-        sync();
         shell.append(toggle);
+        if (collapseHeight) heightFolds.set(block, sync);
+        sync();
       }
     });
     scheduleProgress();
@@ -300,8 +325,8 @@
   enhanceArticle();
   window.addEventListener('hexo-blog-decrypt', enhanceArticle);
   window.addEventListener('scroll', scheduleProgress, { passive: true });
-  window.addEventListener('resize', scheduleProgress);
-  window.addEventListener('load', scheduleProgress);
-  window.addEventListener('pageshow', scheduleProgress);
-  if (typeof ResizeObserver === 'function') new ResizeObserver(scheduleProgress).observe(article);
+  window.addEventListener('resize', updateArticleLayout);
+  window.addEventListener('load', updateArticleLayout);
+  window.addEventListener('pageshow', updateArticleLayout);
+  if (typeof ResizeObserver === 'function') new ResizeObserver(updateArticleLayout).observe(article);
 })();

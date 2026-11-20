@@ -51,6 +51,7 @@ outdated: false
 | `meta_reading_time` | 设为 `true` 或 `false`，显示或隐藏本篇预计阅读时间 | 使用全站阅读时间显示设置 |
 | `code_copy` / `code_language` | 分别控制本篇代码工具栏的复制按钮和语言标签，接受 `true` 或 `false` | 使用各自的全站设置 |
 | `code_viewer` / `code_start_collapsed` | 分别控制本篇代码工具栏的「放大查看」入口和长代码的初始折叠状态，接受 `true` 或 `false` | 使用各自的全站设置 |
+| `code_height_limit` | 用正整数指定本篇代码折叠高度，单位为 px。设为 `false` 恢复按行数判断 | 使用全站折叠高度设置 |
 
 例如要保留列表封面但隐藏文章顶部大图，可以同时写 `cover: /images/posts/first-post.jpg` 和 `top_img: false`。文章 `comments: true` 不会绕过全站 `comments.enable: false`。
 
@@ -91,6 +92,7 @@ article:
     viewer: true
     collapse: true
     start_collapsed: true
+    height_limit: false
     lines: 18
 ```
 
@@ -115,6 +117,7 @@ article:
 | `article.related.date_type` | `created` | 显示发布日期或更新时间，可填 `created` 或 `updated` |
 | `article.code.collapse` | `true` | 为超过行数阈值的代码块提供折叠按钮 |
 | `article.code.start_collapsed` | `true` | 开启折叠时决定长代码的初始状态。设为 `false` 时默认展开，访客仍可手动折叠 |
+| `article.code.height_limit` | `false` | 设为正整数后按实际渲染高度折叠，单位为 px。默认按行数判断 |
 | `article.code.style` | `classic` | 外观：`classic`、`mac`、`minimal` |
 | `article.code.theme` | `dark` | 配色：`dark`、`light`、`auto`；`auto` 跟随站点深浅模式 |
 | `article.code.lines` | `18` | 代码折叠行数阈值，范围 5–100，建议从默认值开始 |
@@ -248,6 +251,8 @@ console.log(theme);
 ### 长代码的初始状态
 
 长代码默认折叠。设置 `article.code.start_collapsed: false` 后，代码默认展开，读者仍可手动折叠。单篇可用 `code_start_collapsed` 覆盖。若关闭 `article.code.collapse`，代码始终展开，折叠按钮也会隐藏。
+
+例如设置 `article.code.height_limit: 280`，渲染高度超过 280 px 的代码块才会提供折叠按钮，折叠预览最多显示 280 px。自动换行和窗口尺寸变化会重新判断是否超限。单篇可用 `code_height_limit` 覆盖，设为 `false` 后按 `article.code.lines` 判断。
 
 ## 文章版权与源文件编辑
 

@@ -63,6 +63,10 @@ const options = {
       'code_viewer: false', 'code_start_collapsed: false', 'code_copy: true', '---', '',
       '```javascript', sampleCode, '```', ''
     ].join('\n'),
+    '_posts/code-height.md': [
+      '---', 'title: 代码块高度限制', 'date: 2018-01-01', 'permalink: posts/code-height/',
+      'code_height_limit: 130', '---', '', '```text', 'word '.repeat(900), '```', ''
+    ].join('\n'),
     '_posts/lazy-images.md': `---
 title: Article image loading
 date: 2020-01-01 00:00:00

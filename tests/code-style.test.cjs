@@ -9,15 +9,27 @@ const { resolveCode } = require('../scripts/lib/code-style.cjs');
 const { inspect } = require('../scripts/lib/config-check.cjs');
 
 test('code styles preserve defaults, support article overrides and reject arbitrary style values', () => {
-  assert.deepEqual(resolveCode(), { style: 'classic', theme: 'dark' });
-  assert.deepEqual(resolveCode(null, null), { style: 'classic', theme: 'dark' });
-  assert.deepEqual(resolveCode({ style: 'mac', theme: 'auto' }), { style: 'mac', theme: 'auto' });
-  assert.deepEqual(resolveCode({ style: 'mac', theme: 'auto' }, { code_style: 'minimal', code_theme: 'light' }), { style: 'minimal', theme: 'light' });
+  assert.deepEqual(resolveCode(), { style: 'classic', theme: 'dark', heightLimit: false });
+  assert.deepEqual(resolveCode(null, null), { style: 'classic', theme: 'dark', heightLimit: false });
+  assert.deepEqual(resolveCode({ style: 'mac', theme: 'auto' }), { style: 'mac', theme: 'auto', heightLimit: false });
+  assert.deepEqual(resolveCode({ style: 'mac', theme: 'auto' }, { code_style: 'minimal', code_theme: 'light' }), { style: 'minimal', theme: 'light', heightLimit: false });
   const warnings = [];
-  assert.deepEqual(resolveCode({ style: 'mac', theme: 'auto' }, { code_style: '<style>', code_theme: {} }, field => warnings.push(field)), { style: 'mac', theme: 'auto' });
+  assert.deepEqual(resolveCode({ style: 'mac', theme: 'auto' }, { code_style: '<style>', code_theme: {} }, field => warnings.push(field)), { style: 'mac', theme: 'auto', heightLimit: false });
   assert.deepEqual(warnings, ['code_style', 'code_theme']);
-  assert.deepEqual(resolveCode({ style: 'wrong', theme: false }), { style: 'classic', theme: 'dark' });
+  assert.deepEqual(resolveCode({ style: 'wrong', theme: false }), { style: 'classic', theme: 'dark', heightLimit: false });
   assert.equal(inspect({ article: { code: { style: 'wrong', theme: 'wrong' } } }).filter(issue => issue.level === 'error').length, 2);
+});
+
+test('code height limit inherits, supports per-page overrides and rejects non-integer values', () => {
+  const config = { height_limit: 280 };
+  assert.equal(resolveCode(config).heightLimit, 280);
+  assert.equal(resolveCode(config, { code_height_limit: 160 }).heightLimit, 160);
+  assert.equal(resolveCode(config, { code_height_limit: false }).heightLimit, false);
+  for (const height_limit of [0, -1, 1.2, '280', true]) {
+    assert.equal(resolveCode({ height_limit }).heightLimit, false);
+    assert.equal(resolveCode(config, { code_height_limit: height_limit }).heightLimit, 280);
+    assert.equal(inspect({ article: { code: { height_limit } } })[0].field, 'article.code.height_limit');
+  }
 });
 
 test('style metadata does not change copied code, line marks, collapse behavior or decrypt initialization', async () => {
