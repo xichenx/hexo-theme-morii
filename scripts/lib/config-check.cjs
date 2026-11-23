@@ -9,6 +9,8 @@ function inspect(config, site = {}, knownKeys) {
   const https = value => { try { const url = new URL(value); return /^https?:$/.test(url.protocol) && !url.username && !url.password; } catch { return false; } };
   if (knownKeys) for (const key of Object.keys(config)) if (!knownKeys.includes(key)) add('warning', key, '未知顶层配置，请检查是否拼写错误。');
   const language = Array.isArray(site.language) ? site.language[0] : site.language;
+  const glass = config.appearance?.effects?.glass;
+  if (glass != null && ![true, false, 'liquid'].includes(glass)) add('error', 'appearance.effects.glass', '填写 true、false 或 liquid。');
   const wallpaper = config.appearance?.wallpaper;
   for (const key of ['image', 'dark_image']) {
     if (wallpaper?.[key] && !navigationTarget(wallpaper[key])) add('error', 'appearance.wallpaper.' + key, '填写站内图片路径或 HTTP(S) 链接。');

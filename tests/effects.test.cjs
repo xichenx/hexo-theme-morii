@@ -69,10 +69,13 @@ test('effect configuration clamps invalid density and supports independent switc
   assert.equal(helper().density, 48);
   config.appearance = { effects: { density: 'broken', particles: false, glass: true } };
   assert.equal(helper().density, 48); assert.equal(helper().particles, false); assert.equal(helper().glass, true);
+  assert.equal(helper().liquid, false);
+  config.appearance.effects.glass = 'liquid';
+  assert.equal(helper().glass, true); assert.equal(helper().liquid, true);
   config.appearance.effects.density = 999; assert.equal(helper().density, 80);
   config.appearance.effects.density = -5; assert.equal(helper().density, 12);
   config.appearance.effects.enable = false;
-  for (const key of ['enabled', 'particles', 'aurora', 'glass', 'spotlight', 'tilt', 'ripple', 'transition']) assert.equal(helper()[key], false);
+  for (const key of ['enabled', 'particles', 'aurora', 'glass', 'liquid', 'spotlight', 'tilt', 'ripple', 'transition']) assert.equal(helper()[key], false);
 });
 
 test('tilt is bounded and reset on scroll', () => {

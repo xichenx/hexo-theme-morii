@@ -8,6 +8,7 @@ hexo.extend.helper.register('morii_effects', () => {
     aurora: enabled && config.aurora !== false,
     particles: enabled && config.particles !== false,
     glass: enabled && config.glass !== false,
+    liquid: enabled && config.glass === 'liquid',
     spotlight: enabled && config.spotlight !== false,
     tilt: enabled && config.tilt !== false,
     ripple: enabled && config.ripple !== false,

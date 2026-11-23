@@ -6,7 +6,7 @@ doctype html
 - var tocOptions = morii_toc_options(page)
 - var articleCover = is_post() && page.top_img !== false && (page.top_img || page.cover)
 - var immersiveChrome = page.type === 'music' || articleCover
-html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || theme.motion.enable !== false) ? 'on' : 'off' data-glass=visualEffects.enabled ? (visualEffects.glass ? 'on' : 'off') : null data-effects=visualEffects.enabled ? 'on' : null data-theme-transition=visualEffects.transition ? 'on' : null)
+html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || theme.motion.enable !== false) ? 'on' : 'off' data-glass=visualEffects.enabled ? (visualEffects.liquid ? 'liquid' : visualEffects.glass ? 'on' : 'off') : null data-effects=visualEffects.enabled ? 'on' : null data-theme-transition=visualEffects.transition ? 'on' : null)
   head
     meta(charset='utf-8')
     meta(name='viewport' content='width=device-width, initial-scale=1, viewport-fit=cover')
@@ -72,6 +72,7 @@ html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || them
     if is_post() && (!theme.article || !theme.article.print || theme.article.print.enable !== false)
       link#article-print-style(rel='stylesheet' href=morii_asset('/css/print.css') media='print')
   body(style=wallpaperStyle || null data-wallpaper=wallpaperStyle ? '' : null data-page-loading=morii_t('正在打开页面…') class=page.type === 'music' ? 'is-music' : is_post() ? 'is-reading' : page.path && page.path.startsWith('air-conditioner/') ? 'is-playground' : '')
+    include liquid-lens.pug
     if visualEffects.enabled
       .morii-atmosphere(aria-hidden='true' data-aurora=visualEffects.aurora ? 'on' : null)
         if visualEffects.particles

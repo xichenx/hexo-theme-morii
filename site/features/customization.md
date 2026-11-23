@@ -204,7 +204,7 @@ motion:
 | `aurora` | `true` | 页面渐变极光背景 |
 | `particles` | `true` | 星尘粒子和近邻连线 |
 | `density` | `48` | 桌面粒子数量，范围 12–80，手机最多 18 |
-| `glass` | `true` | 导航和展示卡片的毛玻璃效果 |
+| `glass` | `true` | `true` 使用毛玻璃，`liquid` 使用液态玻璃，`false` 关闭 |
 | `spotlight` | `true` | 精细指针设备上的卡片跟随光晕 |
 | `tilt` | `true` | 精细指针设备上的卡片轻微倾斜 |
 | `ripple` | `true` | 按钮点击波纹 |
@@ -213,6 +213,19 @@ motion:
 想保留配色但减少动态效果，可把 `particles`、`spotlight`、`tilt`、`ripple`、`theme_transition` 设为 `false`，同时设 `motion.enable: false`。`density: 0` 不等于关闭粒子，关闭应使用 `particles: false`。
 
 主题遵循系统的减少动态效果设置，触屏设备也不会呈现所有鼠标效果。因此电脑上有光晕、手机上没有，并不一定是配置失败。
+
+### 液态玻璃
+
+在 `_config.morii.yml` 选择 `liquid` 后，导航和快捷控件会显示为浮在页面上方的玻璃胶囊。支持 SVG 背景滤镜的浏览器会让背景在胶囊边缘产生位移，其余浏览器使用背景模糊和边缘高光。玻璃质感在搭配全站壁纸或滚过有纹理的内容时更容易看见。
+
+```yaml
+appearance:
+  effects:
+    enable: true
+    glass: liquid
+```
+
+按住导航按钮时，控件会轻微压缩。移动菜单、搜索和快捷导航弹窗从控件一侧弹性展开。将 `motion.enable` 设为 `false` 或开启系统的减少动态效果，可关闭形变。模式随浅色和深色切换，也遵循高对比度、减少透明度和打印设置。展示卡片和文章正文继续使用原有表面样式。
 
 ## 检查修改结果
 
