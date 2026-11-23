@@ -22,6 +22,7 @@ const PAGES = [
   'about/index.html',
   'music/index.html',
   'cinema/index.html',
+  'game/index.html',
   'series/index.html',
   'series/morii-guide/index.html',
   'reading-list/index.html',

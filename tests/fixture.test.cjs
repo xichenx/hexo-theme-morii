@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { JSDOM } = require('jsdom');
 const { buildDemo } = require('../tools/demo.cjs');
-const pages = ['index.html', 'page/2/index.html', 'posts/welcome/index.html', 'archives/index.html', 'categories/index.html', 'categories/主题使用/index.html', 'tags/index.html', 'tags/开始写作/index.html', 'about/index.html', 'link/index.html', 'essay/index.html', 'album/index.html', 'album/morii/index.html', 'music/index.html', 'cinema/index.html', 'comments/index.html', 'series/index.html', 'series/morii-guide/index.html', 'reading-list/index.html', '404.html'];
+const pages = ['index.html', 'page/2/index.html', 'posts/welcome/index.html', 'archives/index.html', 'categories/index.html', 'categories/主题使用/index.html', 'tags/index.html', 'tags/开始写作/index.html', 'about/index.html', 'link/index.html', 'essay/index.html', 'album/index.html', 'album/morii/index.html', 'music/index.html', 'cinema/index.html', 'game/index.html', 'comments/index.html', 'series/index.html', 'series/morii-guide/index.html', 'reading-list/index.html', '404.html'];
 
 function readSitemap(output) {
   const dom = new JSDOM(fs.readFileSync(path.join(output, 'sitemap.xml'), 'utf8'), { contentType: 'application/xml' });
@@ -66,6 +66,13 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       }
       const codeStyle = document.querySelector('link[href*="/css/code."]');
       assert.equal(!!codeStyle, file.startsWith('posts/'), `${file}: code styles load only on article pages`);
+      const gameHall = file === 'game/index.html';
+      assert.equal(!!document.querySelector('link[href*="/css/arcade."]'), gameHall);
+      if (gameHall) {
+        assert.equal(document.querySelector('main h1').textContent, '游戏厅');
+        assert.deepEqual([...document.querySelectorAll('.arcade a')].map(link => link.getAttribute('href')),
+          ['2048', 'mf', 'sl', 'wzq', 'txz'].map(game => `${prefix}game/${game}/`));
+      }
       if (file === 'posts/welcome/index.html') {
         assert.deepEqual([...document.querySelectorAll('.article-header .article-meta time[datetime]')].map(time => time.parentElement.textContent.split(' ')[0]), ['发布于', '更新于']);
         assert.match(document.querySelector('.article-header .article-meta').textContent, /分钟阅读/);
@@ -101,7 +108,7 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       assert.equal(document.querySelector('main .intro-atmosphere, main [data-intro-word], main [data-intro-tone]'), null, `${file}: no decorative banner`);
       assert.equal(document.querySelector('main .page-intro, main .series-intro'), null, `${file}: no standalone title area`);
       const heading = document.querySelector('main h1');
-      const visibleTitle = ['index.html', 'posts/welcome/index.html', '404.html'].includes(file);
+      const visibleTitle = gameHall || ['index.html', 'posts/welcome/index.html', '404.html'].includes(file);
       assert.ok(heading.textContent.trim(), `${file}: accessible heading has a name`);
       assert.equal(heading.classList.contains('sr-only'), !visibleTitle, `${file}: heading visibility`);
       if (file === 'link/index.html') assert.ok(document.querySelector('.friend-toolbar-footer a[href="#friend-connect"]'));

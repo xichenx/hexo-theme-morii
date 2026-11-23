@@ -20,7 +20,7 @@ async function clockBounds(page, selector = '.reading-aside .weather-clock') {
     };
   });
 }
-for (const route of ['', 'archives/', 'categories/', 'about/', 'album/', 'music/', 'cinema/', 'series/', 'posts/layout-stress/']) {
+for (const route of ['', 'archives/', 'categories/', 'about/', 'album/', 'music/', 'cinema/', 'game/', 'series/', 'posts/layout-stress/']) {
   test(`page fits viewport: ${route || 'home'}`, async ({ page, colorScheme }) => {
     await ready(page, route);
     await expect(page.locator('html')).toHaveAttribute('data-theme', colorScheme);

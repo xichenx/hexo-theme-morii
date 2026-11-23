@@ -1,6 +1,7 @@
 doctype html
 - var siteIdentity = morii_identity()
 - var visualEffects = morii_effects()
+- var gameHall = page.path === 'game/' || page.path === 'game/index.html'
 - var wallpaperStyle = page.type === 'music' ? '' : morii_wallpaper()
 - var articleEnhancements = morii_enhancements(page)
 - var tocOptions = morii_toc_options(page)
@@ -64,6 +65,8 @@ html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || them
       link(rel='stylesheet' href=morii_asset('/css/music.css') media='print' data-deferred-style)
     if page.type === 'cinema'
       link(rel='stylesheet' href=morii_asset('/css/cinema.css'))
+    if gameHall
+      link(rel='stylesheet' href=morii_asset('/css/arcade.css'))
     if page.type === 'series_index' || page.type === 'series_detail'
       link(rel='stylesheet' href=morii_asset('/css/series.css'))
     if is_post()

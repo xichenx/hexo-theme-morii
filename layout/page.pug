@@ -5,8 +5,11 @@ block content
   - var categoryLayout = morii_layout('categories')
   - var categoryEditorial = page.type === 'categories' && categoryLayout !== 'cards'
   .wrap.listing-page(class=page.type === 'cinema' ? 'cinema-page' : categoryEditorial ? 'category-directory-page category-overview' : '')
-    h1.sr-only= morii_page_title(page)
-    case page.type
+    if !gameHall
+      h1.sr-only= morii_page_title(page)
+    case gameHall ? 'game-hall' : page.type
+      when 'game-hall'
+        include includes/page/game-hall.pug
       when 'about'
         include includes/page/about.pug
       when 'link'
@@ -39,12 +42,6 @@ block content
       default
         if isAirConditioner
           include includes/page/air-conditioner.pug
-        else if page.path && page.path.startsWith('game/')
-          .taxonomy-grid
-            each game in [{name:'魔方', path:'/game/mf/'}, {name:'扫雷', path:'/game/sl/'}, {name:'2048', path:'/game/2048/'}, {name:'五子棋', path:'/game/wzq/'}, {name:'推箱子', path:'/game/txz/'}]
-              a.taxonomy-card(href=url_for(game.path))
-                strong= game.name
-                span #{morii_t("开始游戏 →")}
         else if page.content
           .page-prose.panel!= page.content
     if page.type !== 'music' && page.type !== 'cinema' && page.type !== 'categories' && page.type !== 'tags'
