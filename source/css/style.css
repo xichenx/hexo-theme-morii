@@ -54,6 +54,22 @@ body{
   font-family:var(--font);
   line-height:1.7
 }
+@media screen and (forced-colors:none) and (prefers-contrast:no-preference){
+  body[data-wallpaper]{isolation:isolate}
+  body[data-wallpaper]::before{
+    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:linear-gradient(0deg,var(--wallpaper-tint),var(--wallpaper-tint)),var(--wallpaper-active) center/cover no-repeat;
+    --wallpaper-active:var(--wallpaper-image);
+    --wallpaper-tint:color-mix(in srgb,var(--bg) var(--wallpaper-overlay),transparent)
+  }
+  html[data-theme=dark] body[data-wallpaper]::before{--wallpaper-active:var(--wallpaper-dark-image,var(--wallpaper-image))}
+  body[data-wallpaper] .site-header[data-header-top]:not(:has(+ main [data-header-backdrop=inverse])){
+    --header-fill:color-mix(in srgb,var(--header-surface) 88%,transparent)
+  }
+  body[data-wallpaper] .site-shell :is(.post-card,.side-card,.article-card,.feature-card,.selected-card,.discovery-card,.archive-tree,.archive-months){
+    background-color:color-mix(in srgb,var(--surface) var(--wallpaper-card-opacity),transparent)
+  }
+}
 a{
   color:inherit;
   text-decoration:none

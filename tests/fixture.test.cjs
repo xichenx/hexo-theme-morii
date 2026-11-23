@@ -34,6 +34,7 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       assert.ok(fs.existsSync(path.join(output, file)), `Generated ${file}`);
       const dom = new JSDOM(fs.readFileSync(path.join(output, file), 'utf8'), { url: `https://example.test${prefix}${file}` });
       const document = dom.window.document;
+      assert.equal(document.body.hasAttribute('data-wallpaper'), false);
       const noindex = ['404.html', 'reading-list/index.html'].includes(file);
       const canonical = file === '404.html' ? undefined : new URL(file.replace(/(^|\/)index\.html$/, '$1'), `https://example.test${prefix}`).href;
       assert.equal(document.querySelector('link[rel="canonical"]')?.href, canonical, `${file}: canonical URL`);
@@ -251,7 +252,10 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       secondary: { label: '查看项目', url: 'https://example.org/project' }
     };
     const robots = 'User-agent: *\nDisallow: /private/\n';
-    const output = await buildDemo({ root: '/theme/', url: 'https://example.test', siteOverrides: { archive_dir: 'history', archive_generator: { monthly }, category_generator: { per_page: 1 } }, themeOverrides: { hero, footer: { nav: false }, appearance: { layouts, effects: { enable: false } }, home: { theme_promo: themePromo, random: { autoplay: false } }, seo: { sitemap: monthly, robots: true } }, sourceOverrides: monthly ? { 'robots.txt': robots } : {} });
+    const wallpaper = monthly ? { image: 'javascript:invalid' } : {
+      image: '/images/covers/welcome.jpg', dark_image: 'https://example.org/night.webp', overlay: 0, card_opacity: 0.8
+    };
+    const output = await buildDemo({ root: '/theme/', url: 'https://example.test', siteOverrides: { archive_dir: 'history', archive_generator: { monthly }, category_generator: { per_page: 1 } }, themeOverrides: { hero, footer: { nav: false }, appearance: { layouts, wallpaper, effects: { enable: false } }, home: { theme_promo: themePromo, random: { autoplay: false } }, seo: { sitemap: monthly, robots: true } }, sourceOverrides: monthly ? { 'robots.txt': robots } : {} });
     if (monthly) {
       assert.ok(readSitemap(output).includes('https://example.test/theme/history/'));
       assert.equal(fs.readFileSync(path.join(output, 'robots.txt'), 'utf8'), robots);
@@ -261,6 +265,14 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
     }
     const documentFor = file => new JSDOM(fs.readFileSync(path.join(output, file, 'index.html'), 'utf8')).window.document;
     const home = documentFor('');
+    assert.equal(home.body.hasAttribute('data-wallpaper'), !monthly);
+    assert.equal(documentFor('music').body.hasAttribute('data-wallpaper'), false);
+    if (!monthly) {
+      assert.equal(home.body.style.getPropertyValue('--wallpaper-image'), 'url("/theme/images/covers/welcome.jpg")');
+      assert.equal(home.body.style.getPropertyValue('--wallpaper-dark-image'), 'url("https://example.org/night.webp")');
+      assert.equal(home.body.style.getPropertyValue('--wallpaper-overlay'), '0%');
+      assert.equal(documentFor('posts/welcome').body.style.getPropertyValue('--wallpaper-card-opacity'), '80%');
+    }
     const heroCard = home.querySelector('.hero__main');
     assert.equal(home.querySelector('[data-random]').dataset.randomAutoplay, 'off');
     assert.ok(home.querySelector('[data-random-refresh]'));

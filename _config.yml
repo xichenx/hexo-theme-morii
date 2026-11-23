@@ -1,6 +1,11 @@
 # 页面布局。也可写入博客根目录的 _config.morii.yml，升级主题时无需修改主题文件。
 appearance:
   back_to_top_percent: false # 在返回顶部按钮上显示当前页面的滚动百分比
+  wallpaper:
+    image: ''         # 全站背景图，留空沿用默认背景
+    dark_image: ''    # 可选，深色模式专用背景图
+    overlay: 0.45     # 背景遮罩强度（0–1），随主题变浅或变深
+    card_opacity: 0.92 # 主要内容卡片的不透明度（0–1）
   effects:
     enable: true        # 视觉特效总开关；独立于页面布局
     aurora: true        # 渐变极光背景

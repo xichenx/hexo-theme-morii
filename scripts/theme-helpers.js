@@ -24,6 +24,25 @@ hexo.extend.helper.register('morii_safe_url', value => {
   } catch { return ''; }
 });
 
+hexo.extend.helper.register('morii_wallpaper', function () {
+  const wallpaper = hexo.theme.config.appearance?.wallpaper;
+  const image = value => {
+    const target = navigationTarget(value);
+    if (!target) return '';
+    return `url(${JSON.stringify(target.local ? this.url_for(target.path) : target.path)})`;
+  };
+  const light = image(wallpaper?.image);
+  if (!light) return '';
+  const dark = image(wallpaper.dark_image);
+  const fraction = (value, fallback) => Number.isFinite(value) && value >= 0 && value <= 1 ? value : fallback;
+  return [
+    `--wallpaper-image:${light}`,
+    dark && `--wallpaper-dark-image:${dark}`,
+    `--wallpaper-overlay:${fraction(wallpaper.overlay, 0.45) * 100}%`,
+    `--wallpaper-card-opacity:${fraction(wallpaper.card_opacity, 0.92) * 100}%`
+  ].filter(Boolean).join(';');
+});
+
 hexo.extend.helper.register('morii_theme_promo', function () {
   const promo = hexo.theme.config.home?.theme_promo;
   if (!promo || promo.enable === false) return null;

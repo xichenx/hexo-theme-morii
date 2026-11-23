@@ -9,6 +9,14 @@ function inspect(config, site = {}, knownKeys) {
   const https = value => { try { const url = new URL(value); return /^https?:$/.test(url.protocol) && !url.username && !url.password; } catch { return false; } };
   if (knownKeys) for (const key of Object.keys(config)) if (!knownKeys.includes(key)) add('warning', key, '未知顶层配置，请检查是否拼写错误。');
   const language = Array.isArray(site.language) ? site.language[0] : site.language;
+  const wallpaper = config.appearance?.wallpaper;
+  for (const key of ['image', 'dark_image']) {
+    if (wallpaper?.[key] && !navigationTarget(wallpaper[key])) add('error', 'appearance.wallpaper.' + key, '填写站内图片路径或 HTTP(S) 链接。');
+  }
+  for (const key of ['overlay', 'card_opacity']) {
+    const value = wallpaper?.[key];
+    if (value != null && (!Number.isFinite(value) || value < 0 || value > 1)) add('error', 'appearance.wallpaper.' + key, '填写 0 到 1 之间的数字。');
+  }
   const promo = config.home?.theme_promo;
   for (const key of ['enable', 'journal_below']) {
     if (promo?.[key] != null && typeof promo[key] !== 'boolean') add('error', 'home.theme_promo.' + key, '必须为 true 或 false。');

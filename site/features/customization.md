@@ -57,6 +57,26 @@ accent_dark: '#8c9aff'
 
 头像和 Logo 的路径详解见[基本信息与图片](/config/basic)，首页卡片详解见[首页内容](/config/home)。
 
+## 更换全站背景图
+
+将图片放到博客的 `source/images/`，然后在博客根目录的 `_config.morii.yml` 中填写：
+
+```yaml
+appearance:
+  wallpaper:
+    image: /images/wallpaper.webp
+    dark_image: /images/wallpaper-dark.webp
+    overlay: 0.45
+    card_opacity: 0.92
+```
+
+- `image` 支持以 `/` 开头的站内路径和完整的 HTTP(S) 图片地址。留空即可恢复默认背景。站内路径会自动带上部署子目录。
+- `dark_image` 可选。留空时，深色模式继续使用 `image`，遮罩自动变深。
+- `overlay` 越大，壁纸越接近页面底色。数值范围为 0–1。
+- `card_opacity` 越小，壁纸越容易透过文章和侧栏等主要卡片。数值范围为 0–1。设置为 `1` 时卡片完全不透明。
+
+壁纸会铺满桌面和手机视口，边缘可能被裁切。音乐馆沿用自己的沉浸式背景。若想让壁纸更清爽，可在同一个 `appearance` 区块下将 `effects.aurora` 和 `effects.particles` 关闭。
+
 ## 探索链接和快捷导航
 
 `explore` 是页脚探索入口列表，也会加入快捷导航面板。它不会自动创建页面。当前默认有六项，想开启时请完整覆盖六项；下面使用常用页面作为示例，请先确认每个页面都已存在：
