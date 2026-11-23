@@ -5,27 +5,7 @@ block content
   - var categoryLayout = morii_layout('categories')
   - var categoryEditorial = page.type === 'categories' && categoryLayout !== 'cards'
   .wrap.listing-page(class=page.type === 'cinema' ? 'cinema-page' : categoryEditorial ? 'category-directory-page category-overview' : '')
-    if isAirConditioner || page.type === 'music'
-      h1.sr-only= morii_page_title(page)
-    else
-      .page-intro
-        h1= morii_page_title(page)
-        if page.description
-          p= page.description
-        else if page.type === 'link'
-          p #{morii_t("以文字相识，在彼此的小站里，发现更大的世界。")}
-        else if page.type === 'categories'
-          p #{morii_t("从一个感兴趣的主题，开始下一次探索。")}
-        if categoryEditorial
-          .category-directory-stats
-            div #[strong=morii_category_directory(site.categories).length] #[span #{morii_t("个主题")}]
-            div #[strong=site.posts.length] #[span #{morii_t("篇全站文章")}]
-        if page.type === 'link'
-          - var introGroups = morii_friend_groups(site.data.link)
-          .friends-intro-meta
-            span #{introGroups.reduce(function(total, group) { return total + group.friends.length }, 0)} #{morii_t("条友链")}
-            span #{introGroups.length} #{morii_t("个分组")}
-            a(href='#friend-connect') #{morii_t("交换友链 ↗")}
+    h1.sr-only= morii_page_title(page)
     case page.type
       when 'about'
         include includes/page/about.pug

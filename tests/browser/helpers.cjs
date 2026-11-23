@@ -23,7 +23,8 @@ function installHooks(test) {
 }
 async function ready(page, route = '') {
   await page.goto(prefix + route, { waitUntil: 'load' });
-  await expect(page.locator(route === 'music/' ? '.music-room' : 'main h1')).toBeVisible();
+  await expect(page.locator(route === 'music/' ? '.music-room' : 'main')).toBeVisible();
+  await expect(page.locator('main h1')).toHaveText(/\S/);
   await page.evaluate(() => document.fonts.ready);
 }
 async function noOverflow(page) {

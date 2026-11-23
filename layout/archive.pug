@@ -3,9 +3,7 @@ include includes/mixins.pug
 
 block content
   .wrap.listing-page
-    .page-intro
-      h1= morii_page_title(page)
-      p= is_category() || is_tag() ? morii_t("这个主题下的所有文章。") : morii_t("所有思考与实践，都在这里留下时间的刻度。")
+    h1.sr-only= morii_page_title(page)
     .content-grid
       section.posts-column
         include includes/category-nav.pug

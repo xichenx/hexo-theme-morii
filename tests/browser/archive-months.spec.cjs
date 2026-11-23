@@ -16,11 +16,13 @@ test('archive months can be reached with the keyboard and across a subdirectory'
   await expect(olderMonth).toBeHidden();
   await nav.locator('summary').filter({ hasText: /^2020$/ }).press('Enter');
   await expect(olderMonth).toBeVisible();
+  const monthCount = Number.parseInt(await olderMonth.locator('small').innerText(), 10);
   await noOverflow(page);
   await olderMonth.press('Enter');
   await expect(page).toHaveURL(/\/layout\/archives\/2020\/01\/$/);
   await expect(index.locator('a[aria-current="date"]')).toHaveAttribute('href', '/layout/archives/2020/01/');
-  await expect(page.locator('.archive-entry')).toHaveCount(1);
+  await expect(page.locator('.archive-entry')).toHaveCount(monthCount);
+  await expect(page.locator('.archive-entry time[aria-label^="2020 年 1 月"]')).toHaveCount(monthCount);
   await ready(page, 'categories/');
   await expect(index).toHaveCount(0);
 });

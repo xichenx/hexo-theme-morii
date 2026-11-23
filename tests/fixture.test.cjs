@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { JSDOM } = require('jsdom');
 const { buildDemo } = require('../tools/demo.cjs');
-const pages = ['index.html', 'page/2/index.html', 'posts/welcome/index.html', 'archives/index.html', 'categories/index.html', 'categories/主题使用/index.html', 'tags/index.html', 'about/index.html', 'link/index.html', 'essay/index.html', 'album/index.html', 'album/morii/index.html', 'music/index.html', 'cinema/index.html', 'reading-list/index.html', '404.html'];
+const pages = ['index.html', 'page/2/index.html', 'posts/welcome/index.html', 'archives/index.html', 'categories/index.html', 'categories/主题使用/index.html', 'tags/index.html', 'tags/开始写作/index.html', 'about/index.html', 'link/index.html', 'essay/index.html', 'album/index.html', 'album/morii/index.html', 'music/index.html', 'cinema/index.html', 'comments/index.html', 'series/index.html', 'series/morii-guide/index.html', 'reading-list/index.html', '404.html'];
 
 test('theme builds independently at both domain root and a Pages subdirectory', async t => {
   for (const prefix of ['/', '/hexo-theme-morii/']) await t.test(prefix, async () => {
@@ -71,13 +71,12 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
         }
       }
       assert.equal(document.querySelector('main .intro-atmosphere, main [data-intro-word], main [data-intro-tone]'), null, `${file}: no decorative banner`);
-      if (['page/2/index.html', 'archives/index.html', 'categories/index.html', 'categories/主题使用/index.html', 'tags/index.html', 'about/index.html', 'link/index.html', 'album/index.html', 'album/morii/index.html', 'cinema/index.html', 'reading-list/index.html'].includes(file)) {
-        assert.ok(document.querySelector('main .page-intro h1')?.textContent.trim(), `${file}: page title stays visible`);
-      }
-      if (file === 'music/index.html') {
-        assert.ok(document.querySelector('main h1.sr-only')?.textContent.trim());
-        assert.equal(document.querySelector('main .page-intro'), null);
-      }
+      assert.equal(document.querySelector('main .page-intro, main .series-intro'), null, `${file}: no standalone title area`);
+      const heading = document.querySelector('main h1');
+      const visibleTitle = ['index.html', 'posts/welcome/index.html', '404.html'].includes(file);
+      assert.ok(heading.textContent.trim(), `${file}: accessible heading has a name`);
+      assert.equal(heading.classList.contains('sr-only'), !visibleTitle, `${file}: heading visibility`);
+      if (file === 'link/index.html') assert.ok(document.querySelector('.friend-toolbar-footer a[href="#friend-connect"]'));
       assert.ok(document.querySelector('#morii-audio-hub'), `${file}: shared music player`);
       assert.ok(document.querySelector('.morii-atmosphere[aria-hidden="true"] #morii-particles'), `${file}: decorative particles`);
       assert.equal(document.documentElement.dataset.glass, 'on');

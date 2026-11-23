@@ -76,9 +76,7 @@ block content
     include includes/home-discovery.pug
     include includes/github-calendar.pug
   else
-    .wrap.listing-page
-      .page-intro
-        h1 #{morii_t("文章 · 第 {0} 页", page.current)}
+    h1.sr-only #{morii_t("文章 · 第 {0} 页", page.current)}
   .wrap.content-grid#latest
     section.posts-column
       .section-heading.section-heading--posts

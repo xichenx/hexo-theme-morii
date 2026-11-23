@@ -12,15 +12,14 @@ block content
         span(aria-current='page')= collection.title
       else
         span(aria-current='page') #{morii_t('专题与系列')}
-    header.series-intro
-      span.section-kicker= collection ? 'READ IN ORDER' : 'COLLECTIONS'
-      h1= collection ? collection.title : morii_t('专题与系列')
-      p= collection ? collection.description || morii_t('沿着一条线索，系统地读下去。') : morii_t('把零散的笔记，连接成持续探索的路线。')
+    h1.sr-only= collection ? collection.title : morii_t('专题与系列')
     if collection
       .series-directory.panel
         .series-directory-heading
           strong #{morii_t('系列目录')}
           span #{morii_t('共 {0} 篇文章', collection.posts.length)}
+        if collection.description
+          p.series-directory-description= collection.description
         ol
           each post, index in collection.posts
             li
