@@ -28,6 +28,60 @@ for (const route of ['', 'archives/', 'categories/', 'about/', 'album/', 'music/
   });
 }
 
+test('mobile backgrounds reach the viewport edges while controls respect safe areas', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'Safe-area regression is exercised on mobile Chromium and WebKit.');
+  for (const { width, height, top, right, bottom, left } of [
+    { width: 390, height: 844, top: 54, right: 0, bottom: 34, left: 0 },
+    { width: 844, height: 390, top: 0, right: 21, bottom: 21, left: 54 }
+  ]) {
+    await page.setViewportSize({ width, height });
+    for (const [route, backdrop, intro] of [
+      ['posts/layout-stress/', '.post-hero', '.post-hero-inner'],
+      ['posts/welcome/', '.post-hero', '.post-hero-inner'],
+      ['music/', '.music-room', '.music-room-top']
+    ]) {
+      await ready(page, route);
+      await expect(page.locator('meta[name=viewport]')).toHaveAttribute('content', /viewport-fit=cover/);
+      // Browser emulation does not supply hardware cutouts. Inject asymmetric insets to exercise the layout.
+      await page.locator('html').evaluate((root, insets) => {
+        for (const [side, pixels] of Object.entries(insets)) root.style.setProperty('--safe-' + side, pixels + 'px');
+      }, { top, right, bottom, left });
+
+      const header = await page.locator('.site-header').boundingBox();
+      const controls = await page.locator('.site-header__inner').boundingBox();
+      const stage = await page.locator(backdrop).boundingBox();
+      expect(header.x).toBe(0);
+      expect(header.width).toBe(width);
+      expect(controls.x).toBeGreaterThanOrEqual(left);
+      expect(controls.y).toBe(top);
+      expect(controls.x + controls.width).toBeLessThanOrEqual(width - right);
+      expect(stage.x).toBe(0);
+      expect(stage.y).toBe(0);
+      expect(stage.width).toBe(width);
+      const heading = await page.locator(intro).boundingBox();
+      expect(heading.x).toBeGreaterThanOrEqual(left);
+      expect(heading.y).toBeGreaterThanOrEqual(header.y + header.height);
+      expect(heading.x + heading.width).toBeLessThanOrEqual(width - right);
+      await expect(page.locator('#back-to-top')).toHaveCSS('bottom', (24 + bottom) + 'px');
+
+      await page.locator('#menu-toggle').click();
+      await expect(page.locator('#site-nav')).toBeVisible();
+      await page.locator('#menu-toggle').click();
+      for (const [opener, dialog] of [['#search-open', '#search-dialog'], ['#navigation-open', '#navigation-dialog']]) {
+        await page.locator(opener).click();
+        const bounds = await page.locator(dialog).boundingBox();
+        expect(bounds.x).toBeGreaterThanOrEqual(left - 1);
+        expect(bounds.y).toBeGreaterThanOrEqual(top - 1);
+        expect(bounds.x + bounds.width).toBeLessThanOrEqual(width - right + 1);
+        expect(bounds.y + bounds.height).toBeLessThanOrEqual(height - bottom + 1);
+        await page.keyboard.press('Escape');
+        await expect(page.locator(dialog)).not.toBeVisible();
+      }
+      await noOverflow(page);
+    }
+  }
+});
+
 test('desktop scroll boundaries keep the homepage header anchored', async ({ page, isMobile }) => {
   await ready(page);
   const root = page.locator('html');

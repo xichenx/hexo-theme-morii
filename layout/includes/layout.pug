@@ -6,7 +6,7 @@ doctype html
 html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || theme.motion.enable !== false) ? 'on' : 'off' data-glass=visualEffects.enabled ? (visualEffects.glass ? 'on' : 'off') : null data-effects=visualEffects.enabled ? 'on' : null data-theme-transition=visualEffects.transition ? 'on' : null)
   head
     meta(charset='utf-8')
-    meta(name='viewport' content='width=device-width, initial-scale=1')
+    meta(name='viewport' content='width=device-width, initial-scale=1, viewport-fit=cover')
     meta(name='theme-color' content=theme.accent)
     - var documentTitle = morii_page_title(page)
     - var documentDescription = is_post() ? morii_excerpt(page, 160) : page.description || config.description
