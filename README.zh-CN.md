@@ -9,9 +9,9 @@ Morii 是一款面向技术写作与个人博客的卡片式 Hexo 主题，支�
 
 [教程网站](https://morii-docs.pages.dev/) · [在线演示](https://xichenx.github.io/hexo-theme-morii/) · [版本发布](https://github.com/xichenx/hexo-theme-morii/releases) · [问题反馈](https://github.com/xichenx/hexo-theme-morii/issues)
 
-[![Morii 首页与手写字标动效](docs/media/morii-demo-preview.gif)](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)
+[![Morii 在桌面、笔记本、平板和手机上的页面预览](docs/media/morii.png)](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)
 
-[观看 v1.1.0 的 44 秒演示](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)
+[观看 v1.1.0 的 44 秒演示](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4) · [查看动图](docs/media/morii-demo-preview.gif)
 
 ## 功能
 

@@ -9,9 +9,9 @@ Morii is a card-based Hexo theme for technical writing and personal blogs. It su
 
 [Documentation (Chinese)](https://morii-docs.pages.dev/) · [Live demo](https://xichenx.github.io/hexo-theme-morii/) · [Releases](https://github.com/xichenx/hexo-theme-morii/releases) · [Issues](https://github.com/xichenx/hexo-theme-morii/issues)
 
-[![Morii homepage with the animated handwritten wordmark](docs/media/morii-demo-preview.gif)](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)
+[![Morii on desktop, laptop, tablet, and mobile](docs/media/morii.png)](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)
 
-[Watch the 44-second v1.1.0 demo](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)
+[Watch the 44-second v1.1.0 demo](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4) · [Animated preview](docs/media/morii-demo-preview.gif)
 
 ## Features
 
