@@ -1,6 +1,7 @@
 'use strict';
 const { test, expect } = require('@playwright/test');
 const { installHooks, ready, noOverflow } = require('./helpers.cjs');
+const { prefix } = require('../../tools/lib/browser-fixture.cjs');
 installHooks(test);
 test.use({ reducedMotion: 'no-preference' });
 
@@ -87,15 +88,30 @@ test('changing reduced motion cancels entrances and ambient movement', async ({ 
 });
 
 test('the Morii wordmark writes once and settles into the complete artwork', async ({ page }) => {
-  await ready(page);
+  let releaseArtwork;
+  const artwork = new Promise(resolve => { releaseArtwork = resolve; });
+  await page.route('**/morii-promo-wordmark.webp', async route => {
+    await artwork;
+    await route.continue();
+  });
   const promo = page.getByRole('region', { name: 'Morii', exact: true });
   const wordmark = promo.getByRole('heading', { name: 'Morii' });
-  await promo.scrollIntoViewIfNeeded();
+  try {
+    await page.goto(prefix, { waitUntil: 'domcontentloaded' });
+    await wordmark.scrollIntoViewIfNeeded();
+    await expect(page.locator('html')).toHaveAttribute('data-promo-ink', 'ready');
+    await expect(wordmark).toHaveCSS('opacity', '0');
+    await expect(promo).not.toHaveAttribute('data-writing', '');
+  } finally {
+    releaseArtwork();
+  }
   await expect(promo).toHaveAttribute('data-writing', '');
+  await expect(wordmark).toHaveCSS('opacity', '1');
   await expect(wordmark).toHaveCSS('mask-image', /morii-promo-ink/);
-  await expect(promo.locator('[data-ink-end]')).toHaveCSS('animation-name', 'morii-write');
+  await expect(promo.locator('[data-ink-end]')).toHaveCSS('animation-name', 'morii-ink-settle');
   await expect(promo).not.toHaveAttribute('data-writing', '');
   await expect(wordmark).toHaveCSS('mask-image', 'none');
+  await expect(page.locator('html')).not.toHaveAttribute('data-promo-ink');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.reload({ waitUntil: 'load' });
   await promo.scrollIntoViewIfNeeded();

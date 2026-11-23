@@ -265,7 +265,7 @@ function loadHelpers(file, theme = {}, config = {}) {
 
 
 test('activated music keeps audio, restores original scroll on back and offers retry after timeout', async () => {
-  const dom = browser(musicMarkup({ title: '音乐', tracks: [{ title: '第一首', url: '/one.mp3' }] }) + '<main id="main"></main><a id="next-page" href="/archives/">文章</a>');
+  const dom = browser('<meta name="theme-color" content="#f6f8fc">' + musicMarkup({ title: '音乐', tracks: [{ title: '第一首', url: '/one.mp3' }] }) + '<main id="main"></main><a id="next-page" href="/archives/">文章</a>');
   const w = dom.window; const d = w.document;
   let scrollY = 350;
   Object.defineProperty(w, 'scrollY', { get: () => scrollY });
@@ -276,7 +276,7 @@ test('activated music keeps audio, restores original scroll on back and offers r
   w.setTimeout = (callback, delay) => { if (delay === 12000) { timers.push(callback); return 999; } return setTimeout(callback, delay); };
   w.setInterval = () => 1; w.clearInterval = () => {};
   const create = d.createElement.bind(d);
-  const child = new JSDOM('<main id="main"></main>', { url: 'https://blog.example.test/archives/' });
+  const child = new JSDOM('<meta name="theme-color" content="#252a40"><main id="main"></main>', { url: 'https://blog.example.test/archives/' });
   Object.defineProperty(child.window.document, 'readyState', { get: () => 'complete' });
   const frameWindow = { close() {}, location: { href: 'about:blank', replace(url) { this.href = url; } }, requestAnimationFrame: callback => callback(), scrollTo() {}, scrollX: 0, scrollY: 0 };
   let currentDocument = null;
@@ -294,6 +294,12 @@ test('activated music keeps audio, restores original scroll on back and offers r
   assert.equal(w.location.pathname, '/archives/'); assert.equal(d.querySelectorAll('#music-player').length, 1);
   const frame = d.getElementById('morii-site-frame'); currentDocument = child.window.document; frame.dispatchEvent(new w.Event('load'));
   assert.equal(frame.hidden, false); assert.equal(w.MoriiMusic.player, audio);
+  const chrome = d.querySelector('meta[name="theme-color"]');
+  const frameChrome = child.window.document.querySelector('meta[name="theme-color"]');
+  assert.equal(chrome.content, '#252a40');
+  frameChrome.content = '#111827';
+  await Promise.resolve();
+  assert.equal(chrome.content, '#111827');
   w.history.replaceState({ moriiMusicKey: 'origin' }, '', '/'); w.dispatchEvent(new w.PopStateEvent('popstate', { state: { moriiMusicKey: 'origin' } }));
   assert.equal(frame.hidden, true); assert.equal(scrollY, 350);
   d.getElementById('next-page').dispatchEvent(new w.MouseEvent('click', { bubbles: true, cancelable: true }));

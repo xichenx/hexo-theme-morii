@@ -26,15 +26,20 @@ html[data-theme=dark] .theme-promo__wordmark img { filter: brightness(1.65) satu
   }
   .theme-promo__wordmark img { opacity: 0; }
   @media (prefers-reduced-motion: no-preference) and (forced-colors: none) {
+    html[data-promo-ink] .theme-promo:not([data-writing]) h2 { opacity: 0; }
     html[data-motion=on] .theme-promo[data-writing] h2 {
       -webkit-mask: url("#morii-promo-ink");
       mask: url("#morii-promo-ink");
     }
     html[data-motion=on] .theme-promo[data-writing] .theme-promo__ink path {
       stroke-dasharray: 1;
-      animation: morii-write var(--ink-time) linear var(--ink-delay, 0s) both;
+      animation: morii-write var(--ink-time) var(--ink-easing, linear) var(--ink-delay, 0s) both;
+    }
+    html[data-motion=on] .theme-promo[data-writing] [data-ink-end] {
+      animation: morii-ink-settle .14s linear 2.45s both;
     }
     @keyframes morii-write { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+    @keyframes morii-ink-settle { from { opacity: 0; } to { opacity: 1; } }
   }
   @media (forced-colors: active) {
     .theme-promo h2::after { display: none; }

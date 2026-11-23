@@ -2,7 +2,18 @@
   let stored;
   try { stored = localStorage.getItem('morii-theme') || localStorage.getItem('mingzhi-theme'); } catch { /* Storage may be unavailable. */ }
   const dark = typeof matchMedia === 'function' && matchMedia('(prefers-color-scheme: dark)').matches;
-  document.documentElement.dataset.theme = stored === 'dark' || stored === 'light' ? stored : dark ? 'dark' : 'light';
+  const root = document.documentElement;
+  root.dataset.theme = stored === 'dark' || stored === 'light' ? stored : dark ? 'dark' : 'light';
+  const chrome = document.querySelector('meta[name="theme-color"]');
+  if (chrome && !chrome.dataset.inverse) chrome.content = chrome.dataset[root.dataset.theme];
+  if (document.currentScript?.hasAttribute('data-promo-ink') && root.dataset.motion === 'on' &&
+      typeof IntersectionObserver === 'function' && typeof Element.prototype.animate === 'function' &&
+      typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: no-preference) and (forced-colors: none)').matches) {
+    root.dataset.promoInk = 'pending';
+    setTimeout(() => {
+      if (root.dataset.promoInk === 'pending') delete root.dataset.promoInk;
+    }, 1500);
+  }
 })();
 
 // Diagnostics are opt-in and stay in the current browser.

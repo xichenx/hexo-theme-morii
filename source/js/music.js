@@ -174,6 +174,7 @@
     let shellActive = false;
     let currentURL = location.href;
     let pendingDocument;
+    let chromeObserver;
     let readyTimer;
     let fallbackTimer;
     const scrollPositions = new Map();
@@ -216,6 +217,7 @@
     };
     const visit = (url, push = true, entry) => {
       recordScroll();
+      chromeObserver?.disconnect();
       if (notice) notice.hidden = true;
       if (history.scrollRestoration !== 'manual') {
         history.scrollRestoration = 'manual';
@@ -263,6 +265,14 @@
         if (location.href !== frameURL) history.replaceState({ moriiMusic: true }, '', frameURL);
         const frameTheme = content.documentElement.dataset.theme;
         if (frameTheme) document.documentElement.dataset.theme = frameTheme;
+        const frameChrome = content.querySelector('meta[name="theme-color"]');
+        const chrome = document.querySelector('meta[name="theme-color"]');
+        if (frameChrome && chrome) {
+          const syncChrome = () => { chrome.content = frameChrome.content; };
+          syncChrome();
+          chromeObserver = new MutationObserver(syncChrome);
+          chromeObserver.observe(frameChrome, { attributeFilter: ['content'] });
+        }
         document.title = content.title;
         frame.title = content.title || t("网站内容");
         bindNavigation(content); updateFloating();

@@ -1,10 +1,19 @@
 (() => {
   const t = (...args) => window.MoriiI18n ? window.MoriiI18n.t(...args) : args[0].replace(/\{(\d+)\}/g, (_, i) => String(args[Number(i) + 1] ?? ''));
   const root = document.documentElement;
+  const chrome = document.querySelector('meta[name="theme-color"]');
+  const siteHeader = document.querySelector('.site-header');
+  const syncChrome = () => {
+    if (!chrome || document.body.classList.contains('music-shell-active')) return;
+    const inverse = !siteHeader?.hasAttribute('data-header-past-backdrop') && chrome.dataset.inverse;
+    const color = inverse || chrome.dataset[root.dataset.theme];
+    if (chrome.content !== color) chrome.content = color;
+  };
   // Hidden dialogs, motion and the inactive music capsule do not block first paint.
   document.querySelectorAll('link[data-deferred-style]').forEach(link => { link.media = 'all'; });
   const themeButton = document.getElementById('theme-toggle');
   const syncThemeButton = () => {
+    syncChrome();
     if (!themeButton) return;
     const dark = root.dataset.theme === 'dark';
     themeButton.setAttribute('aria-pressed', String(dark));
@@ -77,19 +86,22 @@
   });
 
   const menu = document.querySelector('.site-nav');
-  const siteHeader = document.querySelector('.site-header');
   if (siteHeader) {
     const backdrop = document.querySelector('main [data-header-backdrop="inverse"]');
     let headerFrame;
     const updateHeader = () => {
       headerFrame = undefined;
       siteHeader.toggleAttribute('data-header-top', window.scrollY <= 8);
-      if (backdrop) siteHeader.toggleAttribute('data-header-past-backdrop', backdrop.getBoundingClientRect().bottom <= siteHeader.offsetHeight);
+      if (backdrop) {
+        siteHeader.toggleAttribute('data-header-past-backdrop', backdrop.getBoundingClientRect().bottom <= siteHeader.offsetHeight);
+        syncChrome();
+      }
     };
     const scheduleHeader = () => { headerFrame ??= requestAnimationFrame(updateHeader); };
     window.addEventListener('scroll', scheduleHeader, { passive: true });
     window.addEventListener('resize', scheduleHeader);
     window.addEventListener('pageshow', scheduleHeader);
+    window.addEventListener('morii:music-view', () => { updateHeader(); syncChrome(); });
     if (backdrop && typeof ResizeObserver === 'function') new ResizeObserver(scheduleHeader).observe(backdrop);
     updateHeader();
   }

@@ -3,11 +3,39 @@
   const main = document.getElementById('main');
   if (!main) return;
   const promo = main.querySelector('.theme-promo');
+  const wordmark = promo?.querySelector('h2');
+  const artwork = wordmark?.querySelector('img');
   const inkEnd = promo?.querySelector('[data-ink-end]');
-  const finishWriting = () => promo?.removeAttribute('data-writing');
+  let writingObserver;
+  const finishWriting = () => {
+    writingObserver?.disconnect();
+    writingObserver = undefined;
+    if (root.dataset.promoInk) delete root.dataset.promoInk;
+    promo?.removeAttribute('data-writing');
+  };
   inkEnd?.addEventListener('animationend', finishWriting);
+  inkEnd?.addEventListener('animationcancel', finishWriting);
   const preference = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
-  const selector = '.hero__main, .hero-mini, .theme-promo, .section-heading, .feature-card, .post-card, .profile-card, .side-card, .discovery-card, .selected-card, .friend-card, .feed-card, .photo-card, .taxonomy-card, .related-card, .archive-tree-item, .page-intro, .article-header';
+  const startWriting = () => {
+    if (root.dataset.promoInk !== 'pending') return;
+    if (!inkEnd || !artwork?.decode || preference?.matches || document.hidden || promo.contains(document.activeElement)) {
+      finishWriting();
+      return;
+    }
+    root.dataset.promoInk = 'ready';
+    artwork.decode().then(() => {
+      if (root.dataset.promoInk !== 'ready') return;
+      writingObserver = new IntersectionObserver(([entry]) => {
+        if (root.dataset.promoInk !== 'ready' || entry.intersectionRatio < .35) return;
+        writingObserver.disconnect();
+        writingObserver = undefined;
+        root.dataset.promoInk = 'writing';
+        promo.setAttribute('data-writing', '');
+      }, { threshold: .35 });
+      writingObserver.observe(wordmark);
+    }).catch(finishWriting);
+  };
+  const selector = '.hero__main, .hero-mini, .section-heading, .feature-card, .post-card, .profile-card, .side-card, .discovery-card, .selected-card, .friend-card, .feed-card, .photo-card, .taxonomy-card, .related-card, .archive-tree-item, .page-intro, .article-header';
   const seen = new WeakSet();
   const ambientSelector = '.hero__main';
   let ambientObserved = new WeakSet();
@@ -65,11 +93,10 @@
           });
           return;
         }
-        if (element === promo && inkEnd && !element.contains(document.activeElement)) element.setAttribute('data-writing', '');
         const order = groups.get(element.parentElement) || 0;
         groups.set(element.parentElement, order + 1);
         // Stagger siblings, not unrelated sections; no baseline CSS hides content.
-        const heroCard = element.matches('.hero-mini, .theme-promo');
+        const heroCard = element.matches('.hero-mini');
         play(element, [{ opacity: heroCard ? .7 : .25, translate: heroCard ? '0 10px' : '0 14px' }, { opacity: 1, translate: '0 0' }], Math.min(order, 3) * 55);
       });
     }, { threshold: .06 });
@@ -91,6 +118,7 @@
   };
   // Keyboard users never wait for an entry animation to finish before seeing a focused control.
   main.addEventListener('focusin', event => {
+    if (promo?.contains(event.target)) finishWriting();
     for (const element of active.keys()) if (element.contains(event.target)) cancel(element);
   });
   preference?.addEventListener('change', () => { stop(); start(); });
@@ -100,5 +128,5 @@
   document.addEventListener('beforeprint', stop);
   window.addEventListener('beforeprint', stop);
   window.addEventListener('afterprint', start);
-  visibility(); start();
+  visibility(); start(); startWriting();
 })();
