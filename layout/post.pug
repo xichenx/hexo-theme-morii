@@ -8,14 +8,9 @@ block content
       img.article-cover(src=heroCover.src srcset=heroCover.srcset sizes=heroCover.sizes width=heroCover.width height=heroCover.height alt='' aria-hidden='true' fetchpriority='high' decoding='async')
     .post-hero-inner
       nav.article-breadcrumb(aria-label=morii_t('面包屑导航'))
-        a(href=url_for('/')) #{morii_t('首页')}
-        span(aria-hidden='true') /
-        a(href=url_for('/archives/')) #{morii_t('文章')}
-        - var breadcrumbSeries = morii_series(page)
-        if breadcrumbSeries
+        each crumb in morii_article_breadcrumb(page)
+          a(href=url_for(crumb.path))= crumb.name
           span(aria-hidden='true') /
-          a(href=url_for(breadcrumbSeries.path))= breadcrumbSeries.title
-        span(aria-hidden='true') /
         span(aria-current='page')= page.title
       .article-kicker
         a.article-type(href=url_for('/archives/')) #{morii_t("文章")}

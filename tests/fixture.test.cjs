@@ -14,6 +14,12 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       assert.ok(fs.existsSync(path.join(output, file)), `Generated ${file}`);
       const dom = new JSDOM(fs.readFileSync(path.join(output, file), 'utf8'), { url: `https://example.test${prefix}${file}` });
       const document = dom.window.document;
+      const noindex = ['404.html', 'reading-list/index.html'].includes(file);
+      const canonical = file === '404.html' ? undefined : new URL(file.replace(/(^|\/)index\.html$/, '$1'), `https://example.test${prefix}`).href;
+      assert.equal(document.querySelector('link[rel="canonical"]')?.href, canonical, `${file}: canonical URL`);
+      assert.equal(document.querySelector('meta[property="og:url"]')?.content, canonical);
+      assert.equal(document.querySelector('meta[name="robots"]')?.content, noindex ? 'noindex' : undefined);
+      assert.equal(!!document.querySelector('script[type="application/ld+json"]'), !noindex);
       if (file === 'index.html') {
         const backToTop = document.querySelector('#back-to-top');
         assert.equal(backToTop.textContent.trim(), '↑');
@@ -241,6 +247,15 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
     assert.equal(home.querySelector('#effects-dialog, [data-open-effects]'), null);
     const overview = documentFor('categories');
     const category = documentFor('categories/主题使用');
+    const categoryPageTwo = documentFor('categories/主题使用/page/2');
+    assert.match(categoryPageTwo.title, /第 2 页/);
+    assert.equal(decodeURI(categoryPageTwo.querySelector('link[rel="canonical"]').href), 'https://example.test/theme/categories/主题使用/page/2/');
+    categoryPageTwo.defaultView.close();
+    const article = documentFor('posts/welcome');
+    const breadcrumbs = JSON.parse(article.querySelector('script[type="application/ld+json"]').textContent)['@graph']
+      .find(item => item['@type'] === 'BreadcrumbList').itemListElement;
+    assert.equal(breadcrumbs[1].item, 'https://example.test/theme/history/');
+    article.defaultView.close();
     const child = documentFor('categories/主题使用/入门/page/2');
     const otherChild = documentFor('categories/开发笔记/入门');
     const href = link => decodeURIComponent(link.getAttribute('href'));
@@ -305,6 +320,9 @@ test('English and Traditional Chinese build at a subpath with cached locale asse
 test('optional enhancements and Waline produce configured assets and safe sharing metadata', async () => {
   const output = await buildDemo({ root: '/theme/', sourceOverrides: {
     'comments/index.md': '---\ntitle: 留言板\ncomments: true\n---\n欢迎留言。',
+    'preview/index.md': '---\ntitle: Preview\nnoindex: true\n---\nPublic preview.',
+    '_posts/seo-filename.md': '---\ntitle: Canonical filename\ndate: 2001-01-01\npermalink: posts/myindex.html\nshare_image: "javascript:alert(1)"\ncover: /images/covers/welcome.jpg\n---\nCanonical path.',
+    '_posts/seo-protected.md': '---\ntitle: Protected example\ndate: 2001-01-02\npermalink: posts/seo-protected/\npassword: example\nshare_image: https://example.test/private-cover.jpg\ndescription: Private summary\n---\nProtected example.',
     '_posts/formulas.md': '---\ntitle: Formulas and diagrams\ndate: 2026-10-16 12:00:00\npermalink: posts/formulas/\ntags: [Related fixture]\ntoc: true\ntoc_scroll_percent: true\nnavigation_order: newest_first\nsidebar_position: right\nmeta_date_type: created\ncode_viewer: true\ncode_start_collapsed: true\nimage_captions: true\n---\n\n## Examples\n\n{% math %}x^2{% endmath %}\n\n{% mermaid %}\ngraph TD; A-->B;\n{% endmermaid %}\n\n![Sample diagram](/images/covers/welcome.jpg "Build output")',
     '_posts/related-maintained.md': '---\ntitle: Maintained tutorial\npermalink: posts/related-maintained/\ntags: [Related fixture]\ndate: 2020-01-01 12:00:00\nupdated: 2025-02-03 12:00:00\n---\nMaintained tutorial.',
     '_posts/related-recent.md': '---\ntitle: Published later\npermalink: posts/related-recent/\ntags: [Related fixture]\ndate: 2021-01-01 12:00:00\nupdated: 2024-02-03 12:00:00\nmeta_word_count: false\nmeta_reading_time: true\n---\nPublished later.'
@@ -364,6 +382,29 @@ test('optional enhancements and Waline produce configured assets and safe sharin
   assert.equal(article.mainEntityOfPage['@id'], 'https://example.test/theme/posts/welcome/');
   assert.match(article.image[0], /\/theme\/images\/covers\/welcome.jpg$/);
   assert.equal(d.querySelector('meta[name="twitter:card"]').content, 'summary_large_image');
+  const trail = data['@graph'].find(item => item['@type'] === 'BreadcrumbList').itemListElement;
+  assert.deepEqual(trail.map(item => item.item), [
+    ...[...d.querySelectorAll('.article-breadcrumb a')].map(link => new URL(link.href, 'https://example.test').href),
+    article.url
+  ]);
+  assert.deepEqual(trail.map(item => item.position), trail.map((_, index) => index + 1));
+  for (const file of ['preview/index.html', 'posts/seo-protected/index.html', 'posts/myindex.html']) {
+    const sample = new JSDOM(fs.readFileSync(path.join(output, file), 'utf8'));
+    const doc = sample.window.document;
+    const indexable = file === 'posts/myindex.html';
+    assert.equal(doc.querySelector('meta[name="robots"]')?.content, indexable ? undefined : 'noindex');
+    assert.equal(Boolean(doc.querySelector('script[type="application/ld+json"]')), indexable);
+    const publicPath = indexable ? 'posts/myindex' : file.replace(/\/index\.html$/, '/');
+    assert.equal(doc.querySelector('link[rel="canonical"]').href, 'https://example.test/theme/' + publicPath);
+    if (indexable) {
+      assert.equal(doc.querySelector('meta[property="og:image"]').content, 'https://example.test/theme/images/covers/welcome.jpg');
+    } else if (file.startsWith('posts/')) {
+      assert.equal(doc.querySelector('meta[property="og:image"]').content, 'https://example.test/theme/share.jpg');
+      assert.doesNotMatch(doc.head.textContent, /Private summary|private-cover\.jpg/);
+      assert.doesNotMatch(doc.querySelector('meta[name="description"]').content, /Private summary/);
+    }
+    sample.window.close();
+  }
   // This article explicitly disables comments; a normal page uses the selected provider.
   assert.equal(d.querySelector('#comment-service'), null);
   const about = new JSDOM(fs.readFileSync(path.join(output, 'comments/index.html'), 'utf8'));
@@ -391,6 +432,9 @@ test('series pages, article order and responsive covers work in English under a 
   assert.deepEqual(hrefs(detail.window.document.querySelectorAll('.series-directory li a')), links);
   assert.deepEqual(hrefs(index.window.document.querySelectorAll('.series-card:first-child li a')), links.slice(0, 3));
   const doc = article.window.document;
+  const articleTrail = JSON.parse(doc.querySelector('script[type="application/ld+json"]').textContent)['@graph']
+    .find(item => item['@type'] === 'BreadcrumbList').itemListElement;
+  assert.equal(articleTrail.at(-2).item, 'https://example.test/theme/series/guide/');
   assert.equal(doc.querySelector('.article-series [aria-current="page"]').getAttribute('href'), '/theme/posts/welcome/');
   assert.deepEqual(hrefs(doc.querySelectorAll('.article-series li a')), links);
   assert.deepEqual(hrefs(doc.querySelectorAll('.series-article-nav a')), [links[0], links[2]]);

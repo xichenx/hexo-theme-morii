@@ -211,7 +211,11 @@ comments:
 
 最新评论只在有侧栏的页面展示，进入附近区域后加载；失败可以重试。评论展示使用纯文本，评论链接限定为本站地址。Waline 的最新评论侧栏尚未接入。
 
-默认输出 WebSite / BlogPosting 结构化数据，以及 Open Graph 和 Twitter 分享信息。分享图优先级为文章 `share_image` → `cover` → 全站默认图片：
+## 搜索收录与分享预览
+
+Morii 为正常页面生成绝对 canonical URL，并用同一个地址生成 Open Graph 元数据。请在博客根目录的 `_config.yml` 中将 `url` 设为正式网址。部署在子目录时，`url` 也需要包含该路径。归档、分类和标签的分页使用各自的网址和页码标题。
+
+默认输出 WebSite 结构化数据，并为可索引的文章添加 BlogPosting 和 BreadcrumbList。分享图依次使用有效的 `share_image`、`cover` 和全站默认图片：
 
 ```yaml
 seo:
@@ -219,4 +223,6 @@ seo:
   default_image: /images/share.jpg
 ```
 
-图片需要自行提供。这些元数据便于搜索引擎和分享平台读取，但不保证被收录或生成指定样式的卡片。
+在博客的 `_config.morii.yml` 设置上面的选项，图片需要自行提供。设为 `structured_data: false` 可关闭 JSON-LD。
+
+404、稍后阅读和受密码保护的文章会输出 `noindex`。若希望搜索引擎跳过某篇文章或独立页面，可在它的 Front Matter 中加入 `noindex: true`。页面仍可通过原地址访问。
