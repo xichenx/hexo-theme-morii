@@ -2,18 +2,7 @@
 
 const { forPage } = require('./lib/i18n.cjs');
 const { httpURL } = require('./lib/article-attribution.cjs');
-
-function pageURL(path = '') {
-  const site = httpURL(hexo.config.url);
-  if (!site) return '';
-  const url = new URL(site);
-  let route = (path || '').replace(/^\/+/, '').replace(/(^|\/)index\.html$/, '$1');
-  if (hexo.config.pretty_urls?.trailing_html === false) route = route.replace(/\.html$/, '');
-  url.pathname = url.pathname.replace(/\/?$/, '/') + route;
-  url.search = '';
-  url.hash = '';
-  return url.href;
-}
+const { canonicalURL, isNotFound, isNoindex } = require('./lib/seo.cjs');
 
 function shareImage(context, page, fallback) {
   const candidates = page.password ? [fallback] : [page.share_image, page.cover, fallback];
@@ -39,9 +28,8 @@ hexo.extend.helper.register('morii_seo', function (page) {
   const site = hexo.config;
   const options = hexo.theme.config.seo || {};
   const isPost = this.is_post();
-  const notFound = page.type === '404' || page.layout === '404' || page.path === '404.html';
-  const noindex = notFound || page.type === 'reading_list' || Boolean(page.password) || page.published === false || page.noindex === true;
-  const canonical = notFound ? '' : pageURL(page.path);
+  const noindex = isNoindex(page);
+  const canonical = isNotFound(page) ? '' : canonicalURL(site, page.path);
   const firstHome = this.is_home() && !(page.current > 1);
   let title = this.morii_page_title(page);
   if (page.current > 1 && (this.is_archive() || this.is_category() || this.is_tag())) {
@@ -61,7 +49,7 @@ hexo.extend.helper.register('morii_seo', function (page) {
 
   if (noindex || !canonical || options.structured_data === false) return metadata;
 
-  const home = pageURL();
+  const home = canonicalURL(site);
   const graph = [{
     '@type': 'WebSite', '@id': home + '#website', url: home, name: site.title, inLanguage: forPage(hexo).locale
   }];
@@ -74,7 +62,7 @@ hexo.extend.helper.register('morii_seo', function (page) {
       datePublished: published, dateModified: modified,
       inLanguage: this.morii_locale(), ...(image ? { image: [image] } : {})
     });
-    const trail = articleTrail.call(this, page).map(crumb => ({ name: crumb.name, url: pageURL(crumb.path) }));
+    const trail = articleTrail.call(this, page).map(crumb => ({ name: crumb.name, url: canonicalURL(site, crumb.path) }));
     trail.push({ name: page.title, url: canonical });
     graph.push({
       '@type': 'BreadcrumbList', '@id': canonical + '#breadcrumb',

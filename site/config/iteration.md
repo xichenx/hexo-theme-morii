@@ -226,3 +226,21 @@ seo:
 在博客的 `_config.morii.yml` 设置上面的选项，图片需要自行提供。设为 `structured_data: false` 可关闭 JSON-LD。
 
 404、稍后阅读和受密码保护的文章会输出 `noindex`。若希望搜索引擎跳过某篇文章或独立页面，可在它的 Front Matter 中加入 `noindex: true`。页面仍可通过原地址访问。
+
+### Sitemap 与 robots.txt
+
+```yaml
+seo:
+  sitemap: true
+  robots: true
+```
+
+默认生成 `sitemap.xml` 和 `robots.txt`，可在博客的 `_config.morii.yml` 独立关闭。站点地图使用 canonical 的绝对地址，包含通过 Hexo 模板生成的公开页面，跳过 `noindex` 页面和静态资源。URL 较多时自动拆分为 sitemap 索引。若博客已通过 `source/` 或插件提供同名文件，Morii 会保留现有文件。
+
+如果博客部署在 `https://example.com/blog/`，站点地图地址是 `https://example.com/blog/sitemap.xml`。可以直接在 Search Console 提交这个地址。爬虫读取的是域名根目录的 `https://example.com/robots.txt`。如果你能管理该文件，将以下行合并进去，同时保留现有抓取规则。
+
+```text
+Sitemap: https://example.com/blog/sitemap.xml
+```
+
+默认的 robots.txt 允许爬虫访问页面和样式资源，爬虫也能由此读到页面里的 `noindex`。如果已有自定义抓取规则，请避免屏蔽需要让爬虫读取 `noindex` 的页面。

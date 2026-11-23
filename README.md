@@ -32,6 +32,6 @@ Set `theme: morii` and `language: en` in the blog’s `_config.yml`, then previe
 
 ## Documentation
 
-The Chinese documentation site covers [installation](https://morii-docs.pages.dev/guide/), [configuration](https://morii-docs.pages.dev/config/), [examples](https://morii-docs.pages.dev/examples/), [deployment](https://morii-docs.pages.dev/guide/publishing), and [upgrading to v1.1.0](https://morii-docs.pages.dev/guide/upgrade-1-1).
+The Chinese documentation site covers [installation](https://morii-docs.pages.dev/guide/), [configuration](https://morii-docs.pages.dev/config/), [examples](https://morii-docs.pages.dev/examples/), [deployment](https://morii-docs.pages.dev/guide/publishing), and [upgrading](https://morii-docs.pages.dev/guide/updating).
 
 [Changelog](CHANGELOG.md) · [MIT license](LICENSE) · Theme by **Morainet**

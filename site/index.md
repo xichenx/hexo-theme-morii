@@ -26,7 +26,7 @@ features:
   - title: 添加博客功能
     details: 按需接入相册、音乐馆、影院、友链或评论。
     link: /features/
-  - title: 升级到 v1.1.0
-    details: 保留博客配置和内容，检查新版首页、导航和文章页。
-    link: /guide/upgrade-1-1
+  - title: 升级 Morii
+    details: 保留博客配置和内容，查看更新命令与发布后的检查步骤。
+    link: /guide/updating
 ---

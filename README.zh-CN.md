@@ -32,6 +32,6 @@ npm install hexo-theme-morii hexo-renderer-pug
 
 ## 使用文档
 
-详细步骤和配置示例请看教程站。[五步入门](https://morii-docs.pages.dev/guide/) · [配置手册](https://morii-docs.pages.dev/config/) · [完整示例](https://morii-docs.pages.dev/examples/) · [部署上线](https://morii-docs.pages.dev/guide/publishing) · [v1.1.0 升级](https://morii-docs.pages.dev/guide/upgrade-1-1)
+详细步骤和配置示例请看教程站。[五步入门](https://morii-docs.pages.dev/guide/) · [配置手册](https://morii-docs.pages.dev/config/) · [完整示例](https://morii-docs.pages.dev/examples/) · [部署上线](https://morii-docs.pages.dev/guide/publishing) · [升级主题](https://morii-docs.pages.dev/guide/updating)
 
 [更新日志](CHANGELOG.md) · [MIT 许可](LICENSE) · 主题作者 **Morainet**

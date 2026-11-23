@@ -7,9 +7,29 @@ const { JSDOM } = require('jsdom');
 const { buildDemo } = require('../tools/demo.cjs');
 const pages = ['index.html', 'page/2/index.html', 'posts/welcome/index.html', 'archives/index.html', 'categories/index.html', 'categories/主题使用/index.html', 'tags/index.html', 'tags/开始写作/index.html', 'about/index.html', 'link/index.html', 'essay/index.html', 'album/index.html', 'album/morii/index.html', 'music/index.html', 'cinema/index.html', 'comments/index.html', 'series/index.html', 'series/morii-guide/index.html', 'reading-list/index.html', '404.html'];
 
+function readSitemap(output) {
+  const dom = new JSDOM(fs.readFileSync(path.join(output, 'sitemap.xml'), 'utf8'), { contentType: 'application/xml' });
+  const { document } = dom.window;
+  assert.equal(document.documentElement.namespaceURI, 'http://www.sitemaps.org/schemas/sitemap/0.9');
+  const locations = [...document.querySelectorAll('urlset > url > loc')].map(node => node.textContent);
+  assert.equal(new Set(locations).size, locations.length);
+  dom.window.close();
+  return locations;
+}
+
 test('theme builds independently at both domain root and a Pages subdirectory', async t => {
   for (const prefix of ['/', '/hexo-theme-morii/']) await t.test(prefix, async () => {
     const output = await buildDemo({ root: prefix, url: 'https://example.test' });
+    const locations = new Set(readSitemap(output));
+    assert.equal(fs.readFileSync(path.join(output, 'robots.txt'), 'utf8'),
+      `User-agent: *\nDisallow:\n\nSitemap: https://example.test${prefix}sitemap.xml\n`);
+    for (const location of locations) {
+      assert.ok(location.startsWith(`https://example.test${prefix}`));
+      const route = decodeURIComponent(new URL(location).pathname.slice(prefix.length));
+      assert.ok(fs.existsSync(path.join(output, route, 'index.html')), `Sitemap lists a generated page: ${location}`);
+    }
+    assert.ok(!locations.has(`https://example.test${prefix}404`));
+    assert.ok(!locations.has(`https://example.test${prefix}404.html`));
     for (const file of pages) {
       assert.ok(fs.existsSync(path.join(output, file)), `Generated ${file}`);
       const dom = new JSDOM(fs.readFileSync(path.join(output, file), 'utf8'), { url: `https://example.test${prefix}${file}` });
@@ -20,6 +40,7 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       assert.equal(document.querySelector('meta[property="og:url"]')?.content, canonical);
       assert.equal(document.querySelector('meta[name="robots"]')?.content, noindex ? 'noindex' : undefined);
       assert.equal(!!document.querySelector('script[type="application/ld+json"]'), !noindex);
+      assert.equal(locations.has(canonical), !noindex, `${file}: sitemap agrees with indexing metadata`);
       if (file === 'index.html') {
         const backToTop = document.querySelector('#back-to-top');
         assert.equal(backToTop.textContent.trim(), '↑');
@@ -221,7 +242,15 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
     const themePromo = monthly ? { enable: false, journal_below: true } : {
       docs_url: '/about/', repository_url: 'javascript:invalid', journal_below: true
     };
-    const output = await buildDemo({ root: '/theme/', url: 'https://example.test', siteOverrides: { archive_dir: 'history', archive_generator: { monthly }, category_generator: { per_page: 1 } }, themeOverrides: { footer: { nav: false }, appearance: { layouts, effects: { enable: false } }, home: { theme_promo: themePromo, random: { autoplay: false } } } });
+    const robots = 'User-agent: *\nDisallow: /private/\n';
+    const output = await buildDemo({ root: '/theme/', url: 'https://example.test', siteOverrides: { archive_dir: 'history', archive_generator: { monthly }, category_generator: { per_page: 1 } }, themeOverrides: { footer: { nav: false }, appearance: { layouts, effects: { enable: false } }, home: { theme_promo: themePromo, random: { autoplay: false } }, seo: { sitemap: monthly, robots: true } }, sourceOverrides: monthly ? { 'robots.txt': robots } : {} });
+    if (monthly) {
+      assert.ok(readSitemap(output).includes('https://example.test/theme/history/'));
+      assert.equal(fs.readFileSync(path.join(output, 'robots.txt'), 'utf8'), robots);
+    } else {
+      assert.ok(!fs.existsSync(path.join(output, 'sitemap.xml')));
+      assert.equal(fs.readFileSync(path.join(output, 'robots.txt'), 'utf8'), 'User-agent: *\nDisallow:\n');
+    }
     const documentFor = file => new JSDOM(fs.readFileSync(path.join(output, file, 'index.html'), 'utf8')).window.document;
     const home = documentFor('');
     assert.equal(home.querySelector('[data-random]').dataset.randomAutoplay, 'off');
@@ -388,6 +417,7 @@ test('optional enhancements and Waline produce configured assets and safe sharin
     article.url
   ]);
   assert.deepEqual(trail.map(item => item.position), trail.map((_, index) => index + 1));
+  const locations = readSitemap(output);
   for (const file of ['preview/index.html', 'posts/seo-protected/index.html', 'posts/myindex.html']) {
     const sample = new JSDOM(fs.readFileSync(path.join(output, file), 'utf8'));
     const doc = sample.window.document;
@@ -396,6 +426,7 @@ test('optional enhancements and Waline produce configured assets and safe sharin
     assert.equal(Boolean(doc.querySelector('script[type="application/ld+json"]')), indexable);
     const publicPath = indexable ? 'posts/myindex' : file.replace(/\/index\.html$/, '/');
     assert.equal(doc.querySelector('link[rel="canonical"]').href, 'https://example.test/theme/' + publicPath);
+    assert.equal(locations.includes('https://example.test/theme/' + publicPath), indexable);
     if (indexable) {
       assert.equal(doc.querySelector('meta[property="og:image"]').content, 'https://example.test/theme/images/covers/welcome.jpg');
     } else if (file.startsWith('posts/')) {

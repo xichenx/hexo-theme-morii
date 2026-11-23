@@ -1,6 +1,8 @@
 # 更新 Morii 主题
 
-升级到 **v1.1.0** 时，可以先看[版本升级指南](/guide/upgrade-1-1)，按清单检查首页、导航和阅读设置。
+升级到 **v1.1.1** 后，可以检查站点地图、抓取规则和手机端安全区。[本次版本说明](https://github.com/xichenx/hexo-theme-morii/blob/main/CHANGELOG.md#111) · [搜索收录配置](/config/iteration#搜索收录与分享预览)
+
+从较旧版本升级时，也可参考 [v1.1.0 升级指南](/guide/upgrade-1-1)中的首页和阅读设置检查清单。
 
 在博客根目录确认主题安装位置。如果存在 `themes/morii/`，Hexo 优先使用该目录。如果只有 `node_modules/hexo-theme-morii/`，就按 npm 安装方式更新。
 

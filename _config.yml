@@ -210,6 +210,8 @@ performance:
 
 seo:
   structured_data: true
+  sitemap: true # 生成 sitemap.xml，排除 noindex 页面
+  robots: true # 生成 robots.txt；已有同名文件时使用原文件
   # 全站分享图；单篇文章 share_image 优先于 cover，建议填写站内路径或 HTTPS 地址。
   default_image: ''
 
