@@ -16,4 +16,9 @@ function navigationTarget(value) {
   if (!url.username && !url.password) return { path: url.href, local: false };
 }
 
-module.exports = { navigationTarget };
+function heroTarget(value) {
+  const input = typeof value === 'string' ? value.trim() : '';
+  return /^#[^\s\\\u0000-\u001f\u007f]+$/.test(input) ? { path: input, local: false } : navigationTarget(input);
+}
+
+module.exports = { navigationTarget, heroTarget };

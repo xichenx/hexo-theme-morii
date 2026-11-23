@@ -1,6 +1,6 @@
 'use strict';
 const { footerNav } = require('./footer-nav.cjs');
-const { navigationTarget } = require('./navigation-url.cjs');
+const { navigationTarget, heroTarget } = require('./navigation-url.cjs');
 const { isCodeHeightLimit } = require('./code-style.cjs');
 function inspect(config, site = {}, knownKeys) {
   const issues = [];
@@ -15,6 +15,12 @@ function inspect(config, site = {}, knownKeys) {
   }
   for (const key of ['docs_url', 'repository_url']) {
     if (promo?.[key] && !navigationTarget(promo[key])) add('error', 'home.theme_promo.' + key, '填写站内路径或 HTTP(S) 链接。');
+  }
+  for (const key of ['primary', 'secondary']) {
+    const button = config.hero?.[key];
+    if (button == null || button === false) continue;
+    if (typeof button !== 'object' || Array.isArray(button)) add('error', `hero.${key}`, '填写按钮的 label 和 url，或使用 false 隐藏。');
+    else if (button.url != null && button.url !== '' && !heroTarget(button.url)) add('error', `hero.${key}.url`, '填写首页锚点、站内路径或 HTTP(S) 链接。');
   }
   const randomAutoplay = config.home?.random?.autoplay;
   if (randomAutoplay != null && typeof randomAutoplay !== 'boolean') add('error', 'home.random.autoplay', '必须为 true 或 false。');

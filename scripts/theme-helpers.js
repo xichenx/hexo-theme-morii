@@ -1,7 +1,7 @@
 'use strict';
 
 const { forPage } = require('../scripts/lib/i18n.cjs');
-const { navigationTarget } = require('../scripts/lib/navigation-url.cjs');
+const { navigationTarget, heroTarget } = require('../scripts/lib/navigation-url.cjs');
 const { tocObj, unescapeHTML, stripHTML } = require('hexo-util');
 
 hexo.extend.helper.register('morii_page_title', function (page) {
@@ -34,6 +34,30 @@ hexo.extend.helper.register('morii_theme_promo', function () {
   const docs = href(promo.docs_url);
   const source = href(promo.repository_url);
   return docs || source ? { docs, source, journalBelow: promo.journal_below === true } : null;
+});
+
+hexo.extend.helper.register('morii_home_hero', function (identity) {
+  const options = hexo.theme.config.hero || {};
+  const { localized, t } = forPage(hexo, this);
+  const text = (value, fallback) => {
+    const resolved = localized(value);
+    return resolved === false ? '' : typeof resolved === 'string' && resolved.trim() ? resolved.trim() : fallback;
+  };
+  const button = (value, fallbackLabel, fallbackURL) => {
+    if (value === false) return null;
+    const label = text(value?.label, fallbackLabel);
+    const url = value?.url;
+    const target = heroTarget(url == null || url === '' ? fallbackURL : url);
+    if (!label || !target) return null;
+    return { label, href: target.local ? this.url_for(target.path) : target.path };
+  };
+  return {
+    eyebrow: text(options.eyebrow, t('个人博客 · 技术与生活')),
+    intro: text(options.intro, identity.intro),
+    signature: text(options.signature, identity.brand),
+    primary: button(options.primary, t('浏览文章'), '#latest'),
+    secondary: button(options.secondary, t('关于我'), this.morii_has_page('/about/') ? '/about/' : '')
+  };
 });
 
 hexo.extend.helper.register('morii_accent', () => {

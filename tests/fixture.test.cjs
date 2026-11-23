@@ -242,8 +242,16 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
     const themePromo = monthly ? { enable: false, journal_below: true } : {
       docs_url: '/about/', repository_url: 'javascript:invalid', journal_below: true
     };
+    const hero = monthly ? { eyebrow: false, intro: false, signature: false, primary: false, secondary: false } : {
+      title: ['My homepage', 'Welcome back'],
+      eyebrow: '<我的专栏>',
+      intro: '仅在首页显示的简介',
+      signature: '小林',
+      primary: { label: '读文章', url: '/archives/#recent' },
+      secondary: { label: '查看项目', url: 'https://example.org/project' }
+    };
     const robots = 'User-agent: *\nDisallow: /private/\n';
-    const output = await buildDemo({ root: '/theme/', url: 'https://example.test', siteOverrides: { archive_dir: 'history', archive_generator: { monthly }, category_generator: { per_page: 1 } }, themeOverrides: { footer: { nav: false }, appearance: { layouts, effects: { enable: false } }, home: { theme_promo: themePromo, random: { autoplay: false } }, seo: { sitemap: monthly, robots: true } }, sourceOverrides: monthly ? { 'robots.txt': robots } : {} });
+    const output = await buildDemo({ root: '/theme/', url: 'https://example.test', siteOverrides: { archive_dir: 'history', archive_generator: { monthly }, category_generator: { per_page: 1 } }, themeOverrides: { hero, footer: { nav: false }, appearance: { layouts, effects: { enable: false } }, home: { theme_promo: themePromo, random: { autoplay: false } }, seo: { sitemap: monthly, robots: true } }, sourceOverrides: monthly ? { 'robots.txt': robots } : {} });
     if (monthly) {
       assert.ok(readSitemap(output).includes('https://example.test/theme/history/'));
       assert.equal(fs.readFileSync(path.join(output, 'robots.txt'), 'utf8'), robots);
@@ -253,14 +261,24 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
     }
     const documentFor = file => new JSDOM(fs.readFileSync(path.join(output, file, 'index.html'), 'utf8')).window.document;
     const home = documentFor('');
+    const heroCard = home.querySelector('.hero__main');
     assert.equal(home.querySelector('[data-random]').dataset.randomAutoplay, 'off');
     assert.ok(home.querySelector('[data-random-refresh]'));
     if (monthly) {
+      assert.ok(heroCard.querySelector('h1').textContent.trim());
+      assert.equal(heroCard.querySelector('.eyebrow, p, .hero__signature, .hero__actions'), null);
       assert.equal(home.querySelector('.theme-promo'), null);
       assert.equal(home.querySelector('.hero__journal'), null);
       assert.ok(home.querySelector('.hero__side .hero-mini--quote'));
       assert.ok(home.querySelector('.hero__side .hero-mini--stats'));
     } else {
+      assert.equal(heroCard.querySelector('h1 em').textContent, 'Welcome back');
+      assert.equal(heroCard.querySelector('.eyebrow').textContent.trim(), '<我的专栏>');
+      assert.equal(heroCard.querySelector('p').textContent, '仅在首页显示的简介');
+      assert.equal(heroCard.querySelector('.hero__signature').textContent, '小林');
+      assert.deepEqual([...heroCard.querySelectorAll('.hero__actions a')].map(link => [
+        link.firstChild.textContent.trim(), link.getAttribute('href')
+      ]), [['读文章', '/theme/archives/#recent'], ['查看项目', 'https://example.org/project']]);
       const links = [...home.querySelectorAll('.theme-promo a')];
       assert.deepEqual(links.map(link => link.getAttribute('href')), ['/theme/about/']);
       const journal = home.querySelector('.hero__journal');

@@ -19,21 +19,26 @@ block content
   - var firstPage = !page.current || page.current === 1
   if firstPage
     - var themePromo = morii_theme_promo()
+    - var hero = morii_home_hero(siteIdentity)
     section.hero.wrap
       .hero__main
-        .eyebrow #[span.eyebrow__dot] #{morii_t("个人博客 · 技术与生活")}
+        if hero.eyebrow
+          .eyebrow #[span.eyebrow__dot] #{hero.eyebrow}
         h1
           = siteIdentity.title[0]
           if siteIdentity.title[1]
             br
             em= siteIdentity.title[1]
-        if siteIdentity.intro
-          p= siteIdentity.intro
-        .hero__actions
-          a.button.button--primary(href='#latest') #{morii_t("浏览文章")} #[span →]
-          if morii_has_page('/about/')
-            a.button.button--ghost(href=url_for('/about/')) #{morii_t("关于我")}
-        .hero__signature= siteIdentity.brand
+        if hero.intro
+          p= hero.intro
+        if hero.primary || hero.secondary
+          .hero__actions
+            if hero.primary
+              a.button.button--primary(href=hero.primary.href) #{hero.primary.label} #[span(aria-hidden='true') →]
+            if hero.secondary
+              a.button.button--ghost(href=hero.secondary.href)= hero.secondary.label
+        if hero.signature
+          .hero__signature= hero.signature
       if themePromo
         section.theme-promo(aria-labelledby='theme-promo-title')
           .theme-promo__wordmark

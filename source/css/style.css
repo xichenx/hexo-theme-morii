@@ -236,7 +236,8 @@ main{
 .hero h1{position:relative;font-size:clamp(44px,5vw,70px);letter-spacing:-.07em;line-height:1.12;margin:30px 0 18px;overflow-wrap:anywhere}
 .hero h1 em{font-style:normal;color:#ffe79c}
 .hero__main>p{position:relative;max-width:440px;color:rgba(255,255,255,.82);font-size:15px}
-.hero__actions{position:relative;display:flex;gap:10px;margin-top:30px}
+.hero__actions{position:relative;display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.hero__actions .button{max-width:100%;overflow-wrap:anywhere}
 .button{min-height:42px;display:inline-flex;align-items:center;gap:16px;padding:0 19px;border-radius:12px;font-size:13px;font-weight:800;transition:transform .2s,box-shadow .2s}
 .button:hover{transform:translateY(-2px)}
 .button--primary{background:#fff;color:#3b4bd1;box-shadow:0 8px 18px rgba(24,31,96,.11)}
@@ -1150,7 +1151,7 @@ a.footer-filing__item:focus-visible { outline: 2px solid var(--accent); outline-
     margin:15px 0 10px
   }
   .hero__main>p{margin:0;font-size:14px;line-height:1.6}
-  .hero__actions{flex-wrap:wrap;gap:8px;margin-top:16px}
+  .hero__actions{gap:8px;margin-top:16px}
   .hero__actions .button{min-height:44px;gap:9px;padding-inline:14px}
   .hero__signature{display:none}
   .hero__side{

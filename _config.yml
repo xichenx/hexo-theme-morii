@@ -53,6 +53,15 @@ accent: '#5568f6'
 accent_dark: '#8c9aff'
 hero:
   title: [] # 未配置时使用博客 title / subtitle
+  eyebrow: '' # 顶部标签；false 隐藏
+  intro: '' # 首页专用简介；留空继承全站 intro，false 隐藏
+  signature: '' # 右下角署名；留空继承品牌名，false 隐藏
+  primary: # 主按钮；可将整个 primary 设为 false
+    label: ''
+    url: '' # 默认跳到首页文章列表
+  secondary: # 次按钮；可将整个 secondary 设为 false
+    label: ''
+    url: '' # 默认在关于页存在时链接到关于页
   note: ''
 home:
   theme_promo:
