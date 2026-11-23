@@ -5,9 +5,6 @@ hero:
   name: Morii
   text: 从第一篇文章，到博客上线
   tagline: 跟着「小林的笔记」搭建 Hexo 博客。每一步都有可复制的示例和检查方法。
-  image:
-    src: /morii-logo-v2.png
-    alt: Morii Logo
   actions:
     - theme: brand
       text: 开始教程
