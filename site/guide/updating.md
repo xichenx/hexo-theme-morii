@@ -1,6 +1,8 @@
 # 更新 Morii 主题
 
-更新主题前，先确认你用的是 **npm 安装**还是 **Git 安装**。判断方法：在博客根目录看 `node_modules/hexo-theme-morii/` 或 `themes/morii/` 哪个存在。更新命令只在**博客根目录**执行。
+升级到 **v1.1.0** 时，可以先看[版本升级指南](/guide/upgrade-1-1)，按清单检查首页、导航和阅读设置。
+
+在博客根目录确认主题安装位置。如果存在 `themes/morii/`，Hexo 优先使用该目录。如果只有 `node_modules/hexo-theme-morii/`，就按 npm 安装方式更新。
 
 ## 1. 先备份自己的内容
 
@@ -33,15 +35,14 @@ npm list hexo-theme-morii
 
 ### Git 安装
 
-在博客根目录运行：
+如果 `themes/morii/` 跟踪主题的远端分支，在博客根目录运行：
 
 ```bash
-cd themes/morii
-git pull
-cd ../..
+git -C themes/morii status --short --branch
+git -C themes/morii pull --ff-only
 ```
 
-如果 `git pull` 提示本地文件冲突，先检查你是否直接改过主题源码；**不要直接删除这些改动**。把需要保留的个人配置迁到博客根目录，再处理冲突。
+如果主题检出的是发布标签，按目标版本的升级指南切换标签。如果有主题源码改动，先备份或提交，再更新。可以用配置表达的站点设置，放在博客根目录的 `_config.morii.yml` 中。
 
 ## 4. 重新生成并检查
 

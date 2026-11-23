@@ -28,6 +28,12 @@ intro: 分享编程、读书和生活中的小发现。
 
 整张推广卡链接到 `docs_url`，源码按钮单独链接到 `repository_url`。只配置源码地址时，整张卡链接到源码。
 
+| 想看到的首页布局 | 对应配置 |
+| --- | --- |
+| 推广卡独占首屏右侧 | `enable: true`、`journal_below: false`（默认） |
+| 首屏展示推广卡，下方展示两张手账卡 | `enable: true`、`journal_below: true` |
+| 随手记和博客手账回到首屏 | `enable: false` |
+
 五彩字标首次进入视口时会沿笔画写出。关闭全站动效 `motion.enable` 或开启系统的减少动态效果时，直接显示完整字标。
 
 ```yaml

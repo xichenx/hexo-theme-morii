@@ -36,10 +36,9 @@ social:
     icon: github
     url: https://github.com/你的用户名
     description: 在 GitHub 找到我
-  - enable: false
 ```
 
-把“你的用户名”换成真实用户名。第二项 `enable: false` 用来关闭默认的 CSDN 入口；当前 npm 版本会合并列表，**删掉第二项反而会让旧入口出现**。以后要添加自己的第二个社交账号，再把第二项写成完整的 `name`、`icon`、`url`、`description`。`url` 必须是完整的 `https://` 或 `http://` 地址。不需要社交入口就保留 `social: false`。
+把“你的用户名”换成真实用户名。v1.1.0 的社交列表默认为空，可以从一个账号开始。添加其他账号时，为每项填写 `name`、`icon`、`url`，也可以加上 `description`。`url` 使用完整的 `https://` 或 `http://` 地址。要隐藏整个社交区，使用 `social: false`。
 
 ### 字段说明
 

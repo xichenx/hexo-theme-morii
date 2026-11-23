@@ -1,15 +1,22 @@
 import { defineConfig } from 'vitepress'
 
 const onboarding = {
-  text: '跟着做：5 步完成接入',
+  text: '5 步搭建博客',
   items: [
     { text: '先看接入路线', link: '/guide/' },
     { text: '1. 安装并启用主题', link: '/guide/getting-started' },
     { text: '2. 换成自己的资料', link: '/guide/first-config' },
-    { text: '手动配置与快捷向导', link: '/guide/initialization' },
     { text: '3. 写第一篇文章', link: '/guide/first-post' },
     { text: '4. 补齐页面和菜单', link: '/guide/complete-site' },
     { text: '5. 发布上线', link: '/guide/publishing' }
+  ]
+}
+const onboardingExtras = {
+  text: '配套资料',
+  items: [
+    { text: '手动配置与初始化向导', link: '/guide/initialization' },
+    { text: '完整示例', link: '/examples/' },
+    { text: '新手术语表', link: '/guide/glossary' }
   ]
 }
 const reference = {
@@ -47,13 +54,12 @@ const deployment = {
     { text: 'EdgeOne Pages', link: '/guide/deploy/edgeone' }
   ]
 }
-const help = {
-  text: '示例与帮助',
+const maintenance = {
+  text: '升级与排障',
   items: [
-    { text: '完整文件与修改前后对照', link: '/examples/' },
-    { text: '常见问题', link: '/troubleshooting' },
-    { text: '新手术语表', link: '/guide/glossary' },
-    { text: '更新主题', link: '/guide/updating' }
+    { text: '升级到 v1.1.0', link: '/guide/upgrade-1-1' },
+    { text: '通用更新流程', link: '/guide/updating' },
+    { text: '常见问题', link: '/troubleshooting' }
   ]
 }
 
@@ -75,25 +81,56 @@ export default defineConfig({
     sidebarMenuLabel: '教程目录',
     returnToTopLabel: '返回顶部',
     nav: [
-      { text: '开始使用', link: '/guide/', activeMatch: '^/guide/(?!deploy/|publishing)' },
-      { text: '示例', link: '/examples/' },
-      { text: '配置手册', link: '/config/', activeMatch: '^/(config/|features/customization)' },
+      { text: '入门教程', link: '/guide/', activeMatch: '^/guide/(?!upgrade-|updating)' },
       { text: '功能指南', link: '/features/', activeMatch: '^/features/(?!customization)' },
-      { text: '发布上线', link: '/guide/publishing', activeMatch: '^/guide/(publishing|deploy/)' },
-      { text: 'GitHub', link: 'https://github.com/xichenx/hexo-theme-morii' }
+      { text: '配置手册', link: '/config/', activeMatch: '^/(config/|features/customization)' },
+      { text: '示例', link: '/examples/' },
+      {
+        text: '版本与帮助',
+        activeMatch: '^/(guide/(upgrade-|updating)|troubleshooting)',
+        items: [
+          ...maintenance.items,
+          { text: '更新日志', link: 'https://github.com/xichenx/hexo-theme-morii/releases' }
+        ]
+      }
     ],
     // 按页面位置显示当前章节，避免新手同时面对所有字段与部署平台。
     sidebar: {
-      '/guide/deploy/': [deployment, help],
-      '/guide/publishing': [deployment, help],
-      '/guide/': [onboarding, help],
-      '/examples/': [onboarding, help],
-      '/config/': [reference, help],
-      '/features/customization': [reference, help],
-      '/features/': [features, help],
-      '/': [onboarding, help]
+      '/guide/deploy/': [onboarding, deployment, maintenance],
+      '/guide/publishing': [onboarding, deployment, maintenance],
+      '/guide/upgrade-1-1': [maintenance],
+      '/guide/updating': [maintenance],
+      '/troubleshooting': [maintenance],
+      '/guide/': [onboarding, onboardingExtras, maintenance],
+      '/examples/': [onboardingExtras, onboarding],
+      '/config/': [reference, maintenance],
+      '/features/customization': [reference, maintenance],
+      '/features/': [features, maintenance],
+      '/': [onboarding, onboardingExtras, maintenance]
     },
-    search: { provider: 'local' },
+    search: {
+      provider: 'local',
+      options: {
+        translations: {
+          button: { buttonText: '搜索文档', buttonAriaLabel: '搜索文档' },
+          modal: {
+            displayDetails: '展开搜索结果',
+            resetButtonTitle: '清空搜索',
+            backButtonTitle: '关闭搜索',
+            noResultsText: '没有找到相关内容',
+            footer: {
+              selectText: '打开',
+              selectKeyAriaLabel: '回车键',
+              navigateText: '切换结果',
+              navigateUpKeyAriaLabel: '向上方向键',
+              navigateDownKeyAriaLabel: '向下方向键',
+              closeText: '关闭',
+              closeKeyAriaLabel: '退出键'
+            }
+          }
+        }
+      }
+    },
     socialLinks: [
       { icon: 'github', link: 'https://github.com/xichenx/hexo-theme-morii' }
     ],

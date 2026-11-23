@@ -15,6 +15,7 @@ next:
 | --- | --- |
 | 还没有 Hexo 博客 | [第 1 步：安装主题](/guide/getting-started) |
 | 已有 Hexo 8 博客，准备换主题 | [安装页的“已有博客”说明](/guide/getting-started#existing-blog) |
+| 已在使用 Morii，准备升级 | [v1.1.0 升级指南](/guide/upgrade-1-1) |
 | Morii 已能打开，想换自己的资料 | [第 2 步：修改资料](/guide/first-config) |
 | 想直接看文件应该写成什么样 | [完整示例与修改对照](/examples/) |
 | 已经完成接入，只想查某个开关 | [配置手册](/config/) |
