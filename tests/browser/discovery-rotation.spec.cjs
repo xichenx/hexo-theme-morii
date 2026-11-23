@@ -57,6 +57,13 @@ test('discovery card controls fit mobile widths and moment paging stays usable',
 test('random articles rotate in view, pause for interaction and respect reduced motion', async ({ page }) => {
   await page.clock.install();
   await page.addInitScript(() => {
+    const matchMedia = window.matchMedia.bind(window);
+    const query = '(prefers-reduced-motion: reduce)';
+    const motion = matchMedia(query);
+    window.discoveryReducedMotion = motion.matches;
+    motion.addEventListener('change', event => { window.discoveryReducedMotion = event.matches; });
+    window.matchMedia = value => value === query ? motion : matchMedia(value);
+
     const animate = Element.prototype.animate;
     window.discoverySlides = [];
     Element.prototype.animate = function (keyframes, options) {
@@ -108,7 +115,7 @@ test('random articles rotate in view, pause for interaction and respect reduced 
   await expect(link).not.toHaveAttribute('href', paused);
 
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await expect.poll(() => page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches)).toBe(true);
+  await expect.poll(() => page.evaluate(() => window.discoveryReducedMotion)).toBe(true);
   const stopped = await link.getAttribute('href');
   await page.clock.fastForward(8000);
   await expect(link).toHaveAttribute('href', stopped);

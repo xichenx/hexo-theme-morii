@@ -32,10 +32,11 @@ const options = {
     comments: { enable: true, env_id: 'https://comments.example.test/', script_url: '/test-comments.js', load_mode: 'manual' },
     friends_feed: { endpoint: 'https://feed.example.test/articles?source=fixture', page_size: 2 }
   },
+  // Keep archive fixtures away from month boundaries across host time zones.
   sourceOverrides: {
-    '_posts/toc-simple.md': '---\ntitle: 简洁目录示例\ndate: 2020-01-01\nupdated: 2024-02-03 12:00:00\npermalink: posts/toc-simple/\ntoc_style_simple: true\nsidebar_position: left\nmeta_date_type: updated\nmeta_word_count: true\nmeta_reading_time: false\n---\n\n## 第一个章节\n\n正文。\n\n## 第二个章节\n\n更多内容。\n',
-    '_posts/outdated-bottom.md': '---\ntitle: 文末时效提醒\ndate: 2020-01-01\nupdated: 2020-01-01\npermalink: posts/outdated-bottom/\noutdated_days: 30\n---\n\n## 正文\n\n文末显示提醒。\n',
-    '_posts/outdated-top.md': '---\ntitle: 文首时效提醒\ndate: 2020-01-01\nupdated: 2020-01-01\npermalink: posts/outdated-top/\noutdated_position: top\n---\n\n## 正文\n\n文首显示提醒。\n',
+    '_posts/toc-simple.md': '---\ntitle: 简洁目录示例\ndate: 2020-01-15T12:00:00+08:00\nupdated: 2024-02-03 12:00:00\npermalink: posts/toc-simple/\ntoc_style_simple: true\nsidebar_position: left\nmeta_date_type: updated\nmeta_word_count: true\nmeta_reading_time: false\n---\n\n## 第一个章节\n\n正文。\n\n## 第二个章节\n\n更多内容。\n',
+    '_posts/outdated-bottom.md': '---\ntitle: 文末时效提醒\ndate: 2020-01-15T12:00:00+08:00\nupdated: 2020-01-15T12:00:00+08:00\npermalink: posts/outdated-bottom/\noutdated_days: 30\n---\n\n## 正文\n\n文末显示提醒。\n',
+    '_posts/outdated-top.md': '---\ntitle: 文首时效提醒\ndate: 2020-01-15T12:00:00+08:00\nupdated: 2020-01-15T12:00:00+08:00\npermalink: posts/outdated-top/\noutdated_position: top\n---\n\n## 正文\n\n文首显示提醒。\n',
     ...Object.fromEntries(['manual', 'viewport', 'immediate'].map(mode => [
       `comments/${mode}/index.md`,
       `---\ntitle: 留言板 ${mode}\ncomments: true\n${mode === 'manual' ? '' : 'comments_load: ' + mode + '\n'}---\n\n<div style="height:2400px">欢迎留言。</div>\n`
@@ -56,7 +57,7 @@ const options = {
         { name: 'Gamma', link: 'https://gamma.friend.test/' }
       ] }
     ]),
-    '_posts/search-matches.md': '---\ntitle: Search matches fixture\ndate: 2020-02-01 00:00:00\npermalink: posts/search-matches/\n---\n\nOverview.\n\n<!-- more -->\n\norioncache ' + 'Ordinary prose. '.repeat(22) + '\n\nnebularender\n',
+    '_posts/search-matches.md': '---\ntitle: Search matches fixture\ndate: 2020-02-15T12:00:00+08:00\npermalink: posts/search-matches/\n---\n\nOverview.\n\n<!-- more -->\n\norioncache ' + 'Ordinary prose. '.repeat(22) + '\n\nnebularender\n',
     '_posts/layout-stress.md': longArticle,
     '_posts/code-styles.md': codeArticle,
     '_posts/code-controls.md': [
@@ -70,7 +71,7 @@ const options = {
     ].join('\n'),
     '_posts/lazy-images.md': `---
 title: Article image loading
-date: 2020-01-01 00:00:00
+date: 2020-01-15T12:00:00+08:00
 permalink: posts/lazy-images/
 image_captions: true
 ---
