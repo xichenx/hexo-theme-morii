@@ -13,9 +13,18 @@
 
 Responsive layouts, light and dark modes, local full-text search, reading preferences, and dedicated music and photo pages. Built with Pug and native CSS / JavaScript, with English, Simplified Chinese, and Traditional Chinese interfaces.
 
-[Quick start](#quick-start) · [Features](#features) · [Configuration](#configuration) · [Documentation (Chinese)](https://morii-docs.pages.dev/) · [Watch the demo](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4) · [Report an issue](https://github.com/xichenx/hexo-theme-morii/issues)
+[Quick start](#quick-start) · [Features](#features) · [Configuration](#configuration) · [Documentation (Chinese)](https://morii-docs.pages.dev/) · [Live demo](https://xichenx.github.io/hexo-theme-morii/) · [Report an issue](https://github.com/xichenx/hexo-theme-morii/issues)
 
 **Topics:** `hexo` · `hexo-theme` · `blog` · `responsive` · `dark-mode` · `multilingual` · `pug` · `javascript`
+
+## What's new in v1.1.0
+
+- The homepage theme card writes out the colored Morii wordmark as it comes into view. The whole card opens the installation guide, with a separate link to the source.
+- The header blends into the music room and article covers. Archive, category, and other content pages use compact headings.
+- Random posts can rotate automatically or change on demand. Search can show multiple matching passages from the same article.
+- Article settings cover dates, reading time, sidebars, and the table of contents. Code blocks can open in a larger viewer and fold by line count or rendered height.
+
+[Release notes and ZIP download](https://github.com/xichenx/hexo-theme-morii/releases/tag/v1.1.0) · [Full changelog](CHANGELOG.md#110)
 
 ## Quick start
 
@@ -71,11 +80,13 @@ The theme interface follows `language: en`; post content and custom text keep th
 
 ## Demo
 
+[Open the live demo](https://xichenx.github.io/hexo-theme-morii/) to see the current homepage and navigation.
+
 [![Morii theme demo: click to watch the full video](docs/media/morii-demo-preview.gif)](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)
 
 **[Watch the full demo](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)** · [Download MP4](https://github.com/xichenx/hexo-theme-morii/raw/refs/heads/main/docs/media/morii-demo.mp4)
 
-About 44 seconds, 1280 × 720, without music. Recorded from the standalone demo site using `v0.1.0-alpha.2`; the preview GIF is an excerpt. The full video includes Chinese subtitles and chapters.
+This 44-second recording shows the earlier `v0.1.0-alpha.2` demo, with Chinese subtitles and chapters.
 
 | Time | Preview |
 | --- | --- |
@@ -117,7 +128,11 @@ npm install hexo-renderer-pug
 
 Set `theme: morii` in your blog's `_config.yml`. Morii uses Pug and native CSS / JavaScript without a separate frontend bundling step. The development environment uses Hexo 8.1.2.
 
-With npm, the theme lives in `node_modules/hexo-theme-morii`; with Git, it lives in `themes/morii`. Put personal overrides in the blog root's `_config.morii.yml` so theme upgrades preserve your settings. Site identity inherits your blog configuration, and external services are opt-in without the author's accounts prefilled.
+With npm, the theme lives in `node_modules/hexo-theme-morii`. A Git checkout in `themes/morii` takes precedence. Update the copy your site actually uses, and keep your overrides in the blog root's `_config.morii.yml`.
+
+To upgrade an npm installation to this release, run `npm install --save-exact hexo-theme-morii@1.1.0` in the blog root.
+
+Site identity inherits your blog configuration, and external services are opt-in without the author's accounts prefilled.
 
 You can copy the theme's `_config.yml` to the blog root as `_config.morii.yml`, start from the [minimal configuration](site/public/examples/minimal/_config.morii.yml), or use the English example above. Merge fields into an existing configuration rather than adding duplicate keys.
 
@@ -210,7 +225,9 @@ home:
     - Building a Personal Blog
 ```
 
-The large introduction and featured cards appear only on the first homepage page. Later pages show the post list and pagination. Category links lead to complete generated category pages. Archives preserve their year / month scope, and pagination supports custom paths and abbreviated page ranges.
+The homepage introduction, theme card, and featured cards appear on the first page. Set `home.theme_promo.enable: false` to show the quick note and blog stats in the right column. Set `home.theme_promo.journal_below: true` to show both beneath the homepage introduction while keeping the theme card. Use `docs_url` for the card destination and `repository_url` for its source link. The wordmark stays complete when motion is disabled or reduced. See [homepage configuration](site/config/home.md).
+
+Later pages use compact headings and show the post list and pagination. Category links lead to complete generated category pages. Archives preserve their year / month scope, and pagination supports custom paths and abbreviated page ranges.
 
 Sidebar category and year counts come from site posts; recent updates sort by `updated`. Automatic excerpts skip code blocks, line numbers, and scripts, with a code-note fallback for posts containing only code.
 
@@ -230,7 +247,7 @@ The panel includes search, reading controls, and music controls. `⌘/Ctrl + K` 
 
 ### Local search
 
-Search loads the generated `morii-search.json` on first use and reuses it on the current page. It searches titles, body text, categories, and tags, with all query terms required and title matches ranked first. Excerpts highlight matching text. Set `search.content: false` to exclude body text while keeping titles, excerpts, categories, and tags. `search.page_size` accepts 5–30 results per batch, with a default of 10.
+Search loads the generated `morii-search.json` on first use and reuses it on the current page. It searches titles, body text, categories, and tags, with all query terms required and title matches ranked first. Results highlight matching text and show up to two matching body passages per post by default. Set `search.snippets_per_article` to 1–3 to change that limit. Set `search.content: false` to exclude body text while keeping titles, excerpts, categories, and tags. `search.page_size` accepts 5–30 results per batch, with a default of 10.
 
 The panel supports all-content, title-only, and category / tag scopes, plus popular tag shortcuts. Use `↑` / `↓` to move between the query and results, `Enter` to open the first result, and `Esc` to close. Input method composition does not trigger navigation. The results scroll independently of the header and footer.
 
@@ -240,7 +257,7 @@ Larger sites use an inverted index to select body shards and a Web Worker to fil
 
 `home.moments.enable` controls the moments preview; `limit` accepts 1–10 entries, defaulting to 5. It reads nonempty entries from groups marked `home_essay: true` in `source/_data/essay.yml`, respects each group's limit, and sorts newest first. Plain-text previews link to the corresponding moments card; empty data hides the section. Switching is manual, without autoplay.
 
-`home.random.enable` controls random post discovery. It excludes encrypted, unpublished, and duplicate entries. The next-post button changes the preview; the reading link opens the post. Each round avoids repeats, including an immediate repeat across rounds. Without JavaScript, the first moment and latest public post remain visible. Both modules appear only on the first homepage page. Replace inherited demo entries with your own, or set a group's `home_essay` to `false` to hide it from the preview.
+`home.random.enable` controls random post discovery. It rotates about every 7.5 seconds while the card is in view. Set `home.random.autoplay: false` to switch posts manually using the next-post button. Rotation pauses on hover or keyboard focus and respects reduced motion. Encrypted and unpublished posts stay out of the pool, and each round avoids repeats. Without JavaScript, the first moment and latest public post remain visible. Both modules appear only on the first homepage page.
 
 ### About, albums, and friend links
 
@@ -287,7 +304,7 @@ Readers can export JSON and import it in another browser. Imports merge and dedu
 
 ### Reading settings and article layout
 
-Articles use a wide cover with category, tags, publication and update dates, reading time, and author details. Covers prefer `top_img`, then `cover`; `top_img: false` selects a gradient. Body and author sidebar use separate cards. Typography defaults to 17 px, with independent heading, list, table, and quote styles and horizontal scrolling inside long code blocks.
+Articles use a wide cover with category, tags, publication and update dates, reading time, and author details. Covers prefer `top_img`, then `cover`. Set `top_img: false` to use the plain article header. Use `article.meta` to choose which dates, word count, and estimated reading time appear. Set `article.sidebar_position` to `left` or `right` to position the desktop sidebar. Body and author sidebar use separate cards. Typography defaults to 17 px, with independent heading, list, table, and quote styles and horizontal scrolling inside long code blocks.
 
 Reading settings offer 15 / 17 / 19 / 21 px body text and a focus mode that hides the sidebar and centers the article. Preferences persist in the current browser; resetting restores 17 px and clears local preferences. Without storage, controls still affect the current page.
 
@@ -301,13 +318,15 @@ Reading positions are saved locally for up to 50 posts and 90 days. Returning re
 
 `sidebar.announcement` accepts `enable`, `title`, and plain-text `content` with line breaks. `sidebar.tags` accepts `enable` and a `limit` of 1–40, defaulting to 12, sorted by post count. `sidebar.stats.enable` shows post counts, public-content word estimates, and the earliest post date. Counts exclude code, encrypted bodies, and unpublished posts.
 
-`article.outdated.enable` displays an age notice after `days` since the last update, defaulting to 365. It falls back to the publication date and stays hidden for invalid dates or encrypted posts. The browser recalculates age to avoid stale static notices. Set `outdated: false` in a post's Front Matter to disable its notice, and maintain the Hexo `updated` field for long-lived articles.
+`article.outdated.enable` displays an age notice after `days` since the last update, defaulting to 365. It falls back to the publication date and stays hidden for invalid dates or encrypted posts. The browser recalculates age to avoid stale static notices. Use `article.outdated.position` to place the notice before or after the article body. Set `outdated: false` in a post's Front Matter to disable it, or use `outdated_days` and `outdated_position` for per-post overrides.
 
 ### Related posts and code blocks
 
 `article.related` ranks recommendations by shared tags (3 points each) and categories (1 point each), with newer posts winning ties. It excludes the current post, duplicates, encrypted posts, and unpublished posts. `limit` accepts 1–6, defaulting to 3; no matches hide the section.
 
-`article.navigation` controls previous / next links. Code blocks support `classic`, `mac`, and `minimal` styles with `dark`, `light`, or `auto` palettes. `article.code.collapse` folds long code; `lines` accepts 5–100 preview lines, defaulting to 18. Expand controls work with the keyboard, copying always includes the full code, and decrypted content is processed too. Without JavaScript, code remains fully visible.
+`article.related.date_type` controls the displayed date and breaks ties between equally relevant posts. `article.navigation_order` controls the direction of previous and next links.
+
+Code blocks support `classic`, `mac`, and `minimal` styles with `dark`, `light`, or `auto` palettes. Set `article.code.start_collapsed: false` to start expanded while keeping manual folding. Use `height_limit` for a pixel threshold or leave it as `false` to use the line count. The copy button, language label, and larger code viewer have individual switches. See [article and code configuration](site/config/article.md).
 
 ```yaml
 article:
@@ -319,7 +338,10 @@ article:
     style: classic # classic / mac / minimal
     theme: dark    # dark / light / auto
     collapse: true
+    start_collapsed: true
+    height_limit: false
     lines: 18
+    viewer: true
 ```
 
 ### Air conditioner toy

@@ -9,13 +9,22 @@
 
 [English](README.md) · **简体中文**
 
-📖 [使用文档](https://morii-docs.pages.dev/) · [配置手册](https://morii-docs.pages.dev/config/) · [多平台博客部署教程](https://morii-docs.pages.dev/guide/publishing) · [文档站开发与部署](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/DOCS-SITE.md)
+📖 [使用文档](https://morii-docs.pages.dev/) · [配置手册](https://morii-docs.pages.dev/config/) · [在线演示](https://xichenx.github.io/hexo-theme-morii/) · [多平台博客部署教程](https://morii-docs.pages.dev/guide/publishing) · [文档站开发与部署](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/DOCS-SITE.md)
 
 **Morii by Morainet · 用卡片，收藏技术与生活。**
 
 为“心灵涂鸦”重新开发的 Hexo 主题。保留丰富卡片的视觉方向，模板、样式和交互独立实现。
 
 主题品牌为 **Morii**，组织署名为 **Morainet**，项目仓库为 [xichenx/hexo-theme-morii](https://github.com/xichenx/hexo-theme-morii)。博客名称与主题品牌分别配置，当前博客名称继续使用“心灵涂鸦”。
+
+## v1.1.0 更新
+
+- 首页推广卡会在进入视口时写出五彩 Morii 字标。整张卡直达安装指南，源码另有独立入口。
+- 顶栏自动适配音乐馆和文章封面。归档、分类等内容页改用紧凑标题。
+- 「随便逛逛」可自动轮播或手动换文，搜索结果可显示同一篇文章的多个正文命中片段。
+- 文章日期、阅读时间、侧栏和目录可配置。代码支持放大查看，并可按行数或渲染高度折叠。
+
+[发布说明与 ZIP 下载](https://github.com/xichenx/hexo-theme-morii/releases/tag/v1.1.0) · [完整更新日志](CHANGELOG.md#110)
 
 ## 界面语言
 
@@ -42,13 +51,15 @@ menu:
 
 多语言名称优先使用当前语言，缺项时依次回退到简体中文、英文、繁体中文。第三方评论服务及外部播放器的内部界面由服务自身控制。
 
-## 演示视频
+## 在线演示与视频
+
+[打开在线演示](https://xichenx.github.io/hexo-theme-morii/)可查看当前的首页和顶栏。
 
 [![Morii 功能演示：点击查看完整视频](docs/media/morii-demo-preview.gif)](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)
 
 **[▶ 查看完整演示](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)** · [下载 MP4](https://github.com/xichenx/hexo-theme-morii/raw/refs/heads/main/docs/media/morii-demo.mp4)
 
-约 44 秒 · 1280 × 720 · 无配乐。使用独立演示站的真实界面截图剪辑，展示 `v0.1.0-alpha.2` 的功能。动图为节选，完整视频包含中文字幕轨与章节。
+这段约 44 秒的视频录制于 `v0.1.0-alpha.2`，包含中文字幕和章节。
 
 | 时间 | 内容 |
 | --- | --- |
@@ -67,15 +78,6 @@ menu:
 - 图表随深浅模式重绘，保留源码状态；完善长标题与手机中控台。
 
 用法与兼容限制见[内容体验配置](site/config/content.md)。本地封面处理使用可选依赖 `sharp`。
-
-## 本轮迭代
-
-- 主题 CSS / JS 使用内容指纹；新增 `hexo morii:check` 配置检查和可选本地加载诊断。
-- 音乐导航支持会话内滚动恢复与超时重试；搜索脚本按需加载，支持中文分词、分类筛选及全文分片。
-- 新增 `note`、`codefile` 标签，以及按文章启用的 Mermaid、KaTeX；渲染失败保留源内容。
-- 快捷导航整合阅读和音乐控制；支持 Waline、可选 Twikoo 最新评论侧栏和文章分享元数据。
-
-完整配置与使用限制见[增强功能说明](site/config/iteration.md)。新功能保持可配置，默认不加载图表和公式渲染库。
 
 ## 已实现
 
@@ -129,7 +131,11 @@ npm install hexo-renderer-pug
 theme: morii
 ```
 
-主题使用 Pug 模板与原生 CSS / JavaScript，无额外前端打包步骤。当前开发环境为 Hexo 8.1.2。npm 安装会使用 `node_modules/hexo-theme-morii`；建议通过站点根目录的 `_config.morii.yml` 覆盖主题配置，避免修改安装包。站名、首页标题和介绍默认继承博客 `_config.yml`；账号与外部服务按需开启，不预填作者资料。
+主题使用 Pug 模板与原生 CSS / JavaScript，当前使用 Hexo 8.1.2 开发。npm 安装目录是 `node_modules/hexo-theme-morii`。如果博客还有 `themes/morii`，Hexo 会优先加载那份源码。请升级当前实际使用的那一份，并将站点自定义配置放在博客根目录的 `_config.morii.yml`。
+
+已有 npm 安装若要升级并锁定到本版，在博客根目录运行 `npm install --save-exact hexo-theme-morii@1.1.0`。
+
+站名、首页标题和介绍默认继承博客 `_config.yml`。账号与外部服务按需开启，默认留空。
 
 配置方式自由选择：可以手动复制主题 `_config.yml` 到博客根目录并重命名为 `_config.morii.yml`，或从[最小配置](site/public/examples/minimal/_config.morii.yml)开始，按需创建页面和数据文件。已有配置只需合并需要的字段。
 
@@ -202,7 +208,9 @@ home:
     - Ktor 学习与实践文档
 ```
 
-大幅介绍和精选卡片仅出现在首页第一页。后续页直接显示文章列表与页码；分类按钮链接到 Hexo 生成的完整分类页面。归档会保留年份、月份的路由范围，分页支持首页空路径、自定义分页目录及长页码省略。
+首页介绍、推广卡与精选卡片只在第一页展示。设为 `home.theme_promo.enable: false` 可在右栏恢复「随手记」和「博客手账」。设为 `home.theme_promo.journal_below: true` 可在保留推广卡的同时把两张卡放在首屏下方。整张推广卡链接到 `docs_url`，源码按钮单独链接到 `repository_url`。关闭动效或启用系统「减少动态效果」时直接显示完整字标。详见[首页配置](site/config/home.md)。
+
+后续页使用紧凑标题，显示文章列表与页码。分类按钮链接到 Hexo 生成的完整分类页面。归档会保留年份、月份的路由范围，分页支持首页空路径、自定义分页目录及长页码省略。
 
 侧栏的分类数量和年份数量来自站点文章，最近更新按 `updated` 排序。自动摘要会跳过代码块、行号和脚本，纯代码文章显示代码笔记提示。
 
@@ -222,7 +230,7 @@ home:
 
 ## 站内搜索
 
-首次打开搜索弹窗时加载本站生成的 `morii-search.json`，后续在当前页面复用。支持标题、正文、分类和标签，多关键词按同时匹配处理，标题匹配优先；结果摘要围绕命中位置截取并高亮。`search.content: false` 可关闭正文入索引，仍保留标题、摘要、分类和标签；`search.page_size` 设置每批结果数（5–30，默认 10）。
+首次打开搜索弹窗时加载本站生成的 `morii-search.json`，后续在当前页面复用。支持标题、正文、分类和标签，多关键词按同时匹配处理，标题匹配优先；结果摘要围绕命中位置截取并高亮。每篇文章默认显示最多两处正文命中，可用 `search.snippets_per_article` 设置为 1–3 处。`search.content: false` 可关闭正文入索引，仍保留标题、摘要、分类和标签；`search.page_size` 设置每批结果数（5–30，默认 10）。
 
 搜索面板支持“全部内容 / 仅标题 / 分类与标签”范围切换，以及热门标签快捷查找。使用 `↑` / `↓` 在结果与输入框之间移动，输入关键词后按 `Enter` 打开第一条结果，`Esc` 关闭；中文输入法组词期间不会触发跳转。头部与底部固定，结果区域独立滚动。全文索引加载失败时仍可搜索页面内的标题、摘要与分类标签，并可重试。
 
@@ -232,7 +240,7 @@ home:
 
 `home.moments.enable` 控制即刻速览，`limit` 限制条数（1–10，默认 5）。从 `source/_data/essay.yml` 中 `home_essay: true` 的分组读取非空内容，按日期从新到旧排列，并遵守各组的 `limit`。速览使用纯文本，点击后跳转到即刻页对应卡片；没有有效内容时隐藏。切换完全由用户操作，不自动轮播。
 
-`home.random.enable` 控制“随便逛逛”。候选文章排除加密、未发布和重复路径；点击“换一篇”后更新预览，点击阅读链接才打开文章。一轮中不重复，候选耗尽后开始新一轮，也不会立即重复当前文章。没有 JavaScript 时展示第一条即刻和最近的公开文章；只有一条数据时不显示切换按钮。两个模块只在首页第一页展示。
+`home.random.enable` 控制「随便逛逛」。卡片在视口内时约每 7.5 秒自动换文，悬停或键盘焦点进入卡片时暂停，也会遵循系统「减少动态效果」。设为 `home.random.autoplay: false` 后，只通过「换一篇」切换。候选排除加密和未发布文章，同一轮内不会重复。没有 JavaScript 时展示第一条即刻和最近的公开文章。两个模块只在首页第一页展示。
 
 当前即刻数据仍含原主题演示记录，可在 `source/_data/essay.yml` 更新为自己的内容；将对应分组的 `home_essay` 设为 `false`，即可从首页隐藏该组。
 
@@ -291,7 +299,7 @@ social:
 
 ### 阅读设置
 
-阅读页采用独立的通栏大封面，集中展示分类、标签、发布日期、更新日期、阅读时长和作者。封面优先使用文章 `top_img`，其次为 `cover`；`top_img: false` 使用纯渐变背景。正文与作者侧栏分为独立卡片，手机端封面信息居中。正文默认 17 px，章节标题、列表、表格和引用有独立排版，长代码在块内横向滚动。
+阅读页采用独立的通栏大封面，集中展示分类、标签、发布日期、更新日期、阅读时长和作者。封面优先使用文章 `top_img`，其次为 `cover`。设为 `top_img: false` 时显示普通文章标题区。用 `article.meta` 可控制日期、字数和预计阅读时间，用 `article.sidebar_position` 可选择桌面侧栏在正文左侧或右侧。正文默认 17 px，章节标题、列表、表格和引用有独立排版，长代码在块内横向滚动。
 
 文章标题下方提供“阅读设置”，支持 15 / 17 / 19 / 21 px 正文字号，以及收起侧栏、居中正文的专注阅读。设置在当前浏览器保存，切换文章时会沿用；“恢复默认”会清除本机阅读偏好并恢复 17 px。无法访问本地存储时仍可调整当前页面。
 
@@ -303,13 +311,15 @@ social:
 
 参考 AnZhiYu 的公告、标签与站点信息模块，为 Morii 独立实现对应卡片。`sidebar.announcement` 支持 `enable`、`title` 和纯文本 `content`（支持换行，不执行 HTML）；`sidebar.tags` 支持 `enable` 和 `limit`（1–40，默认 12），按文章数量排列。`sidebar.stats.enable` 控制站点档案，显示发表数量、公开内容字数与最早文章日期；字数按汉字和外文单词估算，排除代码、加密正文和未发布文章。
 
-`article.outdated.enable` 开启时效提醒，`days` 为距上次更新的天数阈值，默认 365；超过阈值才显示。无更新日期时使用发表日期，无有效日期或加密文章不展示。浏览器会重新计算天数，避免静态页面缓存造成提示过期；在文章 front matter 中设置 `outdated: false` 可单独关闭。更新日期以 Hexo 的 `updated` 为准，长期文章建议显式维护该字段。
+`article.outdated.enable` 开启时效提醒，`days` 为距上次更新的天数阈值，默认 365；超过阈值才显示。无更新日期时使用发表日期，无有效日期或加密文章不展示。浏览器会重新计算天数，避免静态页面缓存造成提示过期；全站可用 `article.outdated.position` 选择在正文前或后显示。单篇文章可通过 Front Matter 的 `outdated_days`、`outdated_position` 覆盖，或用 `outdated: false` 关闭。
 
 ### 继续阅读与代码
 
 `article.related` 按共同标签、共同分类推荐文章：每个共同标签计 3 分，共同分类计 1 分，同分时优先较新的文章。排除当前文章、重复路径、加密文章和未发布文章；没有关联时隐藏整个推荐区。`limit` 支持 1–6，默认 3。
 
-`article.navigation` 控制文末上一篇/下一篇导航。`article.code.collapse` 控制长代码默认收起，`lines` 设置预览行数（5–100，默认 18）。展开按钮可用键盘操作，复制按钮始终复制完整代码；文章解密后也会自动处理新增代码块。关闭 JavaScript 时直接显示完整代码。
+`article.related.date_type` 控制推荐卡片的日期，以及相关性同分时的排序依据。用 `article.navigation_order` 可调整上一篇和下一篇的翻页方向。
+
+长代码可按 `lines` 或像素高度 `height_limit` 折叠。将 `article.code.start_collapsed` 设为 `false` 可默认展开，读者仍能手动折叠。复制按钮、语言标签和「放大查看」各有独立开关。详见[文章和代码配置](site/config/article.md)。
 
 ```yaml
 article:
@@ -321,7 +331,10 @@ article:
     style: classic # classic / mac / minimal
     theme: dark    # dark / light / auto
     collapse: true
+    start_collapsed: true
+    height_limit: false
     lines: 18
+    viewer: true
 ```
 
 ## 小空调
