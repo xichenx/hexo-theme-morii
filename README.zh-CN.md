@@ -55,20 +55,20 @@ menu:
 
 [打开在线演示](https://xichenx.github.io/hexo-theme-morii/)可查看当前的首页和顶栏。
 
-[![Morii 功能演示：点击查看完整视频](docs/media/morii-demo-preview.gif)](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)
+[![Morii 首页与手写字标动效](docs/media/morii-demo-preview.gif)](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)
 
 **[▶ 查看完整演示](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)** · [下载 MP4](https://github.com/xichenx/hexo-theme-morii/raw/refs/heads/main/docs/media/morii-demo.mp4)
 
-这段约 44 秒的视频录制于 `v0.1.0-alpha.2`，包含中文字幕和章节。
+这段 44 秒的视频录自 `v1.1.0` 演示站，带有可选中文字幕和章节标记。
 
 | 时间 | 内容 |
 | --- | --- |
-| 00:00 | 首页、品牌与内容卡片 |
-| 00:07 | 文章阅读与阅读偏好 |
-| 00:14 | 分类导航与时间树归档 |
-| 00:21 | 图片查看器与音乐馆 |
-| 00:28 | 站内搜索与深色模式 |
-| 00:36 | 移动端首页与分类 |
+| 00:00 | 首页与推广卡手写字标 |
+| 00:07 | 阅读设置、字号调节与专注模式 |
+| 00:14 | 分类总览与归档月份索引 |
+| 00:21 | 相册图片查看器与音乐馆 |
+| 00:29 | 站内搜索与深色模式 |
+| 00:36 | 手机端首页、导航与深色分类页 |
 
 ## 系列与内容体验
 

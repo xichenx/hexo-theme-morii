@@ -82,20 +82,20 @@ The theme interface follows `language: en`; post content and custom text keep th
 
 [Open the live demo](https://xichenx.github.io/hexo-theme-morii/) to see the current homepage and navigation.
 
-[![Morii theme demo: click to watch the full video](docs/media/morii-demo-preview.gif)](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)
+[![Morii homepage with the animated handwritten wordmark](docs/media/morii-demo-preview.gif)](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)
 
 **[Watch the full demo](https://github.com/xichenx/hexo-theme-morii/blob/main/docs/media/morii-demo.mp4)** · [Download MP4](https://github.com/xichenx/hexo-theme-morii/raw/refs/heads/main/docs/media/morii-demo.mp4)
 
-This 44-second recording shows the earlier `v0.1.0-alpha.2` demo, with Chinese subtitles and chapters.
+This 44-second screen recording shows the `v1.1.0` demo and includes optional Chinese subtitles and chapter markers.
 
 | Time | Preview |
 | --- | --- |
-| 00:00 | Homepage, branding, and content cards |
-| 00:07 | Article reading and preferences |
-| 00:14 | Categories and timeline archives |
-| 00:21 | Image viewer and music player |
-| 00:28 | Search and dark mode |
-| 00:36 | Mobile homepage and categories |
+| 00:00 | Homepage and animated handwritten wordmark |
+| 00:07 | Reading settings, font size, and focus mode |
+| 00:14 | Category overview and monthly archive index |
+| 00:21 | Album lightbox and music room |
+| 00:29 | Site search and dark mode |
+| 00:36 | Mobile homepage, navigation, and categories in dark mode |
 
 ## Features
 
