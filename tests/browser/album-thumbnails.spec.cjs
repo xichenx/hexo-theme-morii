@@ -28,3 +28,36 @@ test('album thumbnails select any photo and stay in sync with keyboard navigatio
   await photos.last().click();
   await expect(second).toHaveAttribute('aria-current', 'true');
 });
+
+test('album photos keep their layout when an image fails and let readers retry in the viewer', async ({ page }) => {
+  await ready(page, 'album/morii/');
+  const card = page.locator('.photo-card').first();
+  const placeholder = card.locator('.image-placeholder');
+  const frames = () => page.locator('.photo-card__media').evaluateAll(items => items.map(frame => {
+    const { x, y, width, height } = frame.getBoundingClientRect();
+    return { x, y, width, height };
+  }));
+  const before = await frames();
+  expect(before[0].width / before[0].height).toBeCloseTo(4 / 3, 2);
+  expect(before[1].width / before[1].height).toBeCloseTo(1, 2);
+
+  let available = false;
+  await page.route('**/album-retry.svg', route => route.fulfill(available ? {
+    contentType: 'image/svg+xml',
+    body: '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="160"><rect width="100" height="160" fill="blue"/></svg>'
+  } : { status: 404, headers: { 'cache-control': 'no-store' } }));
+  await card.evaluate(link => {
+    link.href = new URL('album-retry.svg', location.href);
+    link.querySelector('img').src = link.href;
+  });
+  await expect(placeholder).toBeVisible();
+  expect(await frames()).toEqual(before);
+  await noOverflow(page);
+
+  await placeholder.click();
+  const viewer = page.locator('#image-dialog');
+  await expect(viewer).toHaveAttribute('data-image-state', 'error');
+  available = true;
+  await viewer.locator('#image-retry').click();
+  await expect(viewer).toHaveAttribute('data-image-state', 'ready');
+});

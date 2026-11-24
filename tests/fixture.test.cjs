@@ -138,6 +138,9 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
         const photos = [...document.querySelectorAll('.photo-card img')];
         assert.deepEqual(photos.map(image => image.getAttribute('loading')), ['eager', 'eager']);
         assert.deepEqual(photos.map(image => image.getAttribute('fetchpriority')), ['high', 'high']);
+        assert.deepEqual(photos.map(image => image.getAttribute('width')), [null, '128']);
+        assert.deepEqual(photos.map(image => image.getAttribute('height')), [null, '128']);
+        assert.deepEqual(photos.map(image => image.parentElement.style.getPropertyValue('--photo-ratio')), ['', '128/128']);
       }
       for (const node of document.querySelectorAll('script[src],link[rel="stylesheet"],img[src]')) {
         const raw = node.getAttribute('src') || node.getAttribute('href');

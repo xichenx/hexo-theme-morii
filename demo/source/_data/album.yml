@@ -5,7 +5,9 @@
   album_list:
     - image:
         - /icons/brand/morii-logo-v2.png
-        - /icons/brand/morii-logo.png
+        - src: /icons/brand/morii-logo.png
+          width: 128
+          height: 128
       content: Morii 品牌图标
       from: Morii
       date: 2026-10-15

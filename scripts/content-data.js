@@ -38,10 +38,21 @@ const dateLabel = value => {
 
 const albums = (data, translate = t) => array(data).filter(item => item && albumPath(item.path_name)).map(item => {
   const photos = array(item.album_list).filter(Boolean).flatMap(entry => {
-    const images = typeof entry.image === 'string' ? [entry.image] : array(entry.image);
-    return images.map(resource).filter(Boolean).map(src => ({
-      src, caption: text(entry.content), address: text(entry.address), author: text(entry.from), date: dateLabel(entry.date)
-    }));
+    const images = Array.isArray(entry.image) ? entry.image : [entry.image];
+    return images.flatMap(image => {
+      const src = resource(typeof image === 'string' ? image : image?.src);
+      if (!src) return [];
+      const { width, height } = image;
+      const hasSize = [width, height].every(value => Number.isInteger(value) && value > 0 && value <= 100000);
+      return [{
+        src,
+        ...(hasSize ? { width, height } : {}),
+        caption: text(entry.content),
+        address: text(entry.address),
+        author: text(entry.from),
+        date: dateLabel(entry.date)
+      }];
+    });
   });
   return { path: albumPath(item.path_name), title: text(item.class_name) || translate("相册"), description: text(item.description), cover: resource(item.cover) || photos[0]?.src || '', photos };
 });

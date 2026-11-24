@@ -49,13 +49,25 @@ comments: false
 | `path_name` | 相册详情页路径，要与实际创建的页面一致 |
 | `description` | 相册说明 |
 | `cover` | 相册封面，不填时尝试使用第一张照片 |
-| `album_list[].image` | 一张图片的路径，或多张图片路径列表 |
+| `album_list[].image` | 图片路径、带 `src` 与宽高的对象，或由这两种写法组成的列表 |
 | `album_list[].content` | 照片说明 |
 | `album_list[].date` | 拍摄 / 记录日期，建议加引号 |
 | `album_list[].address` | 地点文字 |
 | `album_list[].from` | 作者或来源文字 |
 
 打开多图相册中的任意照片，预览窗口会显示缩略图导航，并标记当前照片。点选缩略图可直接跳转；未加载的图片先显示编号。用 Tab 进入缩略图后，也可以用左右方向键切换。
+
+相册会在加载照片前预留空间。普通图片路径使用 4:3 缩略图，点击后可查看完整原图。想在相册里保留竖图或全景照片的比例，可单独填写宽高：
+
+```yaml
+album_list:
+  - image:
+      - /images/travel/photo-1.jpg
+      - src: /images/travel/portrait.webp
+        width: 900
+        height: 1200
+    content: 路上的记录
+```
 
 例如要给第一张照片加地点，在 `image`、`content` 同一缩进层级加入 `address: 杭州`。这里的 `[]` 表示列表中的每一项，**不是实际要写进 YAML 的字段名**。
 
