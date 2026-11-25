@@ -87,6 +87,42 @@ test('music queue switches tracks, filters searches and handles playback failure
   window.close();
 });
 
+test('audio timeout restores the play icon and retry reloads the current source', async t => {
+  const { window } = browser(musicMarkup({ title: '音乐', playlist: 'https://example.test/playlist', tracks: [{ url: '/one.mp3' }] }));
+  t.after(() => window.close());
+  const document = window.document;
+  const audio = document.getElementById('music-player');
+  const button = document.getElementById('music-toggle');
+  const recovery = document.querySelector('.music-audio-recovery');
+  let timeout;
+  let rejectAttempt;
+  let reloads = 0;
+  const setTimeout = window.setTimeout.bind(window);
+  window.setTimeout = (callback, delay) => {
+    if (delay === 12000) { timeout = callback; return 1; }
+    return setTimeout(callback, delay);
+  };
+  audio.play = () => new Promise((resolve, reject) => { rejectAttempt = reject; });
+  audio.pause = () => audio.dispatchEvent(new window.Event('pause'));
+  audio.load = () => { reloads++; };
+  window.eval(script('music.js'));
+  button.click();
+  assert.equal(button.getAttribute('aria-label'), '播放');
+  timeout();
+  assert.equal(recovery.hidden, false);
+  assert.equal(recovery.querySelector('a').href, 'https://example.test/playlist');
+  assert.match(document.getElementById('music-play-status').textContent, /超时/);
+  audio.play = async () => audio.dispatchEvent(new window.Event('playing'));
+  recovery.querySelector('button').click();
+  rejectAttempt(new Error('stale request'));
+  await tick();
+  assert.equal(reloads, 1);
+  assert.equal(recovery.hidden, true);
+  assert.equal(button.getAttribute('aria-label'), '暂停');
+  assert.equal(button.hasAttribute('data-playing'), true);
+  assert.ok(button.querySelector('svg'));
+});
+
 test('music room uses the base gradient on phones and restores the cover backdrop on wider screens', () => {
   const dom = browser(musicMarkup({ title: '音乐', tracks: [{ url: '/one.mp3', cover: '/one.png' }] }));
   const { window } = dom;
@@ -152,6 +188,63 @@ test('remote music retries failure, normalizes Meting fields and rejects unsafe 
   assert.equal(repeat.window.document.querySelectorAll('.music-track-row').length, 2);
   assert.equal(repeatedFetches, 0);
   repeat.window.close();
+});
+
+test('QQ guest playback replaces only the audio and keeps restricted tracks in the original queue', async t => {
+  const ids = ['002RZMrT40UkuM', '0013eJIe0weuDd'];
+  const remote = { server: 'tencent', type: 'playlist', id: '123', api: 'https://music.example.test/list', qqAudio: true };
+  const { window } = browser(musicMarkup({ title: '音乐', remote }));
+  t.after(() => window.close());
+  const { document } = window;
+  window.fetch = async () => ({ ok: true, json: async () => ids.map(id => ({
+    name: id, url: `https://music.example.test/?server=tencent&type=url&id=${id}`,
+    pic: 'https://music.example.test/cover.jpg', lyrics: '[00:01.00]保留歌词'
+  })) });
+  const append = document.head.append.bind(document.head);
+  document.head.append = element => {
+    append(element);
+    const url = new URL(element.src);
+    assert.equal(url.hostname, 'u.y.qq.com');
+    assert.deepEqual(JSON.parse(url.searchParams.get('data')).req_0.param.songmid, ids);
+    window.queueMicrotask(() => window[url.searchParams.get('callback')]({
+      req_0: { data: { sip: ['http://aqqmusic.tc.qq.com/'], midurlinfo: [
+        { songmid: ids[0], purl: 'track.m4a' }, { songmid: ids[1], purl: '' }
+      ] } }
+    }));
+  };
+  const audio = document.querySelector('audio');
+  audio.play = async () => audio.dispatchEvent(new window.Event('playing'));
+  audio.pause = () => audio.dispatchEvent(new window.Event('pause'));
+  window.eval(script('music.js'));
+  const api = window.MoriiMusic;
+  await api.ensure();
+  await api.play(0);
+  assert.equal(audio.src, 'https://aqqmusic.tc.qq.com/track.m4a');
+  assert.equal(document.querySelector('[data-music-cover]').src, 'https://music.example.test/cover.jpg');
+  assert.equal(api.state.lyrics[0].text, '保留歌词');
+  assert.match(document.querySelector('[data-music-source]').href, /i2\.y\.qq\.com/);
+  await api.play(1);
+  assert.equal(api.state.tracks.length, 2);
+  assert.equal(api.state.playing, false);
+  assert.match(api.state.status, /未开放/);
+});
+
+test('configured audio stays playable when an online playlist also loads', async t => {
+  const music = {
+    title: '音乐',
+    tracks: [{ title: '本地音频', url: '/local.mp3' }],
+    remote: { server: 'tencent', type: 'playlist', id: '123', api: 'https://music.example.test/list' }
+  };
+  const { window } = browser(musicMarkup(music));
+  t.after(() => window.close());
+  window.fetch = async () => ({ ok: true, json: async () => [
+    { title: '重复音频', url: '/local.mp3' },
+    { title: '在线音频', url: '/remote.mp3' }
+  ] });
+  window.eval(script('music.js'));
+  await window.MoriiMusic.ensure();
+  assert.deepEqual(Array.from(window.MoriiMusic.state.tracks, track => track.title), ['本地音频', '在线音频']);
+  assert.match(window.MoriiMusic.player.src, /\/local\.mp3$/);
 });
 
 test('unplayed music does not take over normal page navigation', () => {

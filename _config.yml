@@ -189,6 +189,7 @@ music:
     type: playlist
     id: ''
     api: 'https://api.injahow.cn/meting/?server=:server&type=:type&id=:id&r=:r'
+    qq_audio: false # QQ 歌单通过 QQ 音乐匿名接口取音频，保留现有封面和歌词来源
   # 可选：官方提供的 HTTPS 嵌入播放器。
   embed_url: ''
   # 可选：自有音频资源，格式为 title / artist / url / cover。

@@ -26,10 +26,17 @@
     try { config = JSON.parse(hub.dataset.musicConfig); } catch { return; }
     const player = document.getElementById('music-player');
     const listeners = new Set();
-    const normalize = data => (Array.isArray(data) ? data : []).filter(item => item && typeof item === 'object').flatMap(item => {
+    const normalize = (data, remote = false) => (Array.isArray(data) ? data : []).filter(item => item && typeof item === 'object').flatMap(item => {
       const url = safeURL(item.url);
+      if (!url) return [];
       const text = value => typeof value === 'string' ? value.trim() : '';
-      return url ? [{ url, title: text(item.title) || text(item.name) || t("未命名曲目"), artist: text(item.artist) || text(item.author) || t("未知音乐人"), cover: safeURL(item.cover || item.pic), lrc: safeURL(item.lrc), lyrics: text(item.lyrics) || (typeof item.lrc === 'string' && item.lrc.includes('[0') ? item.lrc : '') }] : [];
+      let qqId = '';
+      if (remote && config.remote?.qqAudio && config.remote.server === 'tencent') {
+        const params = new URL(url).searchParams;
+        const id = params.get('id');
+        if (params.get('server') === 'tencent' && params.get('type') === 'url' && /^[a-z\d]{14}$/i.test(id || '')) qqId = id;
+      }
+      return [{ url, qqId, title: text(item.title) || text(item.name) || t("未命名曲目"), artist: text(item.artist) || text(item.author) || t("未知音乐人"), cover: safeURL(item.cover || item.pic), lrc: safeURL(item.lrc), lyrics: text(item.lyrics) || (typeof item.lrc === 'string' && item.lrc.includes('[0') ? item.lrc : '') }];
     });
     const preferenceKey = `morii-music-preferences:${new URL(hub.dataset.musicPage || '/music/', location.href).pathname}`;
     let preferences;
@@ -38,17 +45,80 @@
     const savedMode = preferences?.mode;
     const volume = Number.isFinite(savedVolume) && savedVolume >= 0 && savedVolume <= 1 ? savedVolume : config.volume ?? .7;
     const mode = Number.isInteger(savedMode) && savedMode >= 0 && savedMode <= 3 ? savedMode : 0;
-    const state = { tracks: normalize(config.tracks), current: 0, playing: false, time: 0, duration: 0, volume, mode, status: t("选择一首音乐，开始聆听。"), fetchStatus: '', loading: false, failed: false, lyrics: [], lyricIndex: -1, lyricStatus: t("播放一首歌，让旋律和文字相遇。"), activated: false };
+    const localTracks = normalize(config.tracks);
+    const localSources = new Set(localTracks.map(track => track.url));
+    const state = { tracks: localTracks, current: 0, playing: false, audioFailed: false, time: 0, duration: 0, volume, mode, status: t("选择一首音乐，开始聆听。"), fetchStatus: '', loading: false, failed: false, lyrics: [], lyricIndex: -1, lyricStatus: t("播放一首歌，让旋律和文字相遇。"), activated: false };
     const savePreferences = () => {
       const { volume, mode } = state;
       try { localStorage.setItem(preferenceKey, JSON.stringify({ volume, mode })); } catch { /* Playback does not depend on storage. */ }
     };
     const emit = () => listeners.forEach(listener => listener(state));
     let playRequest = 0;
+    let audioTimeout;
     let lyricRequest = 0;
     let lyricController;
     let loaded = false;
     let loadingPromise;
+    const qqAudio = new Map();
+    let callbackSerial = 0;
+    const requestQQAudio = ids => {
+      const callback = `moriiQQAudio${++callbackSerial}`;
+      const endpoint = new URL('https://u.y.qq.com/cgi-bin/musicu.fcg');
+      endpoint.search = new URLSearchParams({ format: 'jsonp', callback, platform: 'yqq.json', data: JSON.stringify({
+        req_0: { module: 'vkey.GetVkeyServer', method: 'CgiGetVkey', param: {
+          guid: String(Math.floor(Math.random() * 1e9)), songmid: ids, songtype: ids.map(() => 0), uin: '', loginflag: 1, platform: '20'
+        } },
+        comm: { uin: '', format: 'json', ct: 24, cv: 0, authst: '' }
+      }) });
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        const finish = (error, data) => {
+          clearTimeout(timeout);
+          script.remove();
+          delete window[callback];
+          if (error) reject(error); else resolve(data);
+        };
+        const timeout = setTimeout(() => finish(new Error('QQ audio timeout')), 6000);
+        window[callback] = response => {
+          const data = response?.req_0?.data;
+          if (!Array.isArray(data?.midurlinfo) || !Array.isArray(data.sip)) { finish(new Error('QQ audio response')); return; }
+          const urls = new Map();
+          for (const entry of data.midurlinfo) {
+            if (!ids.includes(entry.songmid) || typeof entry.purl !== 'string' || !entry.purl) continue;
+            for (const base of data.sip) {
+              try {
+                const url = new URL(entry.purl, base);
+                if (!/^https?:$/.test(url.protocol) || !url.hostname.endsWith('.qq.com') || url.username || url.password) continue;
+                url.protocol = 'https:';
+                urls.set(entry.songmid, url.href);
+                break;
+              } catch { /* Try another QQ CDN. */ }
+            }
+          }
+          finish(null, urls);
+        };
+        script.addEventListener('error', () => finish(new Error('QQ audio request')), { once: true });
+        script.src = endpoint.href;
+        document.head.append(script);
+      });
+    };
+    const resolveQQAudio = ids => {
+      const missing = [...new Set(ids)].filter(id => id && (!qqAudio.has(id) || qqAudio.get(id).until <= Date.now()));
+      if (missing.length) {
+        const batch = requestQQAudio(missing).catch(() => null);
+        for (const id of missing) {
+          const entry = { until: Infinity };
+          entry.promise = batch.then(result => {
+            if (!result) { if (qqAudio.get(id) === entry) qqAudio.delete(id); return null; }
+            entry.url = result.get(id) || '';
+            entry.until = Date.now() + (entry.url ? 240000 : 30000);
+            return entry.url;
+          });
+          qqAudio.set(id, entry);
+        }
+      }
+      return ids.map(id => qqAudio.get(id));
+    };
     const timedFetch = async (url, kind, controller = new AbortController(), timeoutMs = 15000) => {
       const timeout = setTimeout(() => controller.abort(), timeoutMs);
       try {
@@ -80,18 +150,56 @@
     const prepare = index => {
       if (!state.tracks[index]) return;
       state.current = index; state.time = 0; state.duration = 0;
-      player.src = state.tracks[index].url;
-      loadLyrics(state.tracks[index]);
+      const track = state.tracks[index];
+      if (track.qqId) {
+        if (player.hasAttribute('src')) { player.pause(); player.removeAttribute('src'); }
+        resolveQQAudio(state.tracks.slice(index, index + 4).map(item => item.qqId));
+      } else player.src = track.url;
+      loadLyrics(track);
     };
+    const clearAudioTimeout = () => {
+      clearTimeout(audioTimeout);
+      audioTimeout = undefined;
+    };
+    const failAudio = message => {
+      clearAudioTimeout();
+      state.playing = false;
+      state.audioFailed = true;
+      state.status = message;
+      emit();
+    };
+    const unavailableAudio = () => t("这首歌曲暂时无法播放，可以切换下一首或打开原平台歌单。");
     const play = async index => {
-      if (!state.tracks[index]) return;
+      const track = state.tracks[index];
+      if (!track) return;
       const token = ++playRequest;
-      if (index !== state.current || !player.getAttribute('src')) prepare(index);
+      clearAudioTimeout();
+      const retry = state.audioFailed && index === state.current;
+      state.audioFailed = false;
+      state.playing = false;
+      if (retry && track.qqId && player.error) qqAudio.delete(track.qqId);
+      if (index !== state.current || (!track.qqId && !player.getAttribute('src'))) prepare(index);
       state.activated = true; state.status = t("正在加载音频…"); emit();
-      try { await player.play(); }
+      audioTimeout = setTimeout(() => {
+        if (token !== playRequest) return;
+        ++playRequest;
+        failAudio(t("音频加载超时，请重试或打开原平台歌单。"));
+        player.pause();
+      }, 12000);
+      try {
+        const existing = track.qqId && !retry && player.getAttribute('src');
+        const entry = track.qqId && !existing ? resolveQQAudio([track.qqId])[0] : null;
+        const url = entry ? (entry.url ?? await entry.promise) : existing || track.url;
+        if (token !== playRequest) return;
+        if (url === '') { failAudio(t("QQ 音乐暂未开放这首歌的匿名播放，可前往原平台收听。")); return; }
+        const source = url || track.url;
+        if (player.getAttribute('src') !== source) player.src = source;
+        else if (retry) player.load();
+        await player.play();
+      }
       catch (error) {
         if (token !== playRequest || error?.name === 'AbortError') return;
-        state.playing = false; state.status = t("这首歌曲暂时无法播放，可以切换下一首或打开原平台歌单。"); emit();
+        if (!state.audioFailed) failAudio(error?.name === 'NotAllowedError' ? t("浏览器暂停了播放，请再次点击播放。") : unavailableAudio());
       }
     };
     const nextIndex = direction => {
@@ -110,9 +218,9 @@
       if (!loaded) {
         try {
           const cached = JSON.parse(sessionStorage.getItem(cacheKey) || 'null');
-          const tracks = cached && Date.now() - cached.at < 1800000 ? normalize(cached.tracks) : [];
+          const tracks = cached && Date.now() - cached.at < 1800000 ? normalize(cached.tracks, true) : [];
           if (tracks.length) {
-            state.tracks = tracks; prepare(0); loaded = true;
+            state.tracks = [...localTracks, ...tracks.filter(track => !localSources.has(track.url))]; prepare(0); loaded = true;
             state.fetchStatus = t("已获取 {0} 首歌曲", tracks.length);
             emit(); return Promise.resolve();
           }
@@ -124,10 +232,10 @@
           const values = { ...config.remote, r: String(Math.random()) };
           const endpoint = safeURL(config.remote.api.replace(/:(server|type|id|r)\b/g, (_, key) => encodeURIComponent(values[key])));
           if (!endpoint) throw new Error('invalid endpoint');
-          const tracks = normalize(await timedFetch(endpoint, 'json', new AbortController(), 8000));
+          const tracks = normalize(await timedFetch(endpoint, 'json', new AbortController(), 8000), true);
           if (!tracks.length) throw new Error('empty playlist');
           if (state.activated) { state.fetchStatus = t("当前播放队列已保留。"); return; }
-          state.tracks = tracks; prepare(0); loaded = true;
+          state.tracks = [...localTracks, ...tracks.filter(track => !localSources.has(track.url))]; prepare(0); loaded = true;
           state.fetchStatus = t("已获取 {0} 首歌曲", tracks.length);
           try { sessionStorage.setItem(cacheKey, JSON.stringify({ at: Date.now(), tracks })); } catch { /* Playback does not depend on storage. */ }
         } catch {
@@ -139,10 +247,17 @@
       return loadingPromise;
     };
     player.volume = state.volume;
-    player.addEventListener('play', () => { state.playing = true; emit(); });
-    player.addEventListener('playing', () => { state.playing = true; state.status = t("正在播放：{0}", state.tracks[state.current]?.title || ''); emit(); });
-    player.addEventListener('pause', () => { state.playing = false; if (!player.error) state.status = t("已暂停，可以随时继续。"); emit(); });
-    player.addEventListener('error', () => { state.playing = false; state.status = t("音频暂不可用，请切换歌曲或打开原平台歌单。"); emit(); });
+    player.addEventListener('playing', () => {
+      if (state.audioFailed) return;
+      clearAudioTimeout(); state.playing = true;
+      state.status = t("正在播放：{0}", state.tracks[state.current]?.title || ''); emit();
+    });
+    player.addEventListener('pause', () => {
+      state.playing = false;
+      if (!state.audioFailed && !audioTimeout && !player.error) state.status = t("已暂停，可以随时继续。");
+      emit();
+    });
+    player.addEventListener('error', () => { if (state.tracks.length && !state.audioFailed) failAudio(unavailableAudio()); });
     player.addEventListener('loadedmetadata', () => { state.duration = Number.isFinite(player.duration) ? player.duration : 0; emit(); });
     player.addEventListener('timeupdate', () => {
       state.time = player.currentTime; state.duration = Number.isFinite(player.duration) ? player.duration : 0;
@@ -159,7 +274,11 @@
       state, player, parseLyrics,
       subscribe(listener) { listeners.add(listener); listener(state); return () => listeners.delete(listener); },
       load, ensure() { return loaded ? Promise.resolve() : load(); }, play,
-      toggle() { if (!state.tracks.length) return load(); if (!player.paused) player.pause(); else return play(state.current); },
+      toggle() {
+        if (!state.tracks.length) return load();
+        if (player.paused || state.audioFailed) return play(state.current);
+        ++playRequest; clearAudioTimeout(); player.pause();
+      },
       step(direction) { if (state.tracks.length) return play(nextIndex(direction)); },
       seek(time) { if (Number.isFinite(time) && Number.isFinite(player.duration) && player.duration > 0) { player.currentTime = Math.max(0, Math.min(player.duration, time)); player.dispatchEvent(new Event('timeupdate')); } },
       volume(value) { state.volume = Math.max(0, Math.min(1, Number(value) || 0)); player.volume = state.volume; savePreferences(); emit(); },
@@ -359,7 +478,7 @@
       else if (action === 'mode') api.mode();
     }));
     return api.subscribe(s => {
-      root.querySelectorAll('[data-music-toggle]').forEach(button => { button.disabled = !s.tracks.length; button.textContent = s.playing ? 'Ⅱ' : '▶'; button.setAttribute('aria-label', s.playing ? t("暂停") : t("播放")); });
+      root.querySelectorAll('[data-music-toggle]').forEach(button => { button.disabled = !s.tracks.length; button.toggleAttribute('data-playing', s.playing); button.setAttribute('aria-label', s.playing ? t("暂停") : t("播放")); });
       root.querySelectorAll('[data-music-action="previous"]').forEach(button => { button.disabled = !s.tracks.length || s.mode === 0 && s.current === 0; });
       root.querySelectorAll('[data-music-action="next"]').forEach(button => { button.disabled = !s.tracks.length || s.mode === 0 && s.current === s.tracks.length - 1; });
     });
@@ -393,6 +512,8 @@
     follow.addEventListener('click', () => { following = true; follow.hidden = true; scrollLyric(); });
     search.addEventListener('input', filter);
     room.querySelector('#music-retry').addEventListener('click', () => api.load());
+    const recovery = room.querySelector('.music-audio-recovery');
+    recovery.querySelector('button').addEventListener('click', () => api.play(api.state.current));
     room.querySelector('.music-seek').addEventListener('input', event => api.seek(Number(event.target.value) / 100 * api.state.duration));
     room.querySelector('.music-volume').addEventListener('input', event => api.volume(event.target.value));
     room.querySelectorAll('[data-music-tab-button]').forEach(button => button.addEventListener('click', () => {
@@ -457,7 +578,10 @@
         if (track?.cover) cover.src = track.cover; else cover.removeAttribute('src');
         syncBackground();
         const source = room.querySelector('[data-music-source]'); source.hidden = !track;
-        if (track) source.href = track.url;
+        if (track) {
+          source.href = track.qqId ? `https://i2.y.qq.com/a/song/${track.qqId}` : track.url;
+          source.textContent = track.qqId ? t("在 QQ 音乐打开这首歌 ↗") : t("打开音频原链接 ↗");
+        }
       }
       if (s.lyrics !== renderedLyrics) {
         renderedLyrics = s.lyrics; lyricIndex = -2;
@@ -479,6 +603,7 @@
       room.querySelector('#music-fetch-status').textContent = s.fetchStatus;
       room.querySelector('#music-retry').hidden = !s.failed;
       room.querySelector('[data-music-status]').textContent = s.status;
+      recovery.hidden = !s.audioFailed;
       room.querySelector('[data-music-elapsed]').textContent = formatTime(s.time);
       room.querySelector('[data-music-duration]').textContent = formatTime(s.duration);
       const seek = room.querySelector('.music-seek'); seek.disabled = !s.duration; seek.value = s.duration ? s.time / s.duration * 100 : 0;

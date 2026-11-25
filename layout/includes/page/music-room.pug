@@ -42,15 +42,26 @@
   section.music-control-bar(aria-label=morii_t("播放控制"))
     .music-playback-status
       p#music-play-status(data-music-status role='status') #{morii_t("选择一首音乐，开始聆听。")}
+      .music-audio-recovery(hidden)
+        button(type='button') #{morii_t("重试音频")}
+        if music.playlist
+          a(href=url_for(music.playlist) target='_blank' rel='noopener noreferrer') #{morii_t("原平台歌单 ↗")}
     .music-timeline
       span(data-music-elapsed) 0:00
       input.music-seek(type='range' min='0' max='100' step='0.1' value='0' aria-label=morii_t("播放进度") disabled)
       span(data-music-duration) 0:00
     .music-transport
       button#music-mode(type='button' data-music-action='mode' aria-label=morii_t("播放模式：顺序播放")) #{morii_t("顺序")}
-      button#music-previous(type='button' data-music-action='previous' aria-label=morii_t("上一首")) ⏮
-      button.music-toggle#music-toggle(type='button' data-music-action='toggle' data-music-toggle aria-label=morii_t("播放")) ▶
-      button#music-next(type='button' data-music-action='next' aria-label=morii_t("下一首")) ⏭
+      button#music-previous(type='button' data-music-action='previous' aria-label=morii_t("上一首"))
+        svg(viewBox='0 0 24 24' aria-hidden='true' focusable='false' fill='currentColor')
+          path(d='M6 5h2v14H6zM18 5v14L9 12z')
+      button.music-toggle#music-toggle(type='button' data-music-action='toggle' data-music-toggle aria-label=morii_t("播放"))
+        svg(viewBox='0 0 24 24' aria-hidden='true' focusable='false' fill='currentColor')
+          path.music-icon-play(d='M8 5v14l11-7z')
+          path.music-icon-pause(d='M7 5h3v14H7zm7 0h3v14h-3z')
+      button#music-next(type='button' data-music-action='next' aria-label=morii_t("下一首"))
+        svg(viewBox='0 0 24 24' aria-hidden='true' focusable='false' fill='currentColor')
+          path(d='M16 5h2v14h-2zM6 5v14l9-7z')
       label.music-volume-label
         span(aria-hidden='true') ♪
         span.sr-only #{morii_t("音量")}

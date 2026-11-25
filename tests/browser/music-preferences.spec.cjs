@@ -1,6 +1,7 @@
 'use strict';
 const { test, expect } = require('@playwright/test');
 const { installHooks, ready } = require('./helpers.cjs');
+const { prefix } = require('../../tools/lib/browser-fixture.cjs');
 installHooks(test);
 
 test('ordinary pages load music only on opening quick navigation and can retry a failed request', async ({ page }) => {
@@ -44,4 +45,33 @@ test('music room remembers muted volume and playback mode after reloading', asyn
   await expect(mode).toHaveAccessibleName('播放模式：列表循环');
   await expect(volume).toHaveValue('0');
   await expect(page.locator('#music-player')).toHaveJSProperty('paused', true);
+});
+
+test('invalid audio exposes recovery and valid audio switches the vector play icon', async ({ page, isMobile, viewport }) => {
+  await page.route('https://music.example.test/playlist', route => route.fulfill({
+    headers: { 'access-control-allow-origin': '*' },
+    json: [
+      { title: '空音频', url: prefix + 'test-audio/empty.wav' },
+      { title: '有效音频', url: prefix + 'test-audio/valid.wav' }
+    ]
+  }));
+  await ready(page, 'music/');
+  const play = page.locator('#music-toggle');
+  await expect(play).toBeEnabled();
+  await play.click();
+  const retry = page.getByRole('button', { name: '重试音频' });
+  await expect(retry).toBeVisible({ timeout: 14000 });
+  await expect(play).toHaveAccessibleName('播放');
+  await expect(play.locator('.music-icon-pause')).toBeHidden();
+  await page.locator('#music-next').click();
+  await expect(retry).toBeHidden();
+  await expect(play).toHaveAccessibleName('暂停');
+  await expect(play.locator('.music-icon-pause')).toBeVisible();
+  await play.click();
+  if (isMobile) {
+    await expect(page.locator('html')).toHaveCSS('background-color', 'rgb(37, 42, 64)');
+    await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(37, 42, 64)');
+    await expect(page.locator('.site-header')).toHaveCSS('background-color', 'rgb(37, 42, 64)');
+    expect((await page.locator('.music-room').boundingBox()).height).toBeGreaterThanOrEqual(viewport.height);
+  }
 });

@@ -25,7 +25,7 @@ hexo.extend.helper.register('morii_music', function () {
   const api = source(meting.api || 'https://api.injahow.cn/meting/?server=:server&type=:type&id=:id&r=:r');
   const id = String(meting.id || '').trim();
   const remote = meting.enable === true && api && id ? {
-    api, id, server: text(meting.server) || 'tencent', type: text(meting.type) || 'playlist'
+    api, id, server: text(meting.server) || 'tencent', type: text(meting.type) || 'playlist', qqAudio: meting.qq_audio === true
   } : null;
   return { remote, volume: Number.isFinite(Number(config.volume)) ? Math.max(0, Math.min(1, Number(config.volume))) : 0.7, title: label(config.title, '我的音乐收藏'), description: label(config.description, '给日常留一点旋律，边听边逛。'), playlist, playlistLabel: label(config.playlist_label, '打开我的歌单'), embed: embed.startsWith('https://') ? embed : '', tracks };
 });
