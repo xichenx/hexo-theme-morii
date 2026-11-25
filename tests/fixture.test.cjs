@@ -68,10 +68,12 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       assert.equal(!!codeStyle, file.startsWith('posts/'), `${file}: code styles load only on article pages`);
       const gameHall = file === 'game/index.html';
       assert.equal(!!document.querySelector('link[href*="/css/arcade."]'), gameHall);
+      assert.equal(!!document.querySelector('script[src*="/js/arcade."]'), gameHall);
       if (gameHall) {
         assert.equal(document.querySelector('main h1').textContent, '游戏厅');
-        assert.deepEqual([...document.querySelectorAll('.arcade a')].map(link => link.getAttribute('href')),
-          ['2048', 'mf', 'sl', 'wzq', 'txz'].map(game => `${prefix}game/${game}/`));
+        assert.deepEqual([...document.querySelectorAll('.arcade [data-game]')].map(button => button.dataset.game),
+          ['trail', 'garden', 'firefly']);
+        assert.equal(document.querySelector('.arcade a'), null);
       }
       if (file === 'posts/welcome/index.html') {
         assert.deepEqual([...document.querySelectorAll('.article-header .article-meta time[datetime]')].map(time => time.parentElement.textContent.split(' ')[0]), ['发布于', '更新于']);
