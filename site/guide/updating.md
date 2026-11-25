@@ -1,6 +1,6 @@
 # 更新 Morii 主题
 
-升级到 **v1.1.2** 后，可以检查首页主卡、手机顶部状态栏、游戏厅与相册详情页。相册缩略图默认使用 4:3 比例，照片可设置宽高以按原比例展示。[本次版本说明](https://github.com/xichenx/hexo-theme-morii/blob/main/CHANGELOG.md#112) · [首页配置](/config/home) · [相册配置](/features/album-links)
+升级到 **v1.1.3** 后，可以检查手机首页的状态栏与导航、Morii 字标书写和音乐馆播放。使用 QQ 音乐歌单时，可设 `music.meting.qq_audio: true` 以启用 QQ 音乐匿名播放并保留原歌单、封面和歌词。[本次版本说明](https://github.com/xichenx/hexo-theme-morii/blob/main/CHANGELOG.md#113) · [音乐馆配置](/features/media)
 
 从较旧版本升级时，也可参考 [v1.1.0 升级指南](/guide/upgrade-1-1)中的首页和阅读设置检查清单。
 
