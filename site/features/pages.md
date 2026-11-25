@@ -19,9 +19,16 @@
 | 相册 `/album/` | `source/album/index.md` | `album` | `source/_data/album.yml` |
 | 友链 `/link/` | `source/link/index.md` | `link` | `source/_data/link.yml` |
 | 音乐馆 `/music/` | `source/music/index.md` | `music` | 主题配置中的 `music` |
+| 游戏厅 `/game/` | `source/game/index.md` | `page` | 无 |
 | 朋友圈 `/fcircle/` | `source/fcircle/index.md` | `fcircle` | 自己可用的朋友圈接口 |
 
 `/archives/` 由 Hexo 的归档生成器提供；`/cinema/` 在 `cinema.enable: true` 时由主题生成；`/reading-list/` 在 `reading_list.enable: true` 时由主题生成。它们不需要同名 `index.md`。电影院仍需要自己的片单数据。不要把主题**文档站**的 `site/` 当成你博客的 `source/`。
+
+已有 `/game/` 页的博客升级后可直接打开游戏厅，体验星轨接力、相位花园和萤火冲刺。新站可以运行 `hexo new page game`，再按需在 `_config.morii.yml` 的 `menu` 中加入 `游戏厅: /game/`。萤火冲刺的最佳分数保存在当前浏览器里。
+
+在游戏厅内切换游戏会保留当前关卡。萤火冲刺切走时会暂停，回到游戏后可继续倒计时。刷新页面会开启新一局。
+
+星轨接力和相位花园各有三关。星轨后两关加入墙，相位花园逐关增加打乱步骤。萤火冲刺达到 10 分后会出现第二个干扰光点。
 
 ## 1. 先做分类和标签
 

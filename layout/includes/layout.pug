@@ -218,6 +218,8 @@ html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || them
     script(src=morii_asset('/js/i18n.js') defer)
     script(src=morii_asset('/js/theme.js') defer)
     script(src=morii_asset('/js/music.js') defer)
+    if gameHall
+      script(src=morii_asset('/js/arcade.js') defer)
     if page.type === 'cinema'
       script(src=morii_asset('/js/cinema.js') defer)
     if visualEffects.enabled

@@ -1,42 +1,23 @@
-.arcade
-  header.arcade-stage
+.arcade(data-arcade)
+  h1 #{morii_t("游戏厅")}
+  nav.arcade-picker(aria-label=morii_t("选择游戏") hidden)
+    each game in [{id:'trail', icon:'✦', name:'星轨接力', kind:'路线解谜'}, {id:'garden', icon:'✿', name:'相位花园', kind:'花格解谜'}, {id:'firefly', icon:'⚡', name:'萤火冲刺', kind:'20 秒挑战'}]
+      button.arcade-choice(type='button' data-game=game.id aria-pressed=game.id === 'trail' ? 'true' : 'false')
+        span.arcade-choice__icon(aria-hidden='true')= game.icon
+        span
+          strong= morii_t(game.name)
+          small= morii_t(game.kind)
+  .arcade-stage(data-game-stage hidden)
     .arcade-stage__copy
-      h1 #{morii_t("游戏厅")}
-      h2 2048
-      p #{morii_t("合并相同的数字，试着凑出 2048。")}
-      a.arcade-play(href=url_for('/game/2048/') aria-label=morii_t("开始玩 2048"))
-        span #{morii_t("开始游戏")}
-        span(aria-hidden='true') →
-    .arcade-board(aria-hidden='true')
-      each value in ['', 2, '', 4, 8, '', 16, '', '', 64, 256, 32, 4, '', 512, 2048]
-        span(data-value=value)= value
-  section.arcade-library(aria-labelledby='arcade-library-title')
-    h2#arcade-library-title #{morii_t("更多游戏")}
-    .arcade-grid
-      each game in [{kind:'cube', slug:'mf', name:morii_t("魔方"), description:morii_t("转动方块，让六面回到同色。")}, {kind:'mines', slug:'sl', name:morii_t("扫雷"), description:morii_t("用数字线索找出每一颗雷。")}, {kind:'stones', slug:'wzq', name:morii_t("五子棋"), description:morii_t("落子连线，先连成五颗棋子。")}, {kind:'boxes', slug:'txz', name:morii_t("推箱子"), description:morii_t("规划路线，把箱子推到目标上。")}]
-        a.arcade-card(href=url_for('/game/' + game.slug + '/') class='arcade-card--' + game.kind)
-          .arcade-card__art(aria-hidden='true')
-            case game.kind
-              when 'cube'
-                .arcade-cube
-                  each tile in Array(9)
-                    span
-              when 'mines'
-                .arcade-mines
-                  span 1
-                  span ✸
-                  span 2
-              when 'stones'
-                .arcade-stones
-                  span
-                  span
-                  span
-              when 'boxes'
-                .arcade-boxes
-                  span
-                  span
-                  span
-          .arcade-card__body
-            h3= game.name
-            p= game.description
-            span.arcade-card__arrow(aria-hidden='true') ↗
+      h2#arcade-title
+      p#arcade-rules
+      .arcade-score(data-score)
+      progress.arcade-timer(data-timer max='20' value='20' aria-label=morii_t("剩余时间") hidden)
+      p.arcade-status(data-status role='status')
+      .arcade-actions
+        button.arcade-play(type='button' data-reset)
+        button.arcade-undo(type='button' data-undo) #{morii_t("撤销一步")}
+        button.arcade-undo(type='button' data-pause hidden)
+    .arcade-board(data-board role='group' aria-labelledby='arcade-title' aria-describedby='arcade-rules')
+  noscript
+    p #{morii_t("开启 JavaScript 即可在这里游玩。")}
