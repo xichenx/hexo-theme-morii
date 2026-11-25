@@ -208,7 +208,7 @@ motion:
 | `spotlight` | `true` | 精细指针设备上的卡片跟随光晕 |
 | `tilt` | `true` | 精细指针设备上的卡片轻微倾斜 |
 | `ripple` | `true` | 按钮点击波纹 |
-| `theme_transition` | `true` | 明暗切换圆形扩散；不支持时直接切换 |
+| `theme_transition` | `true` | 支持动画的桌面浏览器使用圆形扩散；移动端立即切换页面和状态栏底色 |
 
 想保留配色但减少动态效果，可把 `particles`、`spotlight`、`tilt`、`ripple`、`theme_transition` 设为 `false`，同时设 `motion.enable: false`。`density: 0` 不等于关闭粒子，关闭应使用 `particles: false`。
 

@@ -323,11 +323,14 @@ test('activated music keeps audio, restores original scroll on back and offers r
   const chrome = d.querySelector('meta[name="theme-color"]');
   const frameChrome = child.window.document.querySelector('meta[name="theme-color"]');
   assert.equal(chrome.content, '#252a40');
+  assert.equal(d.documentElement.style.getPropertyValue('--frame-chrome'), '#252a40');
   frameChrome.content = '#111827';
   await Promise.resolve();
   assert.equal(chrome.content, '#111827');
+  assert.equal(d.documentElement.style.getPropertyValue('--frame-chrome'), '#111827');
   w.history.replaceState({ moriiMusicKey: 'origin' }, '', '/'); w.dispatchEvent(new w.PopStateEvent('popstate', { state: { moriiMusicKey: 'origin' } }));
   assert.equal(frame.hidden, true); assert.equal(scrollY, 350);
+  assert.equal(d.documentElement.style.getPropertyValue('--frame-chrome'), '');
   d.getElementById('next-page').dispatchEvent(new w.MouseEvent('click', { bubbles: true, cancelable: true }));
   timers.at(-1)();
   assert.equal(d.querySelector('.music-navigation-notice').hidden, false); assert.equal(w.MoriiMusic.player, audio);

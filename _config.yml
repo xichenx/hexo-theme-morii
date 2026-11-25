@@ -15,7 +15,7 @@ appearance:
     spotlight: true     # 鼠标跟随卡片光晕（精细指针设备）
     tilt: true          # 卡片轻量立体倾斜（精细指针设备）
     ripple: true        # 按钮点击波纹
-    theme_transition: true  # 深浅色切换圆形扩散，不支持时直接切换
+    theme_transition: true  # 桌面端深浅色切换圆形扩散，移动端同步换色
   layouts:
     home: featured       # featured：首篇横向突出（奇数篇时）；grid：普通双列
     categories: atlas    # atlas：双列主题导航；directory：分类目录；cards：独立卡片

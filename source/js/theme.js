@@ -3,11 +3,18 @@
   const root = document.documentElement;
   const chrome = document.querySelector('meta[name="theme-color"]');
   const siteHeader = document.querySelector('.site-header');
+  const mobileLayout = typeof matchMedia === 'function' ? matchMedia('(max-width: 800px), (pointer: coarse)') : null;
+  const homeChrome = root.hasAttribute('data-home-chrome');
   const syncChrome = () => {
     if (!chrome || document.body.classList.contains('music-shell-active')) return;
     const inverse = !siteHeader?.hasAttribute('data-header-past-backdrop') && chrome.dataset.inverse;
-    const color = inverse || chrome.dataset[root.dataset.theme];
-    if (chrome.content !== color) chrome.content = color;
+    root.toggleAttribute('data-chrome-inverse', Boolean(inverse));
+    const dark = root.dataset.theme === 'dark';
+    const homeScrolled = homeChrome && mobileLayout?.matches && siteHeader && !siteHeader.hasAttribute('data-header-top');
+    const color = inverse || (homeScrolled
+      ? (dark ? chrome.dataset.scrolledDark : chrome.dataset.scrolledLight)
+      : chrome.dataset[root.dataset.theme]);
+    if (color && chrome.content !== color) chrome.content = color;
   };
   // Hidden dialogs, motion and the inactive music capsule do not block first paint.
   document.querySelectorAll('link[data-deferred-style]').forEach(link => { link.media = 'all'; });
@@ -41,8 +48,8 @@
   let themeTransition;
   const applyTheme = next => {
     root.dataset.theme = next;
-    try { localStorage.setItem('morii-theme', root.dataset.theme); } catch { /* Keep the in-memory preference. */ }
     syncThemeButton();
+    try { localStorage.setItem('morii-theme', next); } catch { /* Keep the in-memory preference. */ }
   };
   const finishTransition = () => {
     themeTransition = undefined;
@@ -52,7 +59,7 @@
   themeButton?.addEventListener('click', event => {
     if (themeTransition) return;
     const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
-    if (root.dataset.themeTransition !== 'on' || root.dataset.motion === 'off' || reducedThemeMotion?.matches || navigator.connection?.saveData || typeof document.startViewTransition !== 'function' || typeof root.animate !== 'function') { applyTheme(next); return; }
+    if (mobileLayout?.matches || root.dataset.themeTransition !== 'on' || root.dataset.motion === 'off' || reducedThemeMotion?.matches || navigator.connection?.saveData || typeof document.startViewTransition !== 'function' || typeof root.animate !== 'function') { applyTheme(next); return; }
     const rect = themeButton.getBoundingClientRect();
     const x = event.detail ? event.clientX : rect.left + rect.width / 2;
     const y = event.detail ? event.clientY : rect.top + rect.height / 2;
@@ -91,16 +98,17 @@
     let headerFrame;
     const updateHeader = () => {
       headerFrame = undefined;
-      siteHeader.toggleAttribute('data-header-top', window.scrollY <= 8);
-      if (backdrop) {
-        siteHeader.toggleAttribute('data-header-past-backdrop', backdrop.getBoundingClientRect().bottom <= siteHeader.offsetHeight);
-        syncChrome();
-      }
+      const atTop = window.scrollY <= 8;
+      const topChanged = siteHeader.hasAttribute('data-header-top') !== atTop;
+      siteHeader.toggleAttribute('data-header-top', atTop);
+      if (backdrop) siteHeader.toggleAttribute('data-header-past-backdrop', backdrop.getBoundingClientRect().bottom <= siteHeader.offsetHeight);
+      if (backdrop || (homeChrome && topChanged)) syncChrome();
     };
     const scheduleHeader = () => { headerFrame ??= requestAnimationFrame(updateHeader); };
     window.addEventListener('scroll', scheduleHeader, { passive: true });
     window.addEventListener('resize', scheduleHeader);
     window.addEventListener('pageshow', scheduleHeader);
+    if (homeChrome) mobileLayout?.addEventListener('change', syncChrome);
     window.addEventListener('morii:music-view', () => { updateHeader(); syncChrome(); });
     if (backdrop && typeof ResizeObserver === 'function') new ResizeObserver(scheduleHeader).observe(backdrop);
     updateHeader();

@@ -40,9 +40,15 @@ html[data-theme=dark]{
   box-sizing:border-box
 }
 html{
+  --chrome-color:var(--bg);
+  --chrome-inverse:#252a40;
+  background-color:var(--frame-chrome,var(--chrome-color));
   scroll-behavior:smooth;
   scroll-padding-top:var(--safe-top)
 }
+html[data-home-chrome]{--home-chrome-color:#e9f0f9;--chrome-color:var(--home-chrome-color)}
+html[data-home-chrome][data-theme=dark]{--home-chrome-color:#172238}
+html[data-chrome-inverse]{--chrome-color:var(--chrome-inverse)}
 /* Keep the sticky header anchored during desktop scroll-boundary gestures. */
 @media (hover:hover) and (pointer:fine){
   html{overscroll-behavior-y:none}
@@ -133,7 +139,7 @@ dialog:modal{inset:var(--safe-top) var(--safe-right) var(--safe-bottom) var(--sa
 .site-header:not([data-header-past-backdrop]):has(+ main [data-header-backdrop=inverse]){
   --header-text:#fff;
   --header-muted:#edf0fa;
-  --header-surface:#252a40;
+  --header-surface:var(--chrome-inverse);
   --header-line:#ffffff30;
   --header-active:#ffffff24;
   --header-ink:#fff
@@ -142,6 +148,20 @@ html[data-theme] .site-header[data-header-top]{
   --header-fill:transparent;
   --header-edge:transparent;
   --header-nav-fill:transparent
+}
+@media (max-width:800px), (pointer:coarse){
+  /* Safari samples an opaque color at the viewport edge, above the navigation controls. */
+  html[data-theme] .site-header[data-header-top]{background:var(--chrome-color)}
+  html[data-home-chrome]:has(.site-header:not([data-header-top])){--chrome-color:var(--bg)}
+  html[data-home-chrome][data-theme] .site-header:not([data-header-top]){
+    background:var(--chrome-color);
+    -webkit-backdrop-filter:none;
+    backdrop-filter:none
+  }
+  /* Continue that solid starting color into the page before revealing its wallpaper or aurora. */
+  html[data-home-chrome] .site-shell > main{
+    background:linear-gradient(var(--home-chrome-color),transparent) top / 100% clamp(104px,19vw,160px) no-repeat
+  }
 }
 @media screen{
   .site-header + main:has([data-header-backdrop]){margin-block-start:calc(-1 * var(--header-height))}

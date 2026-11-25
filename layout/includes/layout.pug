@@ -7,11 +7,14 @@ doctype html
 - var tocOptions = morii_toc_options(page)
 - var articleCover = is_post() && page.top_img !== false && (page.top_img || page.cover)
 - var immersiveChrome = page.type === 'music' || articleCover
-html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || theme.motion.enable !== false) ? 'on' : 'off' data-glass=visualEffects.enabled ? (visualEffects.liquid ? 'liquid' : visualEffects.glass ? 'on' : 'off') : null data-effects=visualEffects.enabled ? 'on' : null data-theme-transition=visualEffects.transition ? 'on' : null)
+- var homeChrome = is_home() && (!page.current || page.current === 1)
+- var chromeLight = homeChrome ? '#e9f0f9' : '#f6f8fc'
+- var chromeDark = homeChrome ? '#172238' : '#111827'
+html(lang=morii_locale() style=morii_accent() data-home-chrome=homeChrome ? '' : null data-chrome-inverse=immersiveChrome ? '' : null data-motion=(!theme.motion || theme.motion.enable !== false) ? 'on' : 'off' data-glass=visualEffects.enabled ? (visualEffects.liquid ? 'liquid' : visualEffects.glass ? 'on' : 'off') : null data-effects=visualEffects.enabled ? 'on' : null data-theme-transition=visualEffects.transition ? 'on' : null)
   head
     meta(charset='utf-8')
     meta(name='viewport' content='width=device-width, initial-scale=1, viewport-fit=cover')
-    meta(name='theme-color' content=immersiveChrome ? '#252a40' : '#f6f8fc' data-inverse=immersiveChrome ? '#252a40' : null data-light='#f6f8fc' data-dark='#111827')
+    meta(name='theme-color' content=immersiveChrome ? '#252a40' : chromeLight data-inverse=immersiveChrome ? '#252a40' : null data-light=chromeLight data-dark=chromeDark data-scrolled-light=homeChrome ? '#f6f8fc' : null data-scrolled-dark=homeChrome ? '#111827' : null)
     - var seo = morii_seo(page)
     meta(name='description' content=seo.description)
     title= seo.documentTitle
@@ -41,7 +44,7 @@ html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || them
       meta(property='article:published_time' content=seo.published)
       meta(property='article:modified_time' content=seo.modified)
     link(rel='icon' href=url_for(theme.favicon || config.favicon || '/favicon.ico'))
-    script(src=morii_asset('/js/theme-init.js') data-promo-ink=is_home() && (!page.current || page.current === 1) ? '' : null data-diagnostics=theme.performance && theme.performance.diagnostics ? 'on' : null data-diagnostics-src=morii_asset('/js/diagnostics.js'))
+    script(src=morii_asset('/js/theme-init.js') data-promo-ink=homeChrome ? '' : null data-diagnostics=theme.performance && theme.performance.diagnostics ? 'on' : null data-diagnostics-src=morii_asset('/js/diagnostics.js'))
     link(rel='stylesheet' href=morii_asset('/css/style.css'))
     link(rel='stylesheet' href=morii_asset('/css/media.css'))
     link(rel='stylesheet' href=morii_asset('/css/search.css') media='print' data-deferred-style)

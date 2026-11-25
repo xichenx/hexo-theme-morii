@@ -230,6 +230,7 @@
       clearInterval(readyTimer); clearTimeout(fallbackTimer);
       if (new URL(url).pathname === originURL.pathname && new URL(url).search === originURL.search) {
         shellActive = false; document.body.classList.remove('music-shell-active', 'music-shell-loading');
+        document.documentElement.style.removeProperty('--frame-chrome');
         if (frame) frame.hidden = true;
         document.title = originTitle;
         document.getElementById('main')?.setAttribute('tabindex', '-1');
@@ -268,7 +269,10 @@
         const frameChrome = content.querySelector('meta[name="theme-color"]');
         const chrome = document.querySelector('meta[name="theme-color"]');
         if (frameChrome && chrome) {
-          const syncChrome = () => { chrome.content = frameChrome.content; };
+          const syncChrome = () => {
+            chrome.content = frameChrome.content;
+            document.documentElement.style.setProperty('--frame-chrome', frameChrome.content);
+          };
           syncChrome();
           chromeObserver = new MutationObserver(syncChrome);
           chromeObserver.observe(frameChrome, { attributeFilter: ['content'] });
