@@ -40,12 +40,10 @@ block content
         if hero.signature
           .hero__signature= hero.signature
       if themePromo
-        section.theme-promo(aria-labelledby='theme-promo-title')
+        section.theme-promo(aria-labelledby='morii-wordmark-title')
           .theme-promo__wordmark
-            h2#theme-promo-title
-              img(src=url_for('/icons/brand/morii-promo-wordmark.webp') alt='Morii' width='800' height='400' decoding='async')
-            if !theme.motion || theme.motion.enable !== false
-              include includes/promo-ink.pug
+            h2#morii-wordmark-title(aria-label='Morii')
+              include includes/promo-wordmark.pug
           .theme-promo__footer
             span #{morii_t("开源 Hexo 主题")}
             if themePromo.docs || themePromo.source

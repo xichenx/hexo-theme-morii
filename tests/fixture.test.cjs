@@ -47,9 +47,11 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
         assert.equal(backToTop.textContent.trim(), '↑');
         assert.equal(backToTop.hasAttribute('data-back-top-percent'), false);
         const promo = document.querySelector('.theme-promo');
-        const wordmark = promo.querySelector('h2 img');
-        assert.equal(wordmark.alt, 'Morii');
-        assert.equal(wordmark.getAttribute('src'), `${prefix}icons/brand/morii-promo-wordmark.webp`);
+        const wordmark = promo.querySelector('h2');
+        assert.equal(wordmark.getAttribute('aria-label'), 'Morii');
+        assert.equal(promo.getAttribute('aria-labelledby'), wordmark.id);
+        assert.equal(wordmark.querySelector('svg').getAttribute('viewBox'), '0 0 800 400');
+        assert.equal(wordmark.querySelector('linearGradient').children.length, 5);
         assert.equal(promo.querySelector('.theme-promo__cover').getAttribute('href'), 'https://github.com/xichenx/hexo-theme-morii#quick-start');
         assert.equal(promo.querySelector('.theme-promo__secondary').getAttribute('href'), 'https://github.com/xichenx/hexo-theme-morii');
         assert.equal(document.querySelector('[data-random]').dataset.randomAutoplay, 'on');

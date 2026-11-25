@@ -2,6 +2,8 @@
 const { test, expect } = require('@playwright/test');
 const { installHooks, ready, noOverflow } = require('./helpers.cjs');
 const { prefix } = require('../../tools/lib/browser-fixture.cjs');
+let sharp;
+try { sharp = require('sharp'); } catch { /* Pixel checks require the optional image dependency. */ }
 installHooks(test);
 test.use({ reducedMotion: 'no-preference' });
 
@@ -90,39 +92,40 @@ test('changing reduced motion cancels entrances and ambient movement', async ({ 
 });
 
 test('the desktop Morii wordmark writes once and settles into the complete artwork', async ({ page, isMobile }) => {
-  test.skip(isMobile, 'Touch screens use the lighter bitmap rendering path.');
-  let releaseArtwork;
-  const artwork = new Promise(resolve => { releaseArtwork = resolve; });
-  await page.route('**/morii-promo-wordmark.webp', async route => {
-    await artwork;
+  test.skip(isMobile, 'Touch screens use a shorter ink animation.');
+  let releaseMotion;
+  const gate = new Promise(resolve => { releaseMotion = resolve; });
+  await page.route(/\/js\/motion\.[a-f0-9]+\.js$/, async route => {
+    await gate;
     await route.continue();
   });
   const promo = page.getByRole('region', { name: 'Morii', exact: true });
   const wordmark = promo.getByRole('heading', { name: 'Morii' });
+  const lettering = wordmark.locator('.theme-promo__lettering');
   try {
-    await page.goto(prefix, { waitUntil: 'domcontentloaded' });
-    await wordmark.scrollIntoViewIfNeeded();
-    await expect(page.locator('html')).toHaveAttribute('data-promo-ink', 'decoding');
-    await expect(wordmark).toHaveCSS('opacity', '0');
+    await page.goto(prefix, { waitUntil: 'commit' });
+    await expect(page.locator('html')).toHaveAttribute('data-promo-ink', 'pending');
+    await expect(wordmark).toHaveCSS('opacity', '1');
+    await expect(lettering).toHaveCSS('mask-image', /morii-promo-ink/);
     await expect(promo).not.toHaveAttribute('data-writing', '');
   } finally {
-    releaseArtwork();
+    releaseMotion();
   }
   await expect(promo).toHaveAttribute('data-writing', '');
   await expect(wordmark).toHaveCSS('opacity', '1');
-  await expect(wordmark).toHaveCSS('mask-image', /morii-promo-ink/);
+  await expect(lettering).toHaveCSS('mask-image', /morii-promo-ink/);
   await expect(promo.locator('[data-ink-end]')).toHaveCSS('animation-name', 'morii-ink-settle');
   await expect(promo).not.toHaveAttribute('data-writing', '');
-  await expect(wordmark).toHaveCSS('mask-image', 'none');
+  await expect(lettering).toHaveCSS('mask-image', 'none');
   await expect(page.locator('html')).not.toHaveAttribute('data-promo-ink');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.reload({ waitUntil: 'load' });
   await promo.scrollIntoViewIfNeeded();
   await expect(promo).not.toHaveAttribute('data-writing', '');
-  await expect(wordmark).toHaveCSS('mask-image', 'none');
+  await expect(lettering).toHaveCSS('mask-image', 'none');
 });
 
-test('mobile headline stays fixed while the wordmark writes with one mask', async ({ page, isMobile }) => {
+test('mobile headline stays fixed while the wordmark writes with one mask', async ({ page, isMobile }, info) => {
   test.skip(!isMobile, 'Touch screens use a shorter ink animation.');
   let releaseMotion;
   const gate = new Promise(resolve => { releaseMotion = resolve; });
@@ -134,15 +137,18 @@ test('mobile headline stays fixed while the wordmark writes with one mask', asyn
   });
   const hero = page.locator('.hero__main h1');
   const promo = page.locator('.theme-promo');
-  const artwork = promo.locator('h2 img');
+  const artwork = promo.locator('.theme-promo__art');
+  const lettering = artwork.locator('.theme-promo__lettering');
   let before;
   try {
     await page.goto(prefix, { waitUntil: 'commit' });
     await expect(hero).toBeVisible();
     await expect(hero).toHaveCSS('opacity', '1');
     await expect(artwork).toHaveCSS('opacity', '1');
-    await expect(artwork).toHaveJSProperty('complete', true);
-    expect(await artwork.evaluate(image => image.naturalWidth)).toBeGreaterThan(0);
+    await expect(lettering).toHaveCSS('fill', /morii-promo-colors-touch/);
+    await expect(lettering).toHaveCSS('mask-image', /morii-promo-ink/);
+    await expect(promo.locator('[data-ink-end]')).toHaveCSS('opacity', '0');
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
     before = await hero.boundingBox();
   } finally {
     releaseMotion();
@@ -153,12 +159,29 @@ test('mobile headline stays fixed while the wordmark writes with one mask', asyn
   expect(fonts).toEqual([]);
   await promo.locator('h2').scrollIntoViewIfNeeded();
   await expect(promo).toHaveAttribute('data-writing', '');
-  await expect(promo.locator('h2')).toHaveCSS('mask-image', /morii-promo-ink/);
-  expect(await promo.locator('h2').evaluate(heading => getComputedStyle(heading, '::after').content)).toBe('none');
-  await expect(promo.locator('[data-ink-end]')).toHaveCSS('animation-delay', '1.764s');
+  await expect(lettering).toHaveCSS('mask-image', /morii-promo-ink/);
+  const aurora = () => page.locator('.morii-atmosphere').evaluate(element => getComputedStyle(element, '::before').animationPlayState);
+  await expect.poll(aurora).toBe('paused');
+  await expect(promo.locator('[data-ink-end]')).toHaveCSS('animation-delay', '1.9584s');
   await expect(promo).not.toHaveAttribute('data-writing');
-  await expect(promo.locator('h2')).toHaveCSS('mask-image', 'none');
+  await expect.poll(aurora).toBe('running');
+  await expect(lettering).toHaveCSS('mask-image', 'none');
   await expect(artwork).toHaveCSS('opacity', '1');
+  if (sharp) {
+    const preview = await promo.locator('h2').screenshot({ path: info.outputPath('color-wordmark.png') });
+    const { data } = await sharp(preview).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+    let teal = 0, purple = 0, orange = 0;
+    for (let i = 0; i < data.length; i += 3) {
+      const [r, g, b] = [data[i], data[i + 1], data[i + 2]];
+      if (g - r > 22 && b - r > 22) teal++;
+      if (r - g > 20 && b - r > 20) purple++;
+      if (r - g > 38 && r - b > 38) orange++;
+    }
+    expect(Math.min(teal, purple, orange)).toBeGreaterThan(50);
+  }
+  await promo.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await page.reload({ waitUntil: 'load' });
+  expect(await page.evaluate(() => ({ top: window.scrollY, hash: location.hash }))).toEqual({ top: 0, hash: '' });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.reload({ waitUntil: 'load' });
   await expect(promo).not.toHaveAttribute('data-writing');

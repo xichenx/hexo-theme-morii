@@ -23,7 +23,8 @@
     card = undefined; dirty = false;
   };
   const compact = () => window.innerWidth < 768 || !fine.matches;
-  const schedule = () => { if (!frame && !scrollTimer && allowed() && (context || dirty)) frame = requestAnimationFrame(draw); };
+  const inkBusy = () => (window.innerWidth <= 800 || !fine.matches) && root.dataset.promoInk === 'writing';
+  const schedule = () => { if (!frame && !scrollTimer && !inkBusy() && allowed() && (context || dirty)) frame = requestAnimationFrame(draw); };
   const stop = () => {
     clearTimeout(scrollTimer); scrollTimer = undefined;
     cancelAnimationFrame(frame); frame = 0; previous = 0; pointer = undefined; clearCard();
@@ -93,7 +94,7 @@
       try { context = canvas.getContext('2d', { alpha: true }); } catch { /* Static atmosphere remains available. */ }
       if (context) resize();
     }
-    if (resizePending) resize();
+    if (resizePending && !inkBusy()) resize();
     palette(); schedule();
   };
   cards.forEach(element => {
@@ -119,13 +120,13 @@
     clearTimeout(scrollTimer);
     scrollTimer = setTimeout(() => {
       scrollTimer = undefined;
-      if (resizePending) resize();
+      if (resizePending && !inkBusy()) resize();
       schedule();
     }, 160);
   }, { passive: true });
   window.addEventListener('resize', () => {
     clearCard();
-    if (scrollTimer) { resizePending = true; return; }
+    if (scrollTimer || inkBusy()) { resizePending = true; return; }
     resize(); schedule();
   }, { passive: true });
   document.addEventListener('visibilitychange', sync);
@@ -136,6 +137,15 @@
   }));
   connection?.addEventListener?.('change', sync);
   new MutationObserver(palette).observe(root, { attributes: true, attributeFilter: ['data-theme', 'style'] });
+  if (document.querySelector('.theme-promo__ink')) new MutationObserver(() => {
+    if (inkBusy()) {
+      // Leave the last particle frame visible while the foreground strokes are drawing.
+      cancelAnimationFrame(frame); frame = 0; previous = 0;
+      return;
+    }
+    if (resizePending && !scrollTimer) resize();
+    schedule();
+  }).observe(root, { attributes: true, attributeFilter: ['data-promo-ink'] });
   if (ripple && typeof Element.prototype.animate === 'function') document.addEventListener('click', event => {
     if (!allowed() || event.button > 0 || !(event.target instanceof Element)) return;
     const host = event.target.closest('button, a.button');

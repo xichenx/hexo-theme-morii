@@ -6,8 +6,8 @@ const path = require('node:path');
 const vm = require('node:vm');
 const { JSDOM } = require('jsdom');
 const source = fs.readFileSync(path.join(__dirname, '../source/js/effects.js'), 'utf8');
-function fixture({ reduced = false, saveData = false, motion = 'on', width = 1280, support = true, preference, tilt = true, ripple = true } = {}) {
-  const dom = new JSDOM(`<html data-motion="${motion}"><body><div class="morii-atmosphere"><canvas id="morii-particles" data-density="48"></canvas></div><main id="main"><a class="feature-card" href="#">Read</a></main><script data-spotlight="on" data-tilt="${tilt ? 'on' : 'off'}" data-ripple="${ripple ? 'on' : 'off'}"></script></body></html>`, { runScripts: 'outside-only', pretendToBeVisual: true, url: 'https://example.test/' });
+function fixture({ reduced = false, saveData = false, motion = 'on', width = 1280, support = true, preference, tilt = true, ripple = true, promo = false } = {}) {
+  const dom = new JSDOM(`<html data-motion="${motion}"><body><div class="morii-atmosphere"><canvas id="morii-particles" data-density="48"></canvas></div><main id="main"><a class="feature-card" href="#">Read</a>${promo ? '<svg class="theme-promo__ink"></svg>' : ''}</main><script data-spotlight="on" data-tilt="${tilt ? 'on' : 'off'}" data-ripple="${ripple ? 'on' : 'off'}"></script></body></html>`, { runScripts: 'outside-only', pretendToBeVisual: true, url: 'https://example.test/' });
   const { window } = dom;
   Object.defineProperty(window.document, 'currentScript', { value: window.document.querySelector('script') });
   Object.defineProperty(window, 'innerWidth', { value: width, configurable: true });
@@ -59,6 +59,22 @@ test('mobile scrolling stops particle redraws and defers viewport resize until s
   resume();
   assert.equal(canvas.width, 420);
   f.tick(300);
+  assert.equal(f.painted, 24);
+  f.dom.window.close();
+});
+test('wordmark ink temporarily pauses mobile particles without clearing the current frame', async () => {
+  const f = fixture({ width: 390, promo: true });
+  const root = f.window.document.documentElement;
+  f.tick();
+  const before = f.cleared;
+  root.dataset.promoInk = 'writing';
+  await Promise.resolve();
+  assert.equal(f.pending.size, 0);
+  assert.equal(f.cleared, before);
+  delete root.dataset.promoInk;
+  await Promise.resolve();
+  assert.equal(f.pending.size, 1);
+  f.tick(150);
   assert.equal(f.painted, 24);
   f.dom.window.close();
 });

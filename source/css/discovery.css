@@ -3,12 +3,21 @@
   padding: clamp(18px, 2vw, 28px); border: 1px solid var(--line); border-radius: 28px;
   background: #eef0fa; color: #292e64;
 }
-html[data-theme=dark] .theme-promo { background: #242740; color: #dedcff; }
-html[data-theme=dark] .theme-promo__wordmark img { filter: brightness(1.65) saturate(.78); }
+html[data-theme=dark] .theme-promo {
+  background: #242740; color: #dedcff;
+  --promo-ink-10: #54d2ce; --promo-ink-31: #819fff; --promo-ink-49: #b795ff;
+  --promo-ink-68: #ff80b7; --promo-ink-87: #ffab6f;
+}
 .theme-promo__wordmark { display: grid; flex: 1; min-height: 164px; place-items: center; }
 .theme-promo h2 { position: relative; margin: 0; width: min(100%, 530px); text-align: center; }
-.theme-promo__wordmark img { display: block; width: 100%; height: auto; }
-.theme-promo__ink { position: absolute; pointer-events: none; }
+.theme-promo__art { display: block; width: 100%; height: auto; }
+@media (max-width: 800px), (hover: none), (pointer: coarse) {
+  .theme-promo__lettering { fill: url("#morii-promo-colors-touch"); }
+  html[data-theme=dark] .theme-promo {
+    --promo-touch-teal: #00a3b0; --promo-touch-blue: #3b6fff; --promo-touch-violet: #9352ff;
+    --promo-touch-pink: #ff40a6; --promo-touch-orange: #ff6b1c;
+  }
+}
 @media (min-width: 801px) {
   .hero:has(> .theme-promo) {
     --promo-columns: minmax(0, 1.27fr) minmax(0, 1fr);
@@ -16,32 +25,21 @@ html[data-theme=dark] .theme-promo__wordmark img { filter: brightness(1.65) satu
   }
 }
 @supports (mask-image: url("")) or (-webkit-mask-image: url("")) {
-  @media (min-width: 801px) and (hover: hover) and (pointer: fine) and (forced-colors: none) {
-    .theme-promo { --promo-colors: #00848e 10%, #325bdc 31%, #7744da 49%, #ce3686 68%, #d9591b 87%; }
-    html[data-theme=dark] .theme-promo { --promo-colors: #54d2ce 10%, #819fff 31%, #b795ff 49%, #ff80b7 68%, #ffab6f 87%; }
-    .theme-promo h2::after {
-      content: ""; position: absolute; inset: 0;
-      background: linear-gradient(100deg, var(--promo-colors));
-      -webkit-mask: url("../icons/brand/morii-promo-wordmark.webp") center / cover no-repeat;
-      mask: url("../icons/brand/morii-promo-wordmark.webp") center / cover no-repeat;
-    }
-    .theme-promo__wordmark img { opacity: 0; }
-  }
   @media (prefers-reduced-motion: no-preference) and (forced-colors: none) {
     @media (max-width: 800px), (hover: none), (pointer: coarse) {
       .theme-promo { --ink-duration-scale: .72; }
     }
-    html[data-promo-ink] .theme-promo:not([data-writing]) h2 { opacity: 0; }
-    html[data-motion=on] .theme-promo[data-writing] h2 {
+    html[data-promo-ink] .theme-promo__lettering {
       -webkit-mask: url("#morii-promo-ink");
       mask: url("#morii-promo-ink");
     }
-    html[data-motion=on] .theme-promo[data-writing] .theme-promo__ink path {
-      stroke-dasharray: 1;
+    html[data-promo-ink] .theme-promo__ink path { stroke-dasharray: 1 2; stroke-dashoffset: 1; }
+    html[data-promo-ink] .theme-promo [data-ink-end] { opacity: 0; }
+    .theme-promo[data-writing] .theme-promo__ink path {
       animation: morii-write calc(var(--ink-time) * var(--ink-duration-scale, 1)) var(--ink-easing, linear) calc(var(--ink-delay, 0s) * var(--ink-duration-scale, 1)) both;
     }
-    html[data-motion=on] .theme-promo[data-writing] [data-ink-end] {
-      animation: morii-ink-settle .14s linear calc(2.45s * var(--ink-duration-scale, 1)) both;
+    .theme-promo[data-writing] [data-ink-end] {
+      animation: morii-ink-settle .14s linear calc(2.72s * var(--ink-duration-scale, 1)) both;
     }
     @keyframes morii-write { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
     @keyframes morii-ink-settle { from { opacity: 0; } to { opacity: 1; } }

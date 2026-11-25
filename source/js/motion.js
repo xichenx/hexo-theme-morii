@@ -5,12 +5,9 @@
   const home = Boolean(main.querySelector('.hero__main'));
   const promo = main.querySelector('.theme-promo');
   const wordmark = promo?.querySelector('h2');
-  const artwork = wordmark?.querySelector('img');
   const inkEnd = promo?.querySelector('[data-ink-end]');
   let writingObserver;
-  let decodeTimeout;
   const finishWriting = () => {
-    clearTimeout(decodeTimeout);
     writingObserver?.disconnect();
     writingObserver = undefined;
     if (root.dataset.promoInk) delete root.dataset.promoInk;
@@ -23,25 +20,19 @@
     ? matchMedia('(min-width: 801px) and (hover: hover) and (pointer: fine)') : null;
   const startWriting = () => {
     if (root.dataset.promoInk !== 'pending') return;
-    if (!inkEnd || !artwork?.decode || preference?.matches || document.hidden || promo.contains(document.activeElement)) {
+    if (!inkEnd || preference?.matches || document.hidden || promo.contains(document.activeElement)) {
       finishWriting();
       return;
     }
-    root.dataset.promoInk = 'decoding';
-    decodeTimeout = setTimeout(finishWriting, 4500);
-    artwork.decode().then(() => {
-      if (root.dataset.promoInk !== 'decoding') return;
-      clearTimeout(decodeTimeout);
-      root.dataset.promoInk = 'ready';
-      writingObserver = new IntersectionObserver(([entry]) => {
-        if (root.dataset.promoInk !== 'ready' || entry.intersectionRatio < .35) return;
-        writingObserver.disconnect();
-        writingObserver = undefined;
-        root.dataset.promoInk = 'writing';
-        promo.setAttribute('data-writing', '');
-      }, { threshold: .35 });
-      writingObserver.observe(wordmark);
-    }).catch(finishWriting);
+    root.dataset.promoInk = 'ready';
+    writingObserver = new IntersectionObserver(([entry]) => {
+      if (root.dataset.promoInk !== 'ready' || entry.intersectionRatio < .35) return;
+      writingObserver.disconnect();
+      writingObserver = undefined;
+      root.dataset.promoInk = 'writing';
+      promo.setAttribute('data-writing', '');
+    }, { threshold: .35 });
+    writingObserver.observe(wordmark);
   };
   const selector = '.hero__main, .hero-mini, .section-heading, .feature-card, .post-card, .profile-card, .side-card, .discovery-card, .selected-card, .friend-card, .feed-card, .photo-card, .taxonomy-card, .related-card, .archive-tree-item, .page-intro, .article-header';
   const seen = new WeakSet();

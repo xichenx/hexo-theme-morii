@@ -126,6 +126,10 @@ html[data-effects='on'][data-glass='off'] dialog::backdrop { -webkit-backdrop-fi
   html[data-motion='on'] .morii-atmosphere::after { animation: morii-aurora 30s ease-in-out -10s infinite alternate-reverse; }
 }
 html[data-effects-paused] .morii-atmosphere::before, html[data-effects-paused] .morii-atmosphere::after { animation-play-state: paused !important; }
+@media (max-width: 800px), (hover: none), (pointer: coarse) {
+  html[data-promo-ink=writing] .morii-atmosphere::before,
+  html[data-promo-ink=writing] .morii-atmosphere::after { animation-play-state: paused; }
+}
 @keyframes morii-aurora { to { transform: translate(12vw, 10vh) rotate(12deg) scale(1.12); } }
 @keyframes morii-sheen { to { left: 150%; } }
 @media (max-width: 767px) {
