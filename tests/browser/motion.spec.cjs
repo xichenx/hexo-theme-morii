@@ -8,7 +8,9 @@ test.use({ reducedMotion: 'no-preference' });
 test('layered entrances finish cleanly and navigation remains interactive', async ({ page, viewport }, info) => {
   await ready(page);
   const hero = page.locator('.hero__main');
-  await expect.poll(() => hero.evaluate(e => e.style.getPropertyValue('--morii-ambient-state'))).toBe('running');
+  const desktop = await page.evaluate(() => matchMedia('(min-width: 801px) and (hover: hover) and (pointer: fine)').matches);
+  if (desktop) await expect.poll(() => hero.evaluate(e => e.style.getPropertyValue('--morii-ambient-state'))).toBe('running');
+  else await expect(hero).toHaveCSS('--morii-ambient-state', '');
   await expect.poll(() => hero.evaluate(e => e.getAnimations({ subtree: true }).filter(a => a.effect?.target instanceof Element && a.effect.target.closest('.hero__actions, h1, .eyebrow, p') && !a.animationName).length)).toBe(0);
   await expect(hero.locator('h1')).toHaveCSS('opacity', '1');
   const promo = page.getByRole('region', { name: 'Morii', exact: true });
@@ -87,7 +89,8 @@ test('changing reduced motion cancels entrances and ambient movement', async ({ 
   await expect(page.locator('.navigation-card').first()).toBeVisible();
 });
 
-test('the Morii wordmark writes once and settles into the complete artwork', async ({ page }) => {
+test('the desktop Morii wordmark writes once and settles into the complete artwork', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'Touch screens use the lighter bitmap rendering path.');
   let releaseArtwork;
   const artwork = new Promise(resolve => { releaseArtwork = resolve; });
   await page.route('**/morii-promo-wordmark.webp', async route => {
@@ -99,7 +102,7 @@ test('the Morii wordmark writes once and settles into the complete artwork', asy
   try {
     await page.goto(prefix, { waitUntil: 'domcontentloaded' });
     await wordmark.scrollIntoViewIfNeeded();
-    await expect(page.locator('html')).toHaveAttribute('data-promo-ink', 'ready');
+    await expect(page.locator('html')).toHaveAttribute('data-promo-ink', 'decoding');
     await expect(wordmark).toHaveCSS('opacity', '0');
     await expect(promo).not.toHaveAttribute('data-writing', '');
   } finally {
@@ -117,4 +120,47 @@ test('the Morii wordmark writes once and settles into the complete artwork', asy
   await promo.scrollIntoViewIfNeeded();
   await expect(promo).not.toHaveAttribute('data-writing', '');
   await expect(wordmark).toHaveCSS('mask-image', 'none');
+});
+
+test('mobile headline stays fixed while the wordmark writes with one mask', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'Touch screens use a shorter ink animation.');
+  let releaseMotion;
+  const gate = new Promise(resolve => { releaseMotion = resolve; });
+  const fonts = [];
+  page.on('request', request => { if (request.resourceType() === 'font') fonts.push(request.url()); });
+  await page.route(/\/js\/motion\.[a-f0-9]+\.js$/, async route => {
+    await gate;
+    await route.continue();
+  });
+  const hero = page.locator('.hero__main h1');
+  const promo = page.locator('.theme-promo');
+  const artwork = promo.locator('h2 img');
+  let before;
+  try {
+    await page.goto(prefix, { waitUntil: 'commit' });
+    await expect(hero).toBeVisible();
+    await expect(hero).toHaveCSS('opacity', '1');
+    await expect(artwork).toHaveCSS('opacity', '1');
+    await expect(artwork).toHaveJSProperty('complete', true);
+    expect(await artwork.evaluate(image => image.naturalWidth)).toBeGreaterThan(0);
+    before = await hero.boundingBox();
+  } finally {
+    releaseMotion();
+  }
+  await page.waitForLoadState('load');
+  await expect(hero).toHaveCSS('translate', 'none');
+  expect(await hero.boundingBox()).toEqual(before);
+  expect(fonts).toEqual([]);
+  await promo.locator('h2').scrollIntoViewIfNeeded();
+  await expect(promo).toHaveAttribute('data-writing', '');
+  await expect(promo.locator('h2')).toHaveCSS('mask-image', /morii-promo-ink/);
+  expect(await promo.locator('h2').evaluate(heading => getComputedStyle(heading, '::after').content)).toBe('none');
+  await expect(promo.locator('[data-ink-end]')).toHaveCSS('animation-delay', '1.764s');
+  await expect(promo).not.toHaveAttribute('data-writing');
+  await expect(promo.locator('h2')).toHaveCSS('mask-image', 'none');
+  await expect(artwork).toHaveCSS('opacity', '1');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.reload({ waitUntil: 'load' });
+  await expect(promo).not.toHaveAttribute('data-writing');
+  await expect(artwork).toHaveCSS('opacity', '1');
 });

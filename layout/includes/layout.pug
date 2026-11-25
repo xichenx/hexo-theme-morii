@@ -61,8 +61,6 @@ html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || them
       link(rel='stylesheet' href=morii_asset('/css/friends.css'))
     if page.type === 'music'
       link(rel='stylesheet' href=morii_asset('/css/music.css'))
-    else
-      link(rel='stylesheet' href=morii_asset('/css/music.css') media='print' data-deferred-style)
     if page.type === 'cinema'
       link(rel='stylesheet' href=morii_asset('/css/cinema.css'))
     if gameHall
@@ -217,7 +215,8 @@ html(lang=morii_locale() style=morii_accent() data-motion=(!theme.motion || them
       script(src=url_for(morii_locale_asset()) defer)
     script(src=morii_asset('/js/i18n.js') defer)
     script(src=morii_asset('/js/theme.js') defer)
-    script(src=morii_asset('/js/music.js') defer)
+    if page.type === 'music'
+      script(src=morii_asset('/js/music.js') defer)
     if page.type === 'cinema'
       script(src=morii_asset('/js/cinema.js') defer)
     if visualEffects.enabled

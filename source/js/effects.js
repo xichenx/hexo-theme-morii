@@ -13,6 +13,7 @@
   const ripples = new Map();
   let context, points = [], width = 0, height = 0, frame = 0, previous = 0;
   let pointer, card, dirty = false, stopped = false, printing = false;
+  let scrollTimer, resizePending = false;
   let color = '#5568f6';
   const cards = spotlight || tilt ? [...document.querySelectorAll('#main :is(.feature-card, .post-card, .selected-card, .discovery-card, .friend-card, .related-card)')] : [];
   const allowed = () => !stopped && !printing && !document.hidden && root.dataset.motion !== 'off' && !reduced.matches && !contrast.matches && !connection?.saveData;
@@ -21,8 +22,10 @@
     card?.style.removeProperty('--tilt-x'); card?.style.removeProperty('--tilt-y');
     card = undefined; dirty = false;
   };
-  const schedule = () => { if (!frame && allowed() && (context || dirty)) frame = requestAnimationFrame(draw); };
+  const compact = () => window.innerWidth < 768 || !fine.matches;
+  const schedule = () => { if (!frame && !scrollTimer && allowed() && (context || dirty)) frame = requestAnimationFrame(draw); };
   const stop = () => {
+    clearTimeout(scrollTimer); scrollTimer = undefined;
     cancelAnimationFrame(frame); frame = 0; previous = 0; pointer = undefined; clearCard();
     context?.clearRect(0, 0, width, height);
     for (const [node, animation] of ripples) { animation.cancel(); node.remove(); }
@@ -30,13 +33,14 @@
     root.setAttribute('data-effects-paused', '');
   };
   const resize = () => {
+    resizePending = false;
     width = window.innerWidth; height = window.innerHeight;
     if (!context || !width || !height) return;
-    const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
+    const ratio = Math.min(window.devicePixelRatio || 1, compact() ? 1 : 1.5);
     canvas.width = Math.round(width * ratio); canvas.height = Math.round(height * ratio);
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
     const configured = Number(canvas.dataset.density);
-    const count = Math.min(width < 768 ? 18 : 80, Math.max(12, Number.isFinite(configured) ? configured : 48));
+    const count = Math.min(compact() ? 12 : 80, Math.max(12, Number.isFinite(configured) ? configured : 48));
     points = Array.from({ length: Math.round(count) }, () => ({ x: Math.random() * width, y: Math.random() * height, vx: (Math.random() - .5) * 13, vy: -5 - Math.random() * 10, radius: .8 + Math.random() * 1.4 }));
     previous = 0;
   };
@@ -55,7 +59,7 @@
       }
       card.setAttribute('data-light-active', ''); dirty = false;
     }
-    if (context && (!previous || time - previous >= 32)) {
+    if (context && (!previous || time - previous >= (compact() ? 48 : 32))) {
       const elapsed = previous ? Math.min((time - previous) / 1000, .06) : 0;
       previous = time;
       context.clearRect(0, 0, width, height);
@@ -89,6 +93,7 @@
       try { context = canvas.getContext('2d', { alpha: true }); } catch { /* Static atmosphere remains available. */ }
       if (context) resize();
     }
+    if (resizePending) resize();
     palette(); schedule();
   };
   cards.forEach(element => {
@@ -107,10 +112,28 @@
     dirty = Boolean(card); schedule();
   }, { passive: true });
   document.addEventListener('pointerleave', () => { pointer = undefined; clearCard(); });
-  window.addEventListener('scroll', () => { pointer = undefined; clearCard(); }, { passive: true });
-  window.addEventListener('resize', () => { clearCard(); resize(); schedule(); }, { passive: true });
+  window.addEventListener('scroll', () => {
+    pointer = undefined; clearCard();
+    if (!context || !compact() || !allowed()) return;
+    cancelAnimationFrame(frame); frame = 0; previous = 0;
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => {
+      scrollTimer = undefined;
+      if (resizePending) resize();
+      schedule();
+    }, 160);
+  }, { passive: true });
+  window.addEventListener('resize', () => {
+    clearCard();
+    if (scrollTimer) { resizePending = true; return; }
+    resize(); schedule();
+  }, { passive: true });
   document.addEventListener('visibilitychange', sync);
-  [reduced, contrast, fine].forEach(media => media.addEventListener('change', () => { stop(); sync(); }));
+  [reduced, contrast, fine].forEach(media => media.addEventListener('change', () => {
+    stop();
+    if (media === fine && context) resizePending = true;
+    sync();
+  }));
   connection?.addEventListener?.('change', sync);
   new MutationObserver(palette).observe(root, { attributes: true, attributeFilter: ['data-theme', 'style'] });
   if (ripple && typeof Element.prototype.animate === 'function') document.addEventListener('click', event => {

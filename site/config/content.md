@@ -79,7 +79,7 @@ series:
 
 ### 本地图片
 
-主题默认使用可选依赖 `sharp`，为文章 `cover` / `top_img` 和专题 `cover` 生成 WebP 候选图。处理发生在 Hexo 构建时，浏览器通过 `srcset` 与 `sizes` 选择适合屏幕的版本。原始文件和回退地址会保留。
+主题默认使用可选依赖 `sharp`，为文章 `cover` / `top_img`、专题 `cover`、相册封面和相册照片生成 WebP 候选图。处理发生在 Hexo 构建时，浏览器通过 `srcset` 与 `sizes` 选择适合屏幕的版本。相册网格使用缩略图，打开大图时仍使用原图地址。
 
 ```yaml
 images:

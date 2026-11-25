@@ -11,7 +11,9 @@ hexo.extend.generator.register('morii-images', async locals => {
   if (!sharp) { hexo.log.warn('[Morii] Optional sharp dependency is unavailable. Keeping original covers and explicit srcset.'); return []; }
   const list = value => Array.isArray(value) ? value : value?.toArray?.() || [];
   const resources = [...list(locals.posts), ...list(locals.pages), ...Object.values(locals.data?.series || {})].filter(Boolean).flatMap(item => [item.cover, item.top_img]).filter(value => typeof value === 'string');
-  const sources = [...new Set(resources)]; const processed = new Map(); let cursor = 0;
+  const albums = hexo.extend.helper.get('morii_albums').call({}, locals.data?.album);
+  const albumResources = albums.flatMap(album => [album.cover, ...album.photos.map(photo => photo.src)]).filter(Boolean);
+  const sources = [...new Set([...resources, ...albumResources])]; const processed = new Map(); let cursor = 0;
   const worker = async () => {
     while (cursor < sources.length) {
       const src = sources[cursor++], file = localFile(src, hexo);
@@ -26,6 +28,19 @@ hexo.extend.generator.register('morii-images', async locals => {
   const variants = new Map();
   for (const item of prepared.values()) for (const variant of item.variants) variants.set(variant.src.slice(1), { path: variant.src.slice(1), data: variant.data });
   return [...variants.values()];
+});
+hexo.extend.helper.register('morii_album_thumbnail', function (src, isPhoto) {
+  const generated = prepared.get(src);
+  const variants = generated?.variants || [];
+  if (!variants.some(item => item.width < generated.width)) return { src: this.url_for(src) };
+  const fallback = variants.find(item => item.width >= (isPhoto ? 480 : 800)) || variants.at(-1);
+  return {
+    src: this.url_for(fallback.src),
+    srcset: variants.map(item => `${this.url_for(item.src)} ${item.width}w`).join(', '),
+    sizes: isPhoto
+      ? '(max-width: 580px) calc((100vw - 42px) / 2), calc((100vw - 80px) / 3)'
+      : '(max-width: 580px) calc(100vw - 28px), calc((100vw - 70px) / 2)'
+  };
 });
 hexo.extend.helper.register('morii_cover', function (src, owner = {}, role = 'card') {
   const generated = prepared.get(src);

@@ -8,6 +8,7 @@
   if (chrome && !chrome.dataset.inverse) chrome.content = chrome.dataset[root.dataset.theme];
   if (document.currentScript?.hasAttribute('data-promo-ink') && root.dataset.motion === 'on' &&
       typeof IntersectionObserver === 'function' && typeof Element.prototype.animate === 'function' &&
+      typeof CSS !== 'undefined' && (CSS.supports('mask-image', 'url("#morii-promo-ink")') || CSS.supports('-webkit-mask-image', 'url("#morii-promo-ink")')) &&
       typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: no-preference) and (forced-colors: none)').matches) {
     root.dataset.promoInk = 'pending';
     setTimeout(() => {

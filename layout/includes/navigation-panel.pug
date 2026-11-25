@@ -1,5 +1,7 @@
 if !theme.quick_navigation || theme.quick_navigation.enable !== false
-  dialog.navigation-dialog#navigation-dialog(aria-labelledby='navigation-heading')
+  - var navigationMusic = morii_music()
+  - var loadNavigationMusic = page.type !== 'music' && (navigationMusic.tracks.length || navigationMusic.remote)
+  dialog.navigation-dialog#navigation-dialog(aria-labelledby='navigation-heading' data-music-script=loadNavigationMusic ? morii_asset('/js/music.js') : null data-music-style=loadNavigationMusic ? morii_asset('/css/music.css') : null)
     .navigation-dialog__header
       div
         span.section-kicker EXPLORE MORII

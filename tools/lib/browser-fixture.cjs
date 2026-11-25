@@ -27,7 +27,7 @@ const options = {
       edit: { enable: true, url: 'https://github.com/example/blog/edit/main/source/{path}' }
     },
     clock: { enable: true, city: '布局测试城市', latitude: 0, longitude: 0, timezone: 'UTC' },
-    music: { meting: { enable: false }, tracks: [] },
+    music: { meting: { enable: true, id: 'demo', api: 'https://music.example.test/playlist' }, tracks: [] },
     github_calendar: { enable: true, user: 'xichenx', api: 'https://contributions.example.test/calendar' },
     comments: { enable: true, env_id: 'https://comments.example.test/', script_url: '/test-comments.js', load_mode: 'manual' },
     friends_feed: { endpoint: 'https://feed.example.test/articles?source=fixture', page_size: 2 }

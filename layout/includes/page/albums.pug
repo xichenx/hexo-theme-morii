@@ -4,7 +4,8 @@ if albums.length
     each album, index in albums
       a.album-card(href=url_for(album.path) data-image-fallback)
         if album.cover
-          img(src=url_for(album.cover) alt=album.title loading=index < 2 ? 'eager' : 'lazy' fetchpriority=index < 2 ? 'high' : 'low' decoding='async')
+          - var thumbnail = morii_album_thumbnail(album.cover)
+          img(src=thumbnail.src srcset=thumbnail.srcset sizes=thumbnail.sizes alt=album.title loading=index < 2 ? 'eager' : 'lazy' fetchpriority=index === 0 ? 'high' : index === 1 ? 'auto' : 'low' decoding='async')
         .album-card__caption
           span #{album.photos.length} #{morii_t("张照片")}
           strong= album.title

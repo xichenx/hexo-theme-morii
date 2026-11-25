@@ -5,12 +5,12 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { JSDOM } = require('jsdom');
 const source = fs.readFileSync(path.join(__dirname, '../source/js/motion.js'), 'utf8');
-function fixture({ reduced = false, support = true, enabled = true } = {}) {
+function fixture({ reduced = false, support = true, enabled = true, desktop = true } = {}) {
   const dom = new JSDOM(`<html data-motion="${enabled ? 'on' : 'off'}"><body><main id="main"><section class="hero__main"><div class="eyebrow">MORII</div><h1>首页</h1><p>介绍</p><div class="hero__actions"><a href="#">开始阅读</a></div></section><article class="post-card"><a href="#">阅读</a></article></main></body></html>`, { runScripts: 'outside-only', pretendToBeVisual: true });
   const { window } = dom;
   const observers = []; const mutations = []; const animations = [];
   const preference = { matches: reduced, addEventListener(type, listener) { this.changed = listener; } };
-  window.matchMedia = () => preference;
+  window.matchMedia = query => query.includes('pointer: fine') ? { matches: desktop, addEventListener() {} } : preference;
   window.Element.prototype.getClientRects = function () { return this.hidden ? [] : [{}]; };
   if (support) {
     window.IntersectionObserver = class {
@@ -81,7 +81,7 @@ test('reduced motion, hidden pages and print cancel effects without hiding conte
   f.dom.window.close();
 });
 
-test('hero text enters in layers without fading the title or the large background', () => {
+test('desktop hero text enters in layers without fading the title or the large background', () => {
   const f = fixture(); const hero = f.window.document.querySelector('.hero__main');
   f.observers[0].enter([hero]);
   assert.deepEqual(f.animations.map(a => a.options.delay), [0, 45, 90, 135]);
@@ -90,6 +90,14 @@ test('hero text enters in layers without fading the title or the large backgroun
   assert.equal(f.animations.at(-1).cancelled, true);
   f.preference.matches = true; f.preference.changed();
   assert.ok(f.animations.every(a => a.cancelled));
+  f.dom.window.close();
+});
+
+test('compact homepages display readable content without starting entrance observers', () => {
+  const f = fixture({ desktop: false });
+  assert.equal(f.observers.length, 0);
+  assert.equal(f.animations.length, 0);
+  assert.equal(f.window.document.querySelector('h1').textContent, '首页');
   f.dom.window.close();
 });
 

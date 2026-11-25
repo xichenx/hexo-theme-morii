@@ -7,7 +7,7 @@ const pug = require('pug');
 const { JSDOM } = require('jsdom');
 
 test('navigation controls reuse reading preferences, bookmark and the existing audio player', () => {
-  const markup = pug.renderFile(path.join(__dirname, '../layout/includes/navigation-panel.pug'), { theme: {}, is_post: () => true, morii_t: key => key, morii_navigation: () => [] });
+  const markup = pug.renderFile(path.join(__dirname, '../layout/includes/navigation-panel.pug'), { theme: {}, page: {}, is_post: () => true, morii_t: key => key, morii_navigation: () => [], morii_music: () => ({ tracks: [] }) });
   const settings = pug.renderFile(path.join(__dirname, '../layout/includes/reading-settings.pug'), { theme: {}, morii_t: key => key });
   const dom = new JSDOM(`<button id="navigation-open"></button><button id="theme-toggle"></button><button data-save-post="/post/" aria-pressed="false"></button><article class="article-body"></article>${settings}${markup}`, { url: 'https://example.test/post/', runScripts: 'outside-only' });
   const w = dom.window, d = w.document, dialog = d.getElementById('navigation-dialog');

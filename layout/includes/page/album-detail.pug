@@ -11,9 +11,10 @@ if album && album.photos.length
   .photo-grid(data-gallery)
     each photo, index in album.photos
       - var photoCaption = [photo.caption || album.title, photo.address, photo.author ? morii_t("来自 ") + photo.author : '', photo.date].filter(Boolean).join(' · ')
+      - var thumbnail = morii_album_thumbnail(photo.src, true)
       a.photo-card(href=url_for(photo.src) data-caption=photoCaption)
         .photo-card__media(data-image-fallback style=photo.width && photo.height ? '--photo-ratio:' + photo.width + '/' + photo.height : null)
-          img(src=url_for(photo.src) width=photo.width height=photo.height alt=photo.caption || album.title loading=index < 2 ? 'eager' : 'lazy' fetchpriority=index < 2 ? 'high' : 'low' decoding='async')
+          img(src=thumbnail.src srcset=thumbnail.srcset sizes=thumbnail.sizes width=photo.width height=photo.height alt=photo.caption || album.title loading=index < 2 ? 'eager' : 'lazy' fetchpriority=index === 0 ? 'high' : index === 1 ? 'auto' : 'low' decoding='async')
           span.image-placeholder(hidden)
             span #{morii_t("照片暂时无法加载")}
             strong #{morii_t("打开大图重试")}

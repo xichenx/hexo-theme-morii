@@ -27,8 +27,8 @@ function fixture({ reduced = false, saveData = false, motion = 'on', width = 128
 }
 test('particle loop obeys mobile density and pixel ratio budget; theme lifecycle pauses and resumes', () => {
   const f = fixture({ width: 390 }); const { window } = f;
-  f.tick(); assert.equal(f.painted, 18);
-  assert.equal(window.document.querySelector('canvas').width, 585);
+  f.tick(); assert.equal(f.painted, 12);
+  assert.equal(window.document.querySelector('canvas').width, 390);
   assert.equal(f.pending.size, 1);
   Object.defineProperty(window.document, 'hidden', { value: true, configurable: true });
   window.document.dispatchEvent(new window.Event('visibilitychange'));
@@ -39,6 +39,27 @@ test('particle loop obeys mobile density and pixel ratio budget; theme lifecycle
   window.dispatchEvent(new window.Event('afterprint')); assert.equal(f.pending.size, 1);
   window.dispatchEvent(new window.Event('pagehide')); assert.equal(f.pending.size, 0);
   window.dispatchEvent(new window.Event('pageshow')); assert.equal(f.pending.size, 1);
+  f.dom.window.close();
+});
+test('mobile scrolling stops particle redraws and defers viewport resize until scrolling settles', () => {
+  const f = fixture({ width: 390 }); const { window } = f;
+  const canvas = window.document.querySelector('canvas');
+  let resume;
+  window.setTimeout = callback => { resume = callback; return 1; };
+  window.clearTimeout = () => { resume = undefined; };
+  f.tick();
+  window.dispatchEvent(new window.Event('scroll'));
+  assert.equal(f.pending.size, 0);
+  Object.defineProperty(window, 'innerWidth', { value: 420, configurable: true });
+  window.dispatchEvent(new window.Event('resize'));
+  assert.equal(canvas.width, 390);
+  window.dispatchEvent(new window.Event('scroll'));
+  f.tick(200);
+  assert.equal(f.painted, 12);
+  resume();
+  assert.equal(canvas.width, 420);
+  f.tick(300);
+  assert.equal(f.painted, 24);
   f.dom.window.close();
 });
 test('reduced motion, disabled motion and data saver do not allocate a canvas; preference changes cancel running work', () => {

@@ -1,6 +1,6 @@
 - var music = morii_music()
 .music-room(data-music-view data-music-tab='lyrics' data-header-backdrop='inverse')
-  img.music-atmosphere(alt='' aria-hidden='true' hidden)
+  img.music-atmosphere(alt='' aria-hidden='true' decoding='async' hidden)
   .music-room-top
     .music-intro
       span.music-eyebrow MORII / MUSIC ROOM
@@ -13,7 +13,7 @@
     section.music-now(aria-label=morii_t("当前曲目"))
       .music-album
         .music-album-fallback(aria-hidden='true') ♫
-        img(data-music-cover alt=morii_t("歌曲封面") hidden)
+        img(data-music-cover alt=morii_t("歌曲封面") decoding='async' hidden)
         span.music-album-spindle(aria-hidden='true')
         span.music-album-arm(aria-hidden='true')
       .music-now-info

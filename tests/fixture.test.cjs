@@ -137,10 +137,23 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       if (file === 'album/morii/index.html') {
         const photos = [...document.querySelectorAll('.photo-card img')];
         assert.deepEqual(photos.map(image => image.getAttribute('loading')), ['eager', 'eager']);
-        assert.deepEqual(photos.map(image => image.getAttribute('fetchpriority')), ['high', 'high']);
+        assert.deepEqual(photos.map(image => image.getAttribute('fetchpriority')), ['high', 'auto']);
         assert.deepEqual(photos.map(image => image.getAttribute('width')), [null, '128']);
         assert.deepEqual(photos.map(image => image.getAttribute('height')), [null, '128']);
         assert.deepEqual(photos.map(image => image.parentElement.style.getPropertyValue('--photo-ratio')), ['', '128/128']);
+        assert.equal(photos[0].closest('a').getAttribute('href'), `${prefix}icons/brand/morii-logo-v2.png`);
+        assert.equal(photos[1].getAttribute('src'), `${prefix}icons/brand/morii-logo.png`);
+      }
+      if (['album/index.html', 'album/morii/index.html'].includes(file)) {
+        const img = document.querySelector('.album-card img, .photo-card img');
+        if (img.hasAttribute('srcset')) {
+          assert.match(img.getAttribute('src'), /\/images\/morii\/[\da-f]+-\d+\.webp$/);
+          for (const entry of img.getAttribute('srcset').split(', ')) {
+            const url = entry.split(' ')[0];
+            assert.ok(url.startsWith(`${prefix}images/morii/`));
+            assert.ok(fs.existsSync(path.join(output, url.slice(prefix.length))));
+          }
+        } else assert.equal(img.getAttribute('src'), `${prefix}icons/brand/morii-logo-v2.png`);
       }
       for (const node of document.querySelectorAll('script[src],link[rel="stylesheet"],img[src]')) {
         const raw = node.getAttribute('src') || node.getAttribute('href');
@@ -164,8 +177,15 @@ test('theme builds independently at both domain root and a Pages subdirectory', 
       const music = JSON.parse(document.querySelector('#morii-audio-hub').dataset.musicConfig);
       assert.ok(music.remote && music.remote.api.startsWith('https://'));
       const musicStyle = document.querySelector('link[href*="/css/music."]');
-      assert.match(musicStyle.href, /music\.[a-f0-9]{12}\.css$/);
-      assert.equal(musicStyle.media, file === 'music/index.html' ? '' : 'print', `${file}: inactive music styles must not block first paint`);
+      const musicScript = document.querySelector('script[src*="/js/music."]');
+      const musicRoom = file === 'music/index.html';
+      assert.equal(Boolean(musicStyle), musicRoom, `${file}: no idle player stylesheet download`);
+      assert.equal(Boolean(musicScript), musicRoom, `${file}: no idle player script download`);
+      const navigation = document.querySelector('#navigation-dialog');
+      const styleUrl = musicStyle?.getAttribute('href') || navigation.dataset.musicStyle;
+      const scriptUrl = musicScript?.getAttribute('src') || navigation.dataset.musicScript;
+      assert.ok(styleUrl.startsWith(`${prefix}css/music.`) && fs.existsSync(path.join(output, styleUrl.slice(prefix.length))));
+      assert.ok(scriptUrl.startsWith(`${prefix}js/music.`) && fs.existsSync(path.join(output, scriptUrl.slice(prefix.length))));
       for (const name of ['search', 'motion']) assert.equal(document.querySelector(`link[href*="/css/${name}."]`)?.media, 'print');
       dom.window.close();
     }

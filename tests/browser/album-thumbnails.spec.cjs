@@ -6,9 +6,15 @@ installHooks(test);
 test('album thumbnails select any photo and stay in sync with keyboard navigation', async ({ page }) => {
   await ready(page, 'album/morii/');
   const photos = page.locator('[data-gallery] .photo-card');
+  const photo = photos.first().locator('img');
+  if (await photo.getAttribute('srcset')) {
+    await expect(photo).toHaveJSProperty('complete', true);
+    expect(await photo.evaluate(image => image.currentSrc)).toMatch(/\/images\/morii\/[\da-f]+-\d+\.webp$/);
+  }
   const viewer = page.locator('#image-dialog');
   const thumbnails = viewer.getByRole('group', { name: '相册缩略图' });
   await photos.first().click();
+  await expect(viewer.locator('#image-original')).toHaveAttribute('href', /\/icons\/brand\/morii-logo-v2\.png$/);
   await expect(thumbnails.getByRole('button')).toHaveCount(2);
   const first = thumbnails.getByRole('button', { name: /^查看第 1 张/ });
   const second = thumbnails.getByRole('button', { name: /^查看第 2 张/ });
@@ -48,7 +54,9 @@ test('album photos keep their layout when an image fails and let readers retry i
   } : { status: 404, headers: { 'cache-control': 'no-store' } }));
   await card.evaluate(link => {
     link.href = new URL('album-retry.svg', location.href);
-    link.querySelector('img').src = link.href;
+    const img = link.querySelector('img');
+    img.removeAttribute('srcset');
+    img.src = link.href;
   });
   await expect(placeholder).toBeVisible();
   expect(await frames()).toEqual(before);

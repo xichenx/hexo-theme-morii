@@ -22,12 +22,11 @@
     document.querySelector('[data-save-post]')?.click();
     bookmark.setAttribute('aria-pressed', document.querySelector('[data-save-post]')?.getAttribute('aria-pressed') || 'false');
   });
-  let releaseMusic;
-  dialog.querySelector('[data-control-music]')?.addEventListener('click', () => window.MoriiMusic?.toggle());
+  const control = dialog.querySelector('[data-control-music]');
+  let releaseMusic, pendingMusic, musicStyle;
   const connectMusic = () => {
     if (releaseMusic) return;
     const music = window.MoriiMusic;
-    const control = dialog.querySelector('[data-control-music]');
     if (!music || !control) return;
     control.disabled = false;
     const unsubscribe = music.subscribe(state => {
@@ -37,6 +36,45 @@
     });
     releaseMusic = typeof unsubscribe === 'function' ? unsubscribe : () => {};
   };
+  const loadMusic = () => {
+    if (!control) return;
+    if (!musicStyle && dialog.dataset.musicStyle) {
+      const style = document.createElement('link');
+      style.rel = 'stylesheet';
+      style.href = dialog.dataset.musicStyle;
+      style.onerror = () => { style.remove(); musicStyle = null; };
+      musicStyle = style;
+      document.head.append(style);
+    }
+    if (window.MoriiMusic) return connectMusic();
+    if (!dialog.dataset.musicScript || pendingMusic) return;
+    control.disabled = true;
+    control.textContent = t("正在加载播放器…");
+    const script = document.createElement('script');
+    script.src = dialog.dataset.musicScript;
+    const failed = () => {
+      clearTimeout(timeout);
+      if (pendingMusic !== script) return;
+      pendingMusic = null;
+      script.remove();
+      control.disabled = false;
+      control.textContent = t("重试");
+    };
+    const timeout = setTimeout(failed, 12000);
+    script.onload = () => {
+      if (pendingMusic !== script || !window.MoriiMusic) return failed();
+      clearTimeout(timeout);
+      pendingMusic = null;
+      connectMusic();
+    };
+    script.onerror = failed;
+    pendingMusic = script;
+    document.head.append(script);
+  };
+  control?.addEventListener('click', () => {
+    if (window.MoriiMusic) window.MoriiMusic.toggle();
+    else loadMusic();
+  });
   window.addEventListener('pagehide', () => { releaseMusic?.(); releaseMusic = null; });
   window.addEventListener('pageshow', connectMusic);
   connectMusic(); syncControls();
@@ -47,6 +85,7 @@
     if (dialog.open) return;
     if (document.querySelector('dialog[open]')) return;
     syncControls();
+    loadMusic();
     opener = document.activeElement;
     document.getElementById('menu-toggle')?.setAttribute('aria-expanded', 'false');
     document.getElementById('menu-toggle')?.setAttribute('aria-label', t("打开菜单"));

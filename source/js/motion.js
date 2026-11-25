@@ -2,12 +2,15 @@
   const root = document.documentElement;
   const main = document.getElementById('main');
   if (!main) return;
+  const home = Boolean(main.querySelector('.hero__main'));
   const promo = main.querySelector('.theme-promo');
   const wordmark = promo?.querySelector('h2');
   const artwork = wordmark?.querySelector('img');
   const inkEnd = promo?.querySelector('[data-ink-end]');
   let writingObserver;
+  let decodeTimeout;
   const finishWriting = () => {
+    clearTimeout(decodeTimeout);
     writingObserver?.disconnect();
     writingObserver = undefined;
     if (root.dataset.promoInk) delete root.dataset.promoInk;
@@ -16,15 +19,20 @@
   inkEnd?.addEventListener('animationend', finishWriting);
   inkEnd?.addEventListener('animationcancel', finishWriting);
   const preference = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
+  const desktopHome = home && typeof matchMedia === 'function'
+    ? matchMedia('(min-width: 801px) and (hover: hover) and (pointer: fine)') : null;
   const startWriting = () => {
     if (root.dataset.promoInk !== 'pending') return;
     if (!inkEnd || !artwork?.decode || preference?.matches || document.hidden || promo.contains(document.activeElement)) {
       finishWriting();
       return;
     }
-    root.dataset.promoInk = 'ready';
+    root.dataset.promoInk = 'decoding';
+    decodeTimeout = setTimeout(finishWriting, 4500);
     artwork.decode().then(() => {
-      if (root.dataset.promoInk !== 'ready') return;
+      if (root.dataset.promoInk !== 'decoding') return;
+      clearTimeout(decodeTimeout);
+      root.dataset.promoInk = 'ready';
       writingObserver = new IntersectionObserver(([entry]) => {
         if (root.dataset.promoInk !== 'ready' || entry.intersectionRatio < .35) return;
         writingObserver.disconnect();
@@ -56,8 +64,8 @@
       animation.finished.then(() => { if (active.get(element) === animation) active.delete(element); }).catch(() => {});
     } catch { /* Keep the normal, visible page if animation is unavailable. */ }
   };
-  const stop = () => {
-    finishWriting();
+  const stop = (finishInk = true) => {
+    if (finishInk) finishWriting();
     reveals?.disconnect(); ambient?.disconnect(); changes?.disconnect();
     reveals = ambient = changes = undefined;
     for (const element of active.keys()) cancel(element);
@@ -76,7 +84,7 @@
     });
   };
   const start = () => {
-    if (stopped || root.dataset.motion === 'off' || preference?.matches || reveals || typeof IntersectionObserver !== 'function' || typeof Element.prototype.animate !== 'function') return;
+    if (stopped || root.dataset.motion === 'off' || preference?.matches || desktopHome?.matches === false || reveals || typeof IntersectionObserver !== 'function' || typeof Element.prototype.animate !== 'function') return;
     reveals = new IntersectionObserver(entries => {
       if (!reveals || stopped || preference?.matches || root.dataset.motion === 'off') return;
       const groups = new Map();
@@ -122,6 +130,7 @@
     for (const element of active.keys()) if (element.contains(event.target)) cancel(element);
   });
   preference?.addEventListener('change', () => { stop(); start(); });
+  desktopHome?.addEventListener('change', () => { stop(false); start(); });
   document.addEventListener('visibilitychange', visibility);
   window.addEventListener('pagehide', () => { stopped = true; stop(); });
   window.addEventListener('pageshow', event => { if (event.persisted) { stopped = false; visibility(); start(); } });

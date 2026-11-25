@@ -10,7 +10,7 @@ appearance:
     enable: true        # 视觉特效总开关；独立于页面布局
     aurora: true        # 渐变极光背景
     particles: true     # 原生 Canvas 星尘与近邻连线
-    density: 48         # 桌面粒子数量（12–80），手机最多 18 个
+    density: 48         # 桌面粒子数量（12–80），手机最多 12 个，滚动时暂停绘制
     glass: true         # true 毛玻璃，liquid 液态玻璃，false 关闭
     spotlight: true     # 鼠标跟随卡片光晕（精细指针设备）
     tilt: true          # 卡片轻量立体倾斜（精细指针设备）
@@ -235,7 +235,7 @@ series:
 images:
   lazy_article: true # 正文首张图片保持默认加载，其余图片按需加载
   article_captions: false # 从独立正文图片的 title 或 alt 生成图注
-  responsive: true  # 使用可选 sharp 为本地封面生成 WebP 候选
+  responsive: true  # 使用可选 sharp 为本地封面和相册生成 WebP 候选
   widths: [480, 800, 1200]
   quality: 78
   cover_tone: true  # 封面取色只用于文章头部，保持正文主题色

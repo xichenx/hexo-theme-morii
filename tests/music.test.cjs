@@ -55,11 +55,18 @@ test('music queue switches tracks, filters searches and handles playback failure
   rows[0].click();
   await tick();
   assert.equal(paused, false);
+  const queueChanges = new window.MutationObserver(() => {});
+  queueChanges.observe(rows[0].parentElement, { subtree: true, attributes: true, childList: true });
+  player.dispatchEvent(new window.Event('timeupdate'));
+  assert.equal(queueChanges.takeRecords().length, 0);
+  queueChanges.disconnect();
   rows[0].click();
   assert.equal(paused, true);
   document.querySelector('#music-next').click();
   await tick();
   assert.equal(document.querySelector('#music-current-title').textContent, '第二首');
+  assert.equal(rows[0].hasAttribute('aria-current'), false);
+  assert.equal(rows[1].getAttribute('aria-current'), 'true');
   assert.ok(player.src.endsWith('/two.mp3'));
   player.dispatchEvent(new window.Event('ended'));
   await tick();
@@ -78,6 +85,25 @@ test('music queue switches tracks, filters searches and handles playback failure
   assert.ok(document.querySelector('#music-play-status').textContent.includes('暂时无法播放'));
   assert.ok(document.querySelector('#music-source').href.endsWith('/two.mp3'));
   window.close();
+});
+
+test('music room uses the base gradient on phones and restores the cover backdrop on wider screens', () => {
+  const dom = browser(musicMarkup({ title: '音乐', tracks: [{ url: '/one.mp3', cover: '/one.png' }] }));
+  const { window } = dom;
+  const media = { matches: true, addEventListener(type, callback) { this.change = callback; } };
+  window.matchMedia = () => media;
+  window.eval(script('music.js'));
+  const background = window.document.querySelector('.music-atmosphere');
+  assert.equal(background.hasAttribute('src'), false);
+  assert.equal(background.hidden, true);
+  assert.ok(window.document.querySelector('[data-music-cover]').src.endsWith('/one.png'));
+  media.matches = false;
+  media.change();
+  assert.ok(background.src.endsWith('/one.png'));
+  media.matches = true;
+  media.change();
+  assert.equal(background.hasAttribute('src'), false);
+  dom.window.close();
 });
 
 test('remote music retries failure, normalizes Meting fields and rejects unsafe tracks', async () => {

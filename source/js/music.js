@@ -405,6 +405,18 @@
     });
     const cover = room.querySelector('[data-music-cover]');
     cover.addEventListener('error', () => { cover.hidden = true; });
+    const background = room.querySelector('.music-atmosphere');
+    const compactRoom = window.matchMedia?.('(max-width: 760px), (max-width: 960px) and (pointer:coarse)');
+    const syncBackground = () => {
+      const url = compactRoom?.matches ? '' : api.state.tracks[api.state.current]?.cover;
+      background.hidden = !url;
+      if (url && background.getAttribute('src') !== url) background.src = url;
+      if (!url) background.removeAttribute('src');
+    };
+    compactRoom?.addEventListener?.('change', syncBackground);
+    dispose.push(() => compactRoom?.removeEventListener?.('change', syncBackground));
+    let activeRow;
+    let rowPlaying;
     dispose.push(api.subscribe(s => {
       const track = s.tracks[s.current];
       room.classList.toggle('is-playing', s.playing);
@@ -419,17 +431,27 @@
         });
         list.replaceChildren(...rows); filter();
       }
-      [...list.children].forEach((row, index) => {
-        if (index === s.current) row.setAttribute('aria-current', 'true'); else row.removeAttribute('aria-current');
-        row.querySelector('.music-track-action').textContent = index === s.current && s.playing ? 'Ⅱ' : '▶';
-      });
+      const row = list.children[s.current];
+      if (activeRow !== row) {
+        if (activeRow) {
+          activeRow.removeAttribute('aria-current');
+          activeRow.querySelector('.music-track-action').textContent = '▶';
+        }
+        activeRow = row;
+        activeRow?.setAttribute('aria-current', 'true');
+        rowPlaying = undefined;
+      }
+      if (activeRow && rowPlaying !== s.playing) {
+        rowPlaying = s.playing;
+        activeRow.querySelector('.music-track-action').textContent = s.playing ? 'Ⅱ' : '▶';
+      }
       if (track !== renderedTrack) {
         renderedTrack = track; following = true; follow.hidden = true;
         room.querySelector('[data-music-title]').textContent = track?.title || t("选择一首音乐");
         room.querySelector('[data-music-artist]').textContent = track?.artist || t("让旋律陪你片刻");
         cover.hidden = !track?.cover;
-        const background = room.querySelector('.music-atmosphere'); background.hidden = !track?.cover;
-        if (track?.cover) { cover.src = track.cover; background.src = track.cover; } else { cover.removeAttribute('src'); background.removeAttribute('src'); }
+        if (track?.cover) cover.src = track.cover; else cover.removeAttribute('src');
+        syncBackground();
         const source = room.querySelector('[data-music-source]'); source.hidden = !track;
         if (track) source.href = track.url;
       }
