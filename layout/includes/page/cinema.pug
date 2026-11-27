@@ -20,23 +20,25 @@ include cinema-player.pug
         h2#cinema-recent-title= morii_t("最近观看")
         button(type='button' data-cinema-clear-history)= morii_t("清空记录")
       ul.cinema-recent-list(data-cinema-history)
-    .cinema-library
+    section#cinema-catalog.cinema-library(aria-labelledby='cinema-catalog-title' tabindex='-1')
       .cinema-library-heading
-        h2 #{morii_t("片单")} #[small #{films.length} #{morii_t("部作品")}]
+        h2#cinema-catalog-title= morii_t("片单")
+        small(data-cinema-result-count role='status')= morii_t("{0} 部作品", films.length)
+        button.cinema-reset(type='button' data-cinema-reset hidden)= morii_t("清除筛选")
       .cinema-toolbar
         .cinema-filters(role='group' aria-label=morii_t("作品分类"))
           each category in categories
             button.cinema-filter(type='button' data-cinema-filter=category.key aria-pressed=category.key === 'all' ? 'true' : 'false') #{category.name} #[span= category.count]
           button.cinema-filter(type='button' data-cinema-filter='watchlist' aria-pressed='false' hidden) #{morii_t("想看")} #[span(data-cinema-watch-count) 0]
         label.cinema-search
-          span.sr-only #{morii_t("搜索片名")}
+          span.sr-only #{morii_t("搜索片名或年份")}
           svg(viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' aria-hidden='true')
             circle(cx='10.8' cy='10.8' r='6.8')
             path(d='m16 16 4.5 4.5')
-          input(type='search' data-cinema-search placeholder=morii_t("搜索作品") autocomplete='off')
+          input(type='search' data-cinema-search placeholder=morii_t("搜索片名或年份") autocomplete='off')
       .cinema-list(data-cinema-grid)
         each film in films
-          article.cinema-card(data-cinema-card data-type=film.type data-title=film.title data-description=film.description)
+          article.cinema-card(data-cinema-card data-type=film.type data-title=film.title data-year=film.year data-description=film.description)
             a.cinema-card-link(href=url_for('/' + film.path))
               +cinemaPoster(film, false)
               .cinema-card-copy

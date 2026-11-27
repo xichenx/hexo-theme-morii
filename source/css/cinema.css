@@ -1,10 +1,12 @@
 .cinema-page { padding-top: 30px; }
 .cinema { display: grid; gap: 26px; padding-bottom: 55px; }
 .cinema [hidden] { display: none !important; }
-.cinema-library { overflow: hidden; padding: 34px clamp(20px, 3vw, 46px) 12px; border: 1px solid var(--line); border-radius: 23px; background: var(--surface); }
-.cinema-library-heading { margin-bottom: 18px; }
+.cinema-library { overflow: hidden; padding: 34px clamp(20px, 3vw, 46px) 12px; border: 1px solid var(--line); border-radius: 23px; background: var(--surface); scroll-margin-top: calc(var(--header-height) + 12px); }
+.cinema-library-heading { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 9px; min-height: 44px; margin-bottom: 18px; }
 .cinema-library-heading h2 { margin: 0; font-size: clamp(25px, 2.7vw, 34px); letter-spacing: -.04em; }
-.cinema-library-heading h2 small { margin-left: 9px; color: var(--muted); font-size: 13px; font-weight: 600; letter-spacing: 0; }
+.cinema-library-heading small { color: var(--muted); font-size: 13px; font-weight: 600; }
+.cinema-reset { min-height: 44px; margin-inline-start: auto; padding: 0 8px; border: 0; border-radius: 8px; background: transparent; color: var(--accent); font: inherit; font-size: 13px; cursor: pointer; }
+.cinema-reset:hover { background: var(--surface-2); }
 .cinema-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
 .cinema-filters { display: flex; flex-wrap: wrap; gap: 7px; }
 .cinema-filter { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 8px 16px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); font: inherit; font-size: 13px; font-weight: 750; cursor: pointer; }

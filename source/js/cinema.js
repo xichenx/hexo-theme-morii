@@ -15,6 +15,9 @@
   const type = root.querySelector('[data-cinema-type]');
   const noResults = root.querySelector('[data-cinema-no-results]');
   const search = root.querySelector('[data-cinema-search]');
+  const resultCount = root.querySelector('[data-cinema-result-count]');
+  const reset = root.querySelector('[data-cinema-reset]');
+  const searchIndex = new WeakMap();
   const filters = [...root.querySelectorAll('[data-cinema-filter]')];
   const watchFilter = root.querySelector('[data-cinema-filter="watchlist"]');
   const watchCount = root.querySelector('[data-cinema-watch-count]');
@@ -43,13 +46,19 @@
   });
   const watchStorageKey = `morii-cinema-watchlist:${root.dataset.cinema}`;
   const historyKey = `morii-cinema-history:${root.dataset.cinema}`;
+  const catalogKey = `morii-cinema-catalog:${root.dataset.cinema}`;
   const historyLimit = 6;
   let history = [];
   const watchlist = new Set();
-  try {
-    const saved = JSON.parse(localStorage.getItem(watchStorageKey));
-    if (Array.isArray(saved)) saved.filter(id => typeof id === 'string').forEach(id => watchlist.add(id));
-  } catch { /* The watchlist can still be used while the page is open. */ }
+
+  function readWatchlist() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(watchStorageKey));
+      watchlist.clear();
+      if (Array.isArray(saved)) saved.filter(id => typeof id === 'string').forEach(id => watchlist.add(id));
+    } catch { /* The watchlist can still be used while the page is open. */ }
+  }
+  readWatchlist();
 
   function updateWatchlist() {
     let count = 0;
@@ -208,22 +217,46 @@
 
   function filter() {
     if (!search) return;
-    const query = search.value.trim().toLocaleLowerCase();
+    const tokens = search.value.normalize('NFKC').toLowerCase().match(/\S+/g) || [];
+    const filtered = activeFilter !== 'all' || tokens.length > 0;
     let visible = 0;
     cards.forEach(card => {
       const matchesFilter = activeFilter === 'watchlist'
         ? watchlist.has(watchButtons.get(card).dataset.cinemaWatch)
         : activeFilter === 'all' || card.dataset.type === activeFilter;
-      const show = matchesFilter && card.dataset.title.toLocaleLowerCase().includes(query);
+      if (matchesFilter && tokens.length && !searchIndex.has(card)) {
+        searchIndex.set(card, `${card.dataset.title} ${card.dataset.year || ''}`.normalize('NFKC').toLowerCase());
+      }
+      const show = matchesFilter && tokens.every(token => searchIndex.get(card).includes(token));
       card.hidden = !show;
       if (show) visible++;
     });
+    const total = filtered ? t("找到 {0} 部作品", visible) : t("{0} 部作品", visible);
+    if (resultCount.textContent !== total) resultCount.textContent = total;
+    reset.hidden = !filtered;
     if (noResults) {
       noResults.hidden = visible !== 0;
       if (!visible) noResults.textContent = activeFilter === 'watchlist' && watchCount.textContent === '0'
         ? t("想看片单还是空的。返回全部作品，点星标添加。")
         : t("没有找到符合条件的作品，试试别的关键词。");
     }
+  }
+
+  function selectFilter(key) {
+    activeFilter = key;
+    filters.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.cinemaFilter === key)));
+    filter();
+  }
+
+  function restoreCatalog() {
+    if (!search) return;
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(catalogKey));
+      if (!saved) return;
+      search.value = typeof saved.query === 'string' ? saved.query : '';
+      const validFilter = filters.some(button => button.dataset.cinemaFilter === saved.filter);
+      selectFilter(validFilter ? saved.filter : 'all');
+    } catch { /* Browsing still works when session storage is unavailable. */ }
   }
 
   for (const [card, button] of watchButtons) {
@@ -262,7 +295,14 @@
     renderHistory();
   };
   refreshHistory();
-  window.addEventListener('pageshow', event => { if (event.persisted) refreshHistory(); });
+  restoreCatalog();
+  window.addEventListener('pageshow', event => {
+    if (!event.persisted) return;
+    refreshHistory();
+    readWatchlist();
+    updateWatchlist();
+    restoreCatalog();
+  });
   window.addEventListener('storage', event => { if (!event.key || event.key === historyKey) refreshHistory(); });
   close?.addEventListener('click', () => {
     stop();
@@ -271,11 +311,19 @@
     if (selectedButton?.closest('[data-cinema-card]')?.hidden) filters.find(button => button.dataset.cinemaFilter === activeFilter)?.focus();
     else selectedButton?.focus();
   });
-  filters.forEach(button => button.addEventListener('click', () => {
-    activeFilter = button.dataset.cinemaFilter;
-    filters.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
-    filter();
-  }));
-  search?.addEventListener('input', filter);
-  window.addEventListener('pagehide', stop);
+  filters.forEach(button => button.addEventListener('click', () => selectFilter(button.dataset.cinemaFilter)));
+  search?.addEventListener('input', event => { if (!event.isComposing) filter(); });
+  search?.addEventListener('compositionend', filter);
+  reset?.addEventListener('click', () => {
+    search.value = '';
+    search.focus({ preventScroll: true });
+    selectFilter('all');
+  });
+  window.addEventListener('pagehide', () => {
+    stop();
+    if (!search) return;
+    try {
+      sessionStorage.setItem(catalogKey, JSON.stringify({ filter: activeFilter, query: search.value }));
+    } catch { /* The current tab can still browse without saving its filters. */ }
+  });
 })();

@@ -3,6 +3,56 @@ const { test, expect } = require('@playwright/test');
 const { installHooks, ready, noOverflow } = require('./helpers.cjs');
 installHooks(test);
 
+test('cinema restores the catalog filter and search when returning from a detail page', async ({ page }) => {
+  await ready(page, 'cinema/');
+  const anime = page.locator('[data-cinema-filter="anime"]');
+  const search = page.getByRole('searchbox', { name: '搜索片名或年份' });
+  const cards = page.locator('[data-cinema-card]:visible');
+  await anime.click();
+  await search.fill('三体');
+  await expect(cards).toHaveCount(1);
+  await cards.first().getByRole('link', { name: '我的三体' }).click();
+  await page.getByRole('link', { name: '返回片单' }).click();
+  await expect(page).toHaveURL(/\/cinema\/#cinema-catalog$/);
+  await expect(page.getByRole('heading', { name: /^片单/ })).toBeInViewport();
+  await expect(anime).toHaveAttribute('aria-pressed', 'true');
+  await expect(search).toHaveValue('三体');
+  await expect(cards).toHaveCount(1);
+
+  await search.clear();
+  await page.locator('[data-cinema-filter="all"]').click();
+  await page.reload({ waitUntil: 'load' });
+  await expect(search).toHaveValue('');
+  await expect(cards).toHaveCount(4);
+});
+
+test('cinema matches title and year together and clears filters in one step', async ({ page }) => {
+  await ready(page, 'cinema/');
+  const movie = page.locator('[data-cinema-filter="movie"]');
+  const all = page.locator('[data-cinema-filter="all"]');
+  const search = page.getByRole('searchbox', { name: '搜索片名或年份' });
+  const reset = page.getByRole('button', { name: '清除筛选' });
+  const count = page.locator('[data-cinema-result-count]');
+  const cards = page.locator('[data-cinema-card]:visible');
+  await expect(reset).toBeHidden();
+  await movie.click();
+  await search.fill('２０２６　花朵');
+  await expect(count).toHaveText('找到 1 部作品');
+  await expect(cards).toHaveCount(1);
+  await expect(cards.first()).toContainText('花朵');
+  await search.fill('花朵 1900');
+  await expect(count).toHaveText('找到 0 部作品');
+  await expect(cards).toHaveCount(0);
+  await noOverflow(page);
+  await reset.click();
+  await expect(all).toHaveAttribute('aria-pressed', 'true');
+  await expect(search).toBeFocused();
+  await expect(search).toHaveValue('');
+  await expect(count).toHaveText('4 部作品');
+  await expect(cards).toHaveCount(4);
+  await expect(reset).toBeHidden();
+});
+
 test('cinema watchlist filters saved titles, survives reload and supports removal', async ({ page }) => {
   await ready(page, 'cinema/');
   const saved = page.locator('[data-cinema-filter="watchlist"]');
@@ -22,7 +72,7 @@ test('cinema watchlist filters saved titles, survives reload and supports remova
   await expect(saved).toHaveText('想看 1');
   await saved.click();
   await expect(cards).toHaveCount(1);
-  const search = page.getByRole('searchbox', { name: '搜索片名' });
+  const search = page.getByRole('searchbox', { name: '搜索片名或年份' });
   await search.fill('动漫');
   await expect(cards).toHaveCount(0);
   await expect(empty).toContainText('没有找到符合条件的作品');
@@ -33,8 +83,11 @@ test('cinema watchlist filters saved titles, survives reload and supports remova
   await expect(saved).toBeFocused();
   await expect(empty).toContainText('想看片单还是空的');
   await page.reload({ waitUntil: 'load' });
-  await expect(star).toHaveAttribute('aria-pressed', 'false');
+  await expect(saved).toHaveAttribute('aria-pressed', 'true');
   await expect(saved).toHaveText('想看 0');
+  await expect(empty).toContainText('想看片单还是空的');
+  await page.locator('[data-cinema-filter="all"]').click();
+  await expect(star).toHaveAttribute('aria-pressed', 'false');
 });
 
 test('cinema recommendation opens a static detail and fetches video only after play', async ({ page, viewport }, info) => {

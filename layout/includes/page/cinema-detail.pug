@@ -3,7 +3,7 @@ include cinema-player.pug
 
 - var film = page.cinemaItem
 .cinema(data-cinema=url_for('/cinema/'))
-  a.cinema-return(href=url_for('/cinema/'))
+  a.cinema-return(href=url_for('/cinema/') + '#cinema-catalog')
     span.cinema-arrow.cinema-arrow--back(aria-hidden='true')
     = morii_t("返回片单")
   article.cinema-detail(data-cinema-detail data-type=film.type data-title=film.title data-description=film.description)
