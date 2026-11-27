@@ -1,31 +1,23 @@
+include cinema-parts.pug
+include cinema-player.pug
 - var films = morii_cinema_catalog()
 - var categories = [{key:'all', name:morii_t("全部"), count:films.length}, {key:'movie', name:morii_t("电影"), count:films.filter(function(film) { return film.type === 'movie' }).length}, {key:'series', name:morii_t("电视剧"), count:films.filter(function(film) { return film.type === 'series' }).length}, {key:'anime', name:morii_t("动漫"), count:films.filter(function(film) { return film.type === 'anime' }).length}]
 .cinema(data-cinema=url_for('/cinema/'))
   if films.length
-    .cinema-stage(data-cinema-stage hidden)
-      .cinema-stage-heading
-        div
-          span.section-kicker NOW SHOWING
-          h2(data-cinema-title aria-live='polite') #{morii_t("正在放映")}
-        button.cinema-close(type='button' data-cinema-close) #{morii_t("← 返回片单")}
-      .cinema-stage-body
-        .cinema-screen
-          video.cinema-video(data-cinema-video controls preload='none' playsinline hidden)
-          iframe.cinema-embed(data-cinema-embed title=morii_t("电影播放器") allow='autoplay; fullscreen; picture-in-picture' allowfullscreen referrerpolicy='strict-origin-when-cross-origin' sandbox='allow-scripts allow-same-origin allow-presentation' hidden)
-          .cinema-screen-placeholder(data-cinema-placeholder)
-            span.cinema-screen-mark(aria-hidden='true') ✦
-            strong #{morii_t("选一集，开始放映")}
-            span CINEMA · MORII
-        .cinema-now
-          span.cinema-now-type(data-cinema-type) #{morii_t("电影")}
-          p(data-cinema-description)
-          .cinema-episodes-anchor(data-cinema-episodes-anchor)
+    +cinemaPlayer(morii_t("← 返回片单"))
+    - var featured = films.find(function(film) { return film.featured }) || films[0]
+    section.cinema-feature
+      +cinemaPoster(featured, true)
+      .cinema-feature-copy
+        p.cinema-feature-label= morii_t("站长推荐")
+        h2= featured.title
+        +cinemaMeta(featured)
+        if featured.review || featured.description
+          p.cinema-feature-review= featured.review || featured.description
+        a.cinema-feature-link(href=url_for('/' + featured.path)) #{morii_t("看推荐与详情")} #[span(aria-hidden='true') →]
     .cinema-library
       .cinema-library-heading
-        div
-          span.section-kicker THE COLLECTION
-          h2 #{morii_t("片单")} #[small #{films.length} #{morii_t("部作品")}]
-        p #{morii_t("电影、剧集和动漫，挑一部慢慢看。")}
+        h2 #{morii_t("片单")} #[small #{films.length} #{morii_t("部作品")}]
       .cinema-toolbar
         .cinema-filters(role='group' aria-label=morii_t("作品分类"))
           each category in categories
@@ -38,29 +30,18 @@
             path(d='m16 16 4.5 4.5')
           input(type='search' data-cinema-search placeholder=morii_t("搜索作品") autocomplete='off')
       .cinema-list(data-cinema-grid)
-        each film, index in films
+        each film in films
           article.cinema-card(data-cinema-card data-type=film.type data-title=film.title data-description=film.description)
-            button.cinema-card-button(type='button' data-cinema-select aria-label=morii_t("查看 ") + film.title + morii_t(" 的片源") aria-pressed='false')
-              .cinema-poster
-                if film.cover
-                  img(src=url_for(film.cover) alt='' loading=index < 2 ? 'eager' : 'lazy' fetchpriority=index < 2 ? 'high' : 'low' decoding='async')
-                else
-                  span.cinema-poster-mark(aria-hidden='true')= film.type === 'series' ? '◇' : film.type === 'anime' ? '✧' : '✦'
-                span.cinema-poster-index= String(index + 1).padStart(2, '0')
+            a.cinema-card-link(href=url_for('/' + film.path))
+              +cinemaPoster(film, false)
               .cinema-card-copy
-                .cinema-card-top
-                  span.cinema-card-type= film.type === 'series' ? morii_t("电视剧") : film.type === 'anime' ? morii_t("动漫") : morii_t("电影")
-                  if film.year
-                    span= film.year
-                  span= film.episodes.length ? film.episodes.length + (film.type === 'movie' ? morii_t(" 个片源") : morii_t(" 集")) : morii_t("待上架")
                 strong.cinema-card-title= film.title
-                p= film.description || morii_t("挑一段空闲时间，来这里看一场。")
-                span.cinema-card-action= film.episodes.length ? morii_t("查看片源  →") : morii_t("查看详情  →")
-            button.cinema-watch(type='button' data-cinema-watch=film.watchKey aria-label=morii_t("想看：{0}", film.title) aria-pressed='false' hidden)
-              span(aria-hidden='true')
-            .cinema-card-data(hidden)
-              each episode in film.episodes
-                span(data-cinema-episode data-kind=episode.kind data-url=url_for(episode.url) data-title=episode.title)
+                +cinemaMeta(film)
+            +cinemaWatch(film)
+            if film.episodes.length
+              button.cinema-quick(type='button' data-cinema-select aria-label=morii_t("查看 ") + film.title + morii_t(" 的片源") aria-pressed='false' hidden) #{morii_t("查看片源  →")}
+              .cinema-card-data(hidden)
+                +cinemaEpisodes(film)
       p.cinema-empty(data-cinema-no-results hidden) #{morii_t("没有找到符合条件的作品，试试别的关键词。")}
   else
     .cinema-empty.panel

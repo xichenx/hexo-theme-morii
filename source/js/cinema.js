@@ -4,8 +4,11 @@
   const root = document.querySelector('[data-cinema]');
   if (!root) return;
   const cards = [...root.querySelectorAll('[data-cinema-card]')];
+  const entries = [...root.querySelectorAll('[data-cinema-card], [data-cinema-detail]')];
+  const trailer = root.querySelector('[data-cinema-trailer]');
   const video = root.querySelector('[data-cinema-video]');
-  const embed = root.querySelector('[data-cinema-embed]');
+  const embedTemplate = root.querySelector('[data-cinema-embed]');
+  const sourceLink = root.querySelector('[data-cinema-source]');
   const placeholder = root.querySelector('[data-cinema-placeholder]');
   const title = root.querySelector('[data-cinema-title]');
   const description = root.querySelector('[data-cinema-description]');
@@ -15,14 +18,19 @@
   const filters = [...root.querySelectorAll('[data-cinema-filter]')];
   const watchFilter = root.querySelector('[data-cinema-filter="watchlist"]');
   const watchCount = root.querySelector('[data-cinema-watch-count]');
-  const watchButtons = new Map(cards.map(card => [card, card.querySelector('[data-cinema-watch]')]));
+  const watchButtons = new Map(entries.map(entry => [entry, entry.querySelector('[data-cinema-watch]')]));
   const stage = root.querySelector('[data-cinema-stage]');
   const close = root.querySelector('[data-cinema-close]');
   const episodeAnchor = root.querySelector('[data-cinema-episodes-anchor]');
-  if (!video || !embed) return;
   let activeFilter = 'all';
   let episodeList;
+  let embed;
   let selectedButton;
+  const selectButtons = [...root.querySelectorAll('[data-cinema-select]')];
+  const scrollToStage = () => stage.scrollIntoView({
+    behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ? 'instant' : 'smooth',
+    block: 'start'
+  });
   const watchStorageKey = `morii-cinema-watchlist:${root.dataset.cinema}`;
   const watchlist = new Set();
   try {
@@ -37,17 +45,20 @@
       button.setAttribute('aria-pressed', String(saved));
       if (saved) count++;
     }
-    watchCount.textContent = count;
+    if (watchCount) watchCount.textContent = count;
   }
 
   function stop() {
-    video.pause();
-    video.removeAttribute('src');
-    video.load();
-    embed.removeAttribute('src');
-    video.hidden = true;
-    embed.hidden = true;
-    placeholder.hidden = false;
+    if (video?.hasAttribute('src')) {
+      video.pause();
+      video.removeAttribute('src');
+      video.load();
+      video.hidden = true;
+    }
+    embed?.remove();
+    embed = undefined;
+    if (sourceLink) { sourceLink.hidden = true; sourceLink.removeAttribute('href'); }
+    if (placeholder) placeholder.hidden = false;
   }
 
   function play(episode, button) {
@@ -55,30 +66,34 @@
     episodeList?.querySelectorAll('button').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
     placeholder.hidden = true;
     if (episode.dataset.kind === 'embed') {
+      if (episode.dataset.watchUrl) {
+        sourceLink.href = episode.dataset.watchUrl;
+        sourceLink.hidden = false;
+      }
+      embed = embedTemplate.content.firstElementChild.cloneNode(true);
       embed.src = episode.dataset.url;
       embed.title = episode.dataset.title;
-      embed.hidden = false;
+      embedTemplate.after(embed);
     } else {
       video.src = episode.dataset.url;
       video.hidden = false;
       video.play().catch(() => {});
     }
     document.getElementById('music-player')?.pause();
-    stage?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    scrollToStage();
   }
 
-  function select(card) {
+  function select(card, opener, preview) {
     stop();
-    selectedButton = card.querySelector('[data-cinema-select]');
-    cards.forEach(item => {
-      const selected = item === card;
-      item.classList.toggle('is-selected', selected);
-      item.querySelector('[data-cinema-select]').setAttribute('aria-pressed', String(selected));
-    });
-    title.textContent = card.dataset.title;
+    selectedButton = opener;
+    selectButtons.forEach(button => button.setAttribute('aria-pressed', String(button === opener)));
+    title.textContent = preview ? `${card.dataset.title} · ${preview.dataset.title}` : card.dataset.title;
     description.textContent = card.dataset.description || t("选一集，开始播放。");
     type.textContent = { movie: t("电影"), series: t("电视剧"), anime: t("动漫") }[card.dataset.type] || t("电影");
     episodeList?.remove();
+    episodeList = undefined;
+    stage.hidden = false;
+    if (preview) { play(preview, opener); return; }
     episodeList = document.createElement('div');
     episodeList.className = 'cinema-episodes';
     episodeList.setAttribute('role', 'group');
@@ -102,11 +117,11 @@
       episodeList.append(button);
     });
     episodeAnchor.append(episodeList);
-    stage.hidden = false;
-    stage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    scrollToStage();
   }
 
   function filter() {
+    if (!search) return;
     const query = search.value.trim().toLocaleLowerCase();
     let visible = 0;
     cards.forEach(card => {
@@ -132,21 +147,26 @@
       try { localStorage.setItem(watchStorageKey, JSON.stringify([...watchlist])); } catch { /* Keep the current list in memory. */ }
       updateWatchlist();
       filter();
-      if (card.hidden) watchFilter.focus();
+      if (card.hidden) watchFilter?.focus();
     });
     button.hidden = false;
   }
   updateWatchlist();
-  watchFilter.hidden = false;
-  cards.forEach(card => card.querySelector('[data-cinema-select]').addEventListener('click', () => select(card)));
+  if (watchFilter) watchFilter.hidden = false;
+  const entrySelector = '[data-cinema-card], [data-cinema-detail]';
+  selectButtons.forEach(button => {
+    button.hidden = false;
+    button.addEventListener('click', () => select(button.closest(entrySelector), button));
+  });
+  if (trailer) {
+    trailer.hidden = false;
+    trailer.addEventListener('click', () => select(trailer.closest(entrySelector), trailer, trailer));
+  }
   close?.addEventListener('click', () => {
     stop();
     stage.hidden = true;
-    cards.forEach(card => {
-      card.classList.remove('is-selected');
-      card.querySelector('[data-cinema-select]').setAttribute('aria-pressed', 'false');
-    });
-    if (selectedButton?.closest('[data-cinema-card]').hidden) filters.find(button => button.dataset.cinemaFilter === activeFilter)?.focus();
+    selectButtons.forEach(button => button.setAttribute('aria-pressed', 'false'));
+    if (selectedButton?.closest('[data-cinema-card]')?.hidden) filters.find(button => button.dataset.cinemaFilter === activeFilter)?.focus();
     else selectedButton?.focus();
   });
   filters.forEach(button => button.addEventListener('click', () => {

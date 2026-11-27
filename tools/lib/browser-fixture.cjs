@@ -1,5 +1,7 @@
 'use strict';
 const yaml = require('js-yaml');
+const { readFileSync } = require('node:fs');
+const { join } = require('node:path');
 const prefix = '/layout/';
 const title = '长标题布局验证：AndroidInternalsAndRenderingPipelineWithoutWordBreaks'.repeat(3);
 const category = 'Android底层原理与渲染实践';
@@ -34,6 +36,10 @@ const options = {
   },
   // Keep archive fixtures away from month boundaries across host time zones.
   sourceOverrides: {
+    '_data/cinema.yml': readFileSync(join(__dirname, '../../demo/source/_data/cinema.yml'), 'utf8') + '\n' + yaml.dump([
+      { id: 'my-three-body', title: '我的三体', type: 'anime',
+        episodes: [{ title: '第 1 集', url: 'https://www.bilibili.com/bangumi/play/ep30636' }] }
+    ]),
     '_posts/toc-simple.md': '---\ntitle: 简洁目录示例\ndate: 2020-01-15T12:00:00+08:00\nupdated: 2024-02-03 12:00:00\npermalink: posts/toc-simple/\ntoc_style_simple: true\nsidebar_position: left\nmeta_date_type: updated\nmeta_word_count: true\nmeta_reading_time: false\n---\n\n## 第一个章节\n\n正文。\n\n## 第二个章节\n\n更多内容。\n',
     '_posts/outdated-bottom.md': '---\ntitle: 文末时效提醒\ndate: 2020-01-15T12:00:00+08:00\nupdated: 2020-01-15T12:00:00+08:00\npermalink: posts/outdated-bottom/\noutdated_days: 30\n---\n\n## 正文\n\n文末显示提醒。\n',
     '_posts/outdated-top.md': '---\ntitle: 文首时效提醒\ndate: 2020-01-15T12:00:00+08:00\nupdated: 2020-01-15T12:00:00+08:00\npermalink: posts/outdated-top/\noutdated_position: top\n---\n\n## 正文\n\n文首显示提醒。\n',

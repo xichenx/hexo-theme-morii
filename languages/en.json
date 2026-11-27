@@ -708,5 +708,14 @@
   "未注明日期": "Undated",
   "全部月份": "All months",
   "相册缩略图": "Album thumbnails",
-  "查看第 {0} 张照片": "View photo {0}"
+  "查看第 {0} 张照片": "View photo {0}",
+  "站长推荐": "Editor’s pick",
+  "看推荐与详情": "Read the recommendation",
+  "评分 {0}/10": "Rating {0}/10",
+  "为什么推荐": "Why I recommend it",
+  "播放预告片": "Play trailer",
+  "预告片": "Trailer",
+  "作品简介": "Synopsis",
+  "关闭播放器": "Close player",
+  "去 B 站观看": "Watch on Bilibili"
 }

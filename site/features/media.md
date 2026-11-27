@@ -136,7 +136,12 @@ cinema:
 | `year` | 年份文字 | 建议写成 `'2026'` |
 | `description` | 简介 | 可选 |
 | `cover` | 封面图片 | 站内路径或 HTTPS 地址 |
-| `url` | 单个视频直链 | 站内路径或 HTTPS 地址，不是视频网站详情页 |
+| `featured` | 首页推荐 | 设为 `true` 使用这部作品，多个标记时取片单顺序第一部；未标记时推荐第一部 |
+| `review` | 站长短评 | 显示在首页推荐卡与独立详情页 |
+| `rating` | 评分 | 可选，0–10 分 |
+| `trailer` | 预告片 | 填 `url` 或 `embed`，点击后加载 |
+| `watch` | 观看入口 | 每项填 `label` 和正版观看页的 HTTPS `url` |
+| `url` | 单个视频的播放来源 | 站内或 HTTPS 视频直链，或受支持的 B 站视频页和番剧分集页 |
 | `embed` | 单个嵌入播放器地址 | 仅支持主题允许的播放器形式 |
 | `episodes` | 分集列表 | 每集包含 `title` 和 `url` 或 `embed` |
 
@@ -166,6 +171,8 @@ cinema:
 当前代码只接受以下 HTTPS 嵌入地址形式：YouTube 的 `/embed/视频ID`（`www.youtube.com` 或 `www.youtube-nocookie.com`）、Bilibili 的 `player.bilibili.com/player.html`、Vimeo 的 `player.vimeo.com/video/数字ID`。
 
 把平台提供的嵌入代码中 `src` 的完整地址填入 `embed`，不要把整段 `<iframe>` 代码粘进去。普通视频分享页不是嵌入地址；不符合允许形式的地址会被忽略。填写了有效 `embed` 时会优先使用它，而不是同项的 `url`。
+
+B 站视频页和番剧分集页可以直接填在 `url`。支持 `/video/BV…`（含多 P 的 `?p=2`）、`/video/av…` 和 `/bangumi/play/ep…`。分集列表里的每一集可分别填写，预告片也可用 `trailer.url`。主题会在点击后加载官方外链播放器，并提供「去 B 站观看」。整季 `ss…` 和短链接请先打开并复制具体分集页地址。
 
 ## 检查结果
 

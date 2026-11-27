@@ -1,0 +1,21 @@
+mixin cinemaPlayer(closeLabel)
+  .cinema-stage(data-cinema-stage hidden)
+    .cinema-stage-heading
+      div
+        span.section-kicker NOW SHOWING
+        h2(data-cinema-title aria-live='polite') #{morii_t("正在放映")}
+      button.cinema-close(type='button' data-cinema-close)= closeLabel
+    .cinema-stage-body
+      .cinema-screen
+        video.cinema-video(data-cinema-video controls preload='none' playsinline hidden)
+        template(data-cinema-embed)
+          iframe.cinema-embed(title=morii_t("电影播放器") allow='autoplay; fullscreen; picture-in-picture' allowfullscreen referrerpolicy='strict-origin-when-cross-origin' sandbox='allow-scripts allow-same-origin allow-presentation')
+        .cinema-screen-placeholder(data-cinema-placeholder)
+          span.cinema-screen-mark(aria-hidden='true') ✦
+          strong #{morii_t("选一集，开始放映")}
+          span CINEMA · MORII
+      .cinema-now
+        span.cinema-now-type(data-cinema-type) #{morii_t("电影")}
+        p(data-cinema-description)
+        a.cinema-source-link(data-cinema-source target='_blank' rel='noopener noreferrer' hidden) #{morii_t("去 B 站观看")} #[span(aria-hidden='true') ↗]
+        .cinema-episodes-anchor(data-cinema-episodes-anchor)
