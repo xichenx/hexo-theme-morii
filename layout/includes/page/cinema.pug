@@ -4,7 +4,7 @@ include cinema-player.pug
 - var categories = [{key:'all', name:morii_t("全部"), count:films.length}, {key:'movie', name:morii_t("电影"), count:films.filter(function(film) { return film.type === 'movie' }).length}, {key:'series', name:morii_t("电视剧"), count:films.filter(function(film) { return film.type === 'series' }).length}, {key:'anime', name:morii_t("动漫"), count:films.filter(function(film) { return film.type === 'anime' }).length}]
 .cinema(data-cinema=url_for('/cinema/'))
   if films.length
-    +cinemaPlayer(morii_t("← 返回片单"))
+    +cinemaPlayer(morii_t("返回片单"))
     - var featured = films.find(function(film) { return film.featured }) || films[0]
     section.cinema-feature
       +cinemaPoster(featured, true)
@@ -14,7 +14,12 @@ include cinema-player.pug
         +cinemaMeta(featured)
         if featured.review || featured.description
           p.cinema-feature-review= featured.review || featured.description
-        a.cinema-feature-link(href=url_for('/' + featured.path)) #{morii_t("看推荐与详情")} #[span(aria-hidden='true') →]
+        a.cinema-feature-link(href=url_for('/' + featured.path)) #{morii_t("看推荐与详情")} #[span.cinema-arrow(aria-hidden='true')]
+    section.cinema-recent(data-cinema-recent hidden aria-labelledby='cinema-recent-title')
+      .cinema-recent-heading
+        h2#cinema-recent-title= morii_t("最近观看")
+        button(type='button' data-cinema-clear-history)= morii_t("清空记录")
+      ul.cinema-recent-list(data-cinema-history)
     .cinema-library
       .cinema-library-heading
         h2 #{morii_t("片单")} #[small #{films.length} #{morii_t("部作品")}]
@@ -39,7 +44,7 @@ include cinema-player.pug
                 +cinemaMeta(film)
             +cinemaWatch(film)
             if film.episodes.length
-              button.cinema-quick(type='button' data-cinema-select aria-label=morii_t("查看 ") + film.title + morii_t(" 的片源") aria-pressed='false' hidden) #{morii_t("查看片源  →")}
+              button.cinema-quick(type='button' data-cinema-select aria-label=morii_t("查看 ") + film.title + morii_t(" 的片源") aria-pressed='false' hidden)= morii_t("查看片源")
               .cinema-card-data(hidden)
                 +cinemaEpisodes(film)
       p.cinema-empty(data-cinema-no-results hidden) #{morii_t("没有找到符合条件的作品，试试别的关键词。")}

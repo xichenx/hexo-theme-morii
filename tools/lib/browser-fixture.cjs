@@ -38,7 +38,10 @@ const options = {
   sourceOverrides: {
     '_data/cinema.yml': readFileSync(join(__dirname, '../../demo/source/_data/cinema.yml'), 'utf8') + '\n' + yaml.dump([
       { id: 'my-three-body', title: '我的三体', type: 'anime',
-        episodes: [{ title: '第 1 集', url: 'https://www.bilibili.com/bangumi/play/ep30636' }] }
+        episodes: [
+          { title: '第 1 集', url: 'https://www.bilibili.com/bangumi/play/ep30636' },
+          { title: '第 2 集', url: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4' }
+        ] }
     ]),
     '_posts/toc-simple.md': '---\ntitle: 简洁目录示例\ndate: 2020-01-15T12:00:00+08:00\nupdated: 2024-02-03 12:00:00\npermalink: posts/toc-simple/\ntoc_style_simple: true\nsidebar_position: left\nmeta_date_type: updated\nmeta_word_count: true\nmeta_reading_time: false\n---\n\n## 第一个章节\n\n正文。\n\n## 第二个章节\n\n更多内容。\n',
     '_posts/outdated-bottom.md': '---\ntitle: 文末时效提醒\ndate: 2020-01-15T12:00:00+08:00\nupdated: 2020-01-15T12:00:00+08:00\npermalink: posts/outdated-bottom/\noutdated_days: 30\n---\n\n## 正文\n\n文末显示提醒。\n',

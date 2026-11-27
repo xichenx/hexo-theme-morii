@@ -3,9 +3,13 @@ include cinema-player.pug
 
 - var film = page.cinemaItem
 .cinema(data-cinema=url_for('/cinema/'))
-  a.cinema-return(href=url_for('/cinema/'))= morii_t("← 返回片单")
+  a.cinema-return(href=url_for('/cinema/'))
+    span.cinema-arrow.cinema-arrow--back(aria-hidden='true')
+    = morii_t("返回片单")
   article.cinema-detail(data-cinema-detail data-type=film.type data-title=film.title data-description=film.description)
-    +cinemaPoster(film, true)
+    .cinema-detail-cover
+      +cinemaPoster(film, true)
+      +cinemaWatch(film)
     .cinema-detail-heading
       h2= film.title
       +cinemaMeta(film)
@@ -15,20 +19,18 @@ include cinema-player.pug
           h3= morii_t("为什么推荐")
           p= film.review
       .cinema-detail-actions
+        if film.episodes.length
+          button.cinema-quick.cinema-resume(type='button' data-cinema-resume hidden)
+          button.cinema-quick.cinema-play-action(type='button' data-cinema-select aria-pressed='false' hidden)= morii_t("查看片源")
+          .cinema-card-data(hidden)
+            +cinemaEpisodes(film)
+        if film.trailer
+          button.cinema-quick(type='button' data-cinema-trailer data-kind=film.trailer.kind data-url=url_for(film.trailer.url) data-title=film.trailer.title data-watch-url=film.trailer.watchUrl hidden)= morii_t("播放预告片")
+          noscript
+            a(href=url_for(film.trailer.watchUrl || film.trailer.url))= morii_t("播放预告片")
         if film.watch.length
           each link in film.watch
-            a.button.button--primary(href=url_for(link.url) target='_blank' rel='noopener noreferrer') #{link.label} #[span(aria-hidden='true') ↗]
-        +cinemaWatch(film)
-      if film.trailer || film.episodes.length
-        .cinema-detail-actions
-          if film.trailer
-            button.cinema-quick(type='button' data-cinema-trailer data-kind=film.trailer.kind data-url=url_for(film.trailer.url) data-title=film.trailer.title data-watch-url=film.trailer.watchUrl hidden) #{morii_t("播放预告片")}
-            noscript
-              a(href=url_for(film.trailer.watchUrl || film.trailer.url))= morii_t("播放预告片")
-          if film.episodes.length
-            button.cinema-quick(type='button' data-cinema-select aria-pressed='false' hidden) #{morii_t("查看片源  →")}
-            .cinema-card-data(hidden)
-              +cinemaEpisodes(film)
+            a.cinema-quick(href=url_for(link.url) target='_blank' rel='noopener noreferrer') #{link.label} #[span.ui-icon.ui-icon--external(aria-hidden='true')]
       if film.description
         .cinema-detail-section
           h3= morii_t("作品简介")

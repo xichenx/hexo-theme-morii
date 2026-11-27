@@ -3,7 +3,7 @@ mixin cinemaPoster(film, eager)
     if film.cover
       img(src=url_for(film.cover) alt='' width='240' height='360' loading=eager ? 'eager' : 'lazy' fetchpriority=eager ? 'high' : 'low' decoding='async')
     else
-      span.cinema-poster-mark(aria-hidden='true')= film.type === 'series' ? '◇' : film.type === 'anime' ? '✧' : '✦'
+      span.cinema-poster-mark(aria-hidden='true') ▧
 
 mixin cinemaMeta(film)
   .cinema-meta
@@ -19,4 +19,4 @@ mixin cinemaWatch(film)
 
 mixin cinemaEpisodes(film)
   each episode in film.episodes
-    span(data-cinema-episode data-kind=episode.kind data-url=url_for(episode.url) data-title=episode.title data-watch-url=episode.watchUrl)
+    span(data-cinema-episode=morii_cinema_episode_key(episode) data-kind=episode.kind data-url=url_for(episode.url) data-title=episode.title data-watch-url=episode.watchUrl)

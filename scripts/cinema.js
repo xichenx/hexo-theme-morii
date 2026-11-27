@@ -114,6 +114,10 @@ hexo.extend.helper.register('morii_cinema_catalog', function () {
   return catalog(this.site?.data?.cinema);
 });
 
+hexo.extend.helper.register('morii_cinema_episode_key', episode =>
+  createHash('sha256').update(JSON.stringify([episode.title, episode.watchUrl || episode.url])).digest('hex').slice(0, 20)
+);
+
 hexo.extend.generator.register('morii-cinema', locals => {
   if (hexo.theme.config.cinema?.enable === false) return [];
   const label = (value, fallback) => {

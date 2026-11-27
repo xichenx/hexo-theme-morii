@@ -19,11 +19,21 @@
   const watchFilter = root.querySelector('[data-cinema-filter="watchlist"]');
   const watchCount = root.querySelector('[data-cinema-watch-count]');
   const watchButtons = new Map(entries.map(entry => [entry, entry.querySelector('[data-cinema-watch]')]));
+  const historySection = root.querySelector('[data-cinema-recent]');
+  const historyList = root.querySelector('[data-cinema-history]');
+  const resumeButton = root.querySelector('[data-cinema-resume]');
+  const historyEntries = new Map([...watchButtons].map(([entry, button]) => [button.dataset.cinemaWatch, entry]));
   const stage = root.querySelector('[data-cinema-stage]');
   const close = root.querySelector('[data-cinema-close]');
   const episodeAnchor = root.querySelector('[data-cinema-episodes-anchor]');
+  const episodeNav = root.querySelector('[data-cinema-episode-nav]');
+  const episodeStatus = root.querySelector('[data-cinema-episode-status]');
+  const previous = root.querySelector('[data-cinema-prev]');
+  const next = root.querySelector('[data-cinema-next]');
   let activeFilter = 'all';
   let episodeList;
+  let episodeControls = [];
+  let activeEpisode = -1;
   let embed;
   let selectedButton;
   const selectButtons = [...root.querySelectorAll('[data-cinema-select]')];
@@ -32,6 +42,9 @@
     block: 'start'
   });
   const watchStorageKey = `morii-cinema-watchlist:${root.dataset.cinema}`;
+  const historyKey = `morii-cinema-history:${root.dataset.cinema}`;
+  const historyLimit = 6;
+  let history = [];
   const watchlist = new Set();
   try {
     const saved = JSON.parse(localStorage.getItem(watchStorageKey));
@@ -61,9 +74,67 @@
     if (placeholder) placeholder.hidden = false;
   }
 
-  function play(episode, button) {
+  function updateEpisodeNav() {
+    episodeNav.hidden = activeEpisode < 0 || episodeControls.length < 2;
+    if (episodeNav.hidden) return;
+    previous.setAttribute('aria-disabled', String(activeEpisode === 0));
+    next.setAttribute('aria-disabled', String(activeEpisode === episodeControls.length - 1));
+    episodeStatus.textContent = t("{0}（{1}/{2}）", episodeControls[activeEpisode].textContent, activeEpisode + 1, episodeControls.length);
+  }
+
+  function renderHistory() {
+    const valid = history.flatMap(({ film, episode }) => {
+      const entry = historyEntries.get(film);
+      const match = [...(entry?.querySelectorAll('[data-cinema-episode]') || [])]
+        .find(item => item.dataset.cinemaEpisode === episode);
+      return match ? [{ entry, episode: match }] : [];
+    });
+    if (historyList) {
+      historyList.replaceChildren(...valid.map(({ entry, episode }) => {
+        const item = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = entry.querySelector('.cinema-card-link').href;
+        const name = document.createElement('strong');
+        name.textContent = entry.dataset.title;
+        const detail = document.createElement('span');
+        detail.textContent = episode.dataset.title;
+        link.append(name, detail);
+        item.append(link);
+        return item;
+      }));
+      historySection.hidden = !valid.length;
+    }
+    if (resumeButton) {
+      resumeButton.hidden = !valid.length;
+      resumeButton.textContent = valid.length ? t("继续观看 · {0}", valid[0].episode.dataset.title) : '';
+    }
+    return valid[0];
+  }
+
+  function readHistory() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(historyKey));
+      history = Array.isArray(saved) ? saved.filter(record =>
+        typeof record?.film === 'string' && typeof record.episode === 'string').slice(0, historyLimit) : [];
+    } catch { /* Continue with the in-memory history. */ }
+  }
+
+  function saveHistory(records) {
+    history = records;
+    try { localStorage.setItem(historyKey, JSON.stringify(history)); } catch { /* Keep the history in memory. */ }
+    renderHistory();
+  }
+
+  function play(episode, button, card, { keepPosition = false } = {}) {
     stop();
-    episodeList?.querySelectorAll('button').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+    if (episode.hasAttribute('data-cinema-episode')) {
+      readHistory();
+      const film = watchButtons.get(card).dataset.cinemaWatch;
+      saveHistory([{ film, episode: episode.dataset.cinemaEpisode }, ...history.filter(item => item.film !== film)].slice(0, historyLimit));
+    }
+    activeEpisode = episodeControls.indexOf(button);
+    episodeControls.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+    updateEpisodeNav();
     placeholder.hidden = true;
     if (episode.dataset.kind === 'embed') {
       if (episode.dataset.watchUrl) {
@@ -80,20 +151,23 @@
       video.play().catch(() => {});
     }
     document.getElementById('music-player')?.pause();
-    scrollToStage();
+    if (!keepPosition) scrollToStage();
   }
 
-  function select(card, opener, preview) {
+  function select(card, opener, { preview, resume } = {}) {
     stop();
     selectedButton = opener;
     selectButtons.forEach(button => button.setAttribute('aria-pressed', String(button === opener)));
     title.textContent = preview ? `${card.dataset.title} · ${preview.dataset.title}` : card.dataset.title;
-    description.textContent = card.dataset.description || t("选一集，开始播放。");
+    description.textContent = card.dataset.description;
     type.textContent = { movie: t("电影"), series: t("电视剧"), anime: t("动漫") }[card.dataset.type] || t("电影");
     episodeList?.remove();
     episodeList = undefined;
+    episodeControls = [];
+    activeEpisode = -1;
+    updateEpisodeNav();
     stage.hidden = false;
-    if (preview) { play(preview, opener); return; }
+    if (preview) { play(preview, opener, card); return; }
     episodeList = document.createElement('div');
     episodeList.className = 'cinema-episodes';
     episodeList.setAttribute('role', 'group');
@@ -108,16 +182,28 @@
       note.textContent = t("这部作品暂时没有可用片源。");
       episodeList.append(note);
     }
-    episodes.forEach(episode => {
+    let resumeControl;
+    episodeControls = episodes.map(episode => {
       const button = document.createElement('button');
       button.type = 'button';
       button.textContent = episode.dataset.title;
       button.setAttribute('aria-pressed', 'false');
-      button.addEventListener('click', () => play(episode, button));
+      button.addEventListener('click', () => play(episode, button, card));
+      if (episode === resume) resumeControl = button;
       episodeList.append(button);
+      return button;
     });
+    previous.onclick = () => {
+      if (activeEpisode > 0) play(episodes[activeEpisode - 1], episodeControls[activeEpisode - 1], card, { keepPosition: true });
+    };
+    next.onclick = () => {
+      if (activeEpisode >= 0 && activeEpisode < episodes.length - 1) {
+        play(episodes[activeEpisode + 1], episodeControls[activeEpisode + 1], card, { keepPosition: true });
+      }
+    };
     episodeAnchor.append(episodeList);
-    scrollToStage();
+    if (resumeControl) play(resume, resumeControl, card);
+    else scrollToStage();
   }
 
   function filter() {
@@ -160,8 +246,24 @@
   });
   if (trailer) {
     trailer.hidden = false;
-    trailer.addEventListener('click', () => select(trailer.closest(entrySelector), trailer, trailer));
+    trailer.addEventListener('click', () => select(trailer.closest(entrySelector), trailer, { preview: trailer }));
   }
+  resumeButton?.addEventListener('click', () => {
+    readHistory();
+    const recent = renderHistory();
+    if (recent) select(recent.entry, resumeButton, { resume: recent.episode });
+  });
+  root.querySelector('[data-cinema-clear-history]')?.addEventListener('click', () => {
+    saveHistory([]);
+    search?.focus({ preventScroll: true });
+  });
+  const refreshHistory = () => {
+    readHistory();
+    renderHistory();
+  };
+  refreshHistory();
+  window.addEventListener('pageshow', event => { if (event.persisted) refreshHistory(); });
+  window.addEventListener('storage', event => { if (!event.key || event.key === historyKey) refreshHistory(); });
   close?.addEventListener('click', () => {
     stop();
     stage.hidden = true;

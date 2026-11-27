@@ -53,6 +53,12 @@ test('cinema recommendation opens a static detail and fetches video only after p
     expect(posters[1].y).toBe(posters[0].y);
     expect(posters[2].y).toBeGreaterThan(posters[0].y);
     expect(posters[0].width / posters[0].height).toBeCloseTo(2 / 3, 2);
+    const watchButton = page.locator('[data-cinema-card] [data-cinema-watch]').first();
+    const watchTarget = await watchButton.boundingBox();
+    const watchBadge = await watchButton.locator('span').boundingBox();
+    expect(watchTarget.width).toBeGreaterThanOrEqual(44);
+    expect(watchTarget.height).toBeGreaterThanOrEqual(44);
+    expect(watchBadge.width).toBeLessThan(watchTarget.width);
     await noOverflow(page);
     await page.screenshot({ path: info.outputPath('cinema-mobile-home.png'), animations: 'disabled' });
   }
@@ -70,6 +76,7 @@ test('cinema recommendation opens a static detail and fetches video only after p
   await page.getByRole('button', { name: '播放预告片' }).click();
   const player = page.locator('[data-cinema-video]');
   await expect(player).toHaveAttribute('src', /\/flower\.mp4$/);
+  await expect(page.locator('[data-cinema-resume]')).toBeHidden();
   await page.getByRole('button', { name: '关闭播放器' }).click();
   await expect(player).not.toHaveAttribute('src');
   await expect(page.getByRole('button', { name: '播放预告片' })).toBeFocused();
@@ -98,4 +105,74 @@ test('Bilibili episode loads the official iframe on selection and exposes the or
   await page.getByRole('button', { name: '关闭播放器' }).click();
   await expect(player).toHaveCount(0);
   await expect(fallback).toBeHidden();
+});
+
+test('cinema remembers the selected episode locally and can clear the history', async ({ page }) => {
+  await page.route('https://player.bilibili.com/player.html?*', route => route.fulfill({ body: 'Test player' }));
+  await ready(page, 'cinema/');
+  const recent = page.getByRole('region', { name: '最近观看' });
+  await expect(recent).toBeHidden();
+  await page.getByRole('link', { name: '我的三体' }).click();
+  await page.getByRole('button', { name: '查看片源' }).click();
+  await page.getByRole('button', { name: '第 1 集', exact: true }).click();
+  await page.getByRole('link', { name: '返回片单' }).click();
+
+  const historyLink = recent.getByRole('link', { name: '我的三体 第 1 集' });
+  await expect(historyLink).toBeVisible();
+  await noOverflow(page);
+  await historyLink.click();
+  await expect(page.locator('.cinema iframe')).toHaveCount(0);
+  await page.getByRole('button', { name: '继续观看 · 第 1 集' }).click();
+  await expect(page.locator('.cinema iframe')).toHaveAttribute('src', /episodeId=30636/);
+  await expect(page.getByRole('button', { name: '第 1 集', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('link', { name: '返回片单' }).click();
+  await recent.getByRole('button', { name: '清空记录' }).click();
+  await expect(recent).toBeHidden();
+  await page.getByRole('link', { name: '我的三体' }).click();
+  await expect(page.getByRole('button', { name: /继续观看/ })).toBeHidden();
+});
+
+test('cinema episode controls stay by the player and update resume when switching sources', async ({ page, viewport }, info) => {
+  await page.route('https://player.bilibili.com/player.html?*', route => route.fulfill({ body: 'Test player' }));
+  await ready(page, 'cinema/detail/my-three-body/');
+  const nav = page.getByRole('group', { name: '切换分集' });
+  const previous = nav.getByRole('button', { name: '上一集' });
+  const next = nav.getByRole('button', { name: '下一集' });
+  const frame = page.locator('.cinema iframe');
+  const video = page.locator('[data-cinema-video]');
+  await page.getByRole('button', { name: '查看片源' }).click();
+  await expect(nav).toBeHidden();
+  await expect(page.locator('[data-cinema-description]')).toBeHidden();
+  if (viewport.width <= 650) {
+    await page.locator('[data-cinema-stage]').screenshot({ path: info.outputPath('cinema-mobile-episode-picker.png'), animations: 'disabled' });
+  }
+  await page.getByRole('button', { name: '第 1 集', exact: true }).click();
+  await expect(previous).toBeDisabled();
+  await expect(nav.getByRole('status')).toHaveText('第 1 集（1/2）');
+  if (viewport.width <= 650) {
+    const fallback = page.getByRole('link', { name: '去 B 站观看' });
+    const linkBox = await fallback.boundingBox();
+    const episodeBox = await page.getByRole('button', { name: '第 1 集', exact: true }).boundingBox();
+    expect(linkBox.y).toBeLessThan(episodeBox.y);
+    expect(linkBox.height).toBeGreaterThanOrEqual(44);
+    expect(episodeBox.height).toBeGreaterThanOrEqual(44);
+    expect((await next.boundingBox()).height).toBeGreaterThanOrEqual(44);
+    expect((await next.locator('.cinema-arrow').boundingBox()).width).toBe(14);
+    await noOverflow(page);
+    await page.locator('[data-cinema-stage]').screenshot({ path: info.outputPath('cinema-mobile-episode-controls.png'), animations: 'disabled' });
+  }
+  await next.click();
+  await expect(next).toBeDisabled();
+  await expect(frame).toHaveCount(0);
+  await expect(video).toHaveAttribute('src', /\/flower\.mp4$/);
+  await expect(nav.getByRole('status')).toHaveText('第 2 集（2/2）');
+  await noOverflow(page);
+  await previous.click();
+  await expect(video).not.toHaveAttribute('src');
+  await expect(frame).toHaveAttribute('src', /episodeId=30636/);
+  await next.click();
+  await page.reload({ waitUntil: 'load' });
+  await expect(nav).toBeHidden();
+  await page.getByRole('button', { name: '继续观看 · 第 2 集' }).click();
+  await expect(nav.getByRole('status')).toHaveText('第 2 集（2/2）');
 });
